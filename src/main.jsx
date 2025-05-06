@@ -16,13 +16,14 @@ import { SparkProvier } from "./contexts/sparkContext.jsx";
 import WalletHome from "./pages/wallet/wallet.jsx";
 import EditReceivePaymentInformation from "./pages/receiveAmount/receiveAmount.jsx";
 import ReceiveQRPage from "./pages/receiveQRPage/receiveQRPage.jsx";
+import Camera from "./pages/camera/camera.jsx";
 
 function Root() {
   const navigate = useNavigate();
 
   return (
     <AuthProvider navigate={navigate}>
-      <SparkProvier>
+      <SparkProvier navigate={navigate}>
         <AuthGate />
         <Routes>
           {/* Public Routes */}
@@ -89,6 +90,14 @@ function Root() {
             element={
               <SafeAreaComponent>
                 <ReceiveQRPage />
+              </SafeAreaComponent>
+            }
+          />
+          <Route
+            path="/camera"
+            element={
+              <SafeAreaComponent>
+                <Camera />
               </SafeAreaComponent>
             }
           />

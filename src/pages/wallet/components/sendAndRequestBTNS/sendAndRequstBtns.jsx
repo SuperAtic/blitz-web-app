@@ -9,7 +9,10 @@ export default function SendAndRequestBtns() {
       <div className="buttonContainer buttonWhite">
         <img className="buttonImage send" src={arrow} alt="small arrow" />
       </div>
-      <div className="buttonContainer buttonBlue">
+      <div
+        onClick={() => naigate("/camera")}
+        className="buttonContainer buttonBlue"
+      >
         <img className="buttonImage" src={Qr} alt="small arrow" />
       </div>
       <div
