@@ -1,0 +1,7 @@
+.transactionContainer {
+  width: 100%;
+}
+
+.transactionContainer .noTxText {
+  text-align: center;
+}

@@ -1,0 +1,15 @@
+.userBalanceContainer {
+  text-align: center;
+  margin-top: 40px;
+}
+.userBalanceContainer p,
+h1 {
+  margin: 0;
+}
+.userBalanceContainer p {
+  text-transform: uppercase;
+}
+.userBalanceContainer h1 {
+  font-weight: 500;
+  font-size: 40px;
+}

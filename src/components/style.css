@@ -1,0 +1,9 @@
+.safeAreaContainer {
+  width: 95%;
+  max-width: 1500px;
+  height: calc(100% - 40px);
+  padding: 20px 0;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}

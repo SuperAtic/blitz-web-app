@@ -1,0 +1,17 @@
+.qrContainer {
+  width: max-content;
+  background-color: var(--lightModeBackgroundOffset);
+  padding: 10px;
+  border-radius: 8px;
+  height: auto;
+
+  width: 95%;
+  max-width: 275px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.receiveQrPageContent .feeText {
+  margin: 0;
+}
