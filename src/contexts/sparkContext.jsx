@@ -93,6 +93,7 @@ export const SparkProvier = ({ children, navigate }) => {
         trasactions: storedTransaction ? storedTransaction : prev.trasactions,
       };
     });
+    navigate("/wallet");
   };
 
   const setWalletState = async () => {
