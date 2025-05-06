@@ -7,6 +7,7 @@ import {
 } from "@buildonspark/spark-sdk/proto/spark";
 import { TransferDirection } from "@buildonspark/spark-sdk/types";
 import "./style.css";
+import arrow from "../../assets/arrow-left-blue.png";
 
 export default function TransactionContanier({}) {
   const { sparkInformation } = useSpark();
@@ -46,7 +47,7 @@ export default function TransactionContanier({}) {
 
     return <TxItem isDonation={isDonation} tx={tx} index={index} />;
   });
-  return transferElements;
+  return <div className="transactionContainer">{transferElements}</div>;
 }
 
 function TxItem({ tx, index, isDonation }) {
@@ -54,37 +55,36 @@ function TxItem({ tx, index, isDonation }) {
   const isBitcoinPayment = tx.type == "COOPERATIVE_EXIT";
   const isSparkPayment = tx.type === "TRANSFER";
 
-  //   BITCOIN PENDING = TRANSFER_STATUS_SENDER_KEY_TWEAK_PENDING
-  //   BITCOIN CONFIRMED = TRANSFER_STATUS_COMPLETED
-  //   BITCOIN FAILED = TRANSFER_STATUS_RETURNED
+  // BITCOIN PENDING = TRANSFER_STATUS_SENDER_KEY_TWEAK_PENDING
+  // BITCOIN CONFIRMED = TRANSFER_STATUS_COMPLETED
+  // BITCOIN FAILED = TRANSFER_STATUS_RETURNED
 
-  //   SPARK PENDING = TRANSFER_STATUS_SENDER_KEY_TWEAKED
-  //   SPARK CONFIRMED = TRANSFER_STATUS_COMPLETED
+  // SPARK PENDING = TRANSFER_STATUS_SENDER_KEY_TWEAKED
+  // SPARK CONFIRMED = TRANSFER_STATUS_COMPLETED
 
-  //   LIGHTING PENDING = LIGHTNING_PAYMENT_INITIATED
-  //   LIGHTNING CONFIRMED = TRANSFER_STATUS_COMPLETED
+  // LIGHTING PENDING = LIGHTNING_PAYMENT_INITIATED
+  // LIGHTNING CONFIRMED = TRANSFER_STATUS_COMPLETED
 
   return (
-    <div
-      style={{
-        backgroundColor: "gainsboro",
-        padding: 10,
-        margin: 10,
-        display: "flex",
-        justifyContent: "space-between",
-      }}
-      key={index}
-    >
-      <div>
-        <p>{isDonation ? "Donation" : "No description"}</p>
-        <p>{new Date(tx.updated_at_time).toDateString()}</p>
+    <div className="transaction" key={index}>
+      <img
+        style={{
+          transform: `rotate(${
+            tx.transfer_direction === "INCOMING" ? "310deg" : "130deg"
+          })`,
+        }}
+        src={arrow}
+        alt=""
+      />
+      <div className="textContainer">
         <p>
-          {isLightningPayment
-            ? "Lightning"
-            : isBitcoinPayment
-            ? "Bitcion"
-            : "Spark"}
+          {isDonation
+            ? "Donation"
+            : tx.transfer_direction === "INCOMING"
+            ? "Received"
+            : "Sent"}
         </p>
+        <p>{new Date(tx.updated_at_time).toDateString()}</p>
       </div>
       <p>
         {tx.transferDirection === TransferDirection.OUTGOING ? "-" : "+"}
