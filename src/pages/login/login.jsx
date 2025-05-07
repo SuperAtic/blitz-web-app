@@ -24,8 +24,6 @@ function Login() {
   };
   return (
     <div className="passwordContainer">
-      <BackArrow />
-
       <div className="inputContainer">
         <p className="containerDescription">Enter Your Wallet Password</p>
         <p>Password</p>
