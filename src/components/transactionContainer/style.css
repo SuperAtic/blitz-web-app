@@ -18,11 +18,20 @@
 .transactionContainer .transaction img {
   width: 30px;
   height: 30px;
-  margin-right: 20px;
+  margin-right: 10px;
 }
 .transactionContainer .transaction p {
   margin: 0;
 }
 .transactionContainer .transaction .textContainer {
   margin-right: auto;
+}
+.transactionContainer .transaction .dateText {
+  font-weight: 300;
+  font-size: 14px;
+}
+.transactionContainer .viewAllTxText {
+  text-align: center;
+  cursor: pointer;
+  margin: 10px 0;
 }

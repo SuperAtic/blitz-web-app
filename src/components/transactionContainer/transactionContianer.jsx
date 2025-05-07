@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSpark } from "../../contexts/sparkContext";
 import {
   TransferFilter,
@@ -9,8 +9,18 @@ import { TransferDirection } from "@buildonspark/spark-sdk/types";
 import "./style.css";
 import arrow from "../../assets/arrow-left-blue.png";
 
-export default function TransactionContanier({}) {
+export default function TransactionContanier({ frompage }) {
   const { sparkInformation } = useSpark();
+  const includedDonations = useRef(null);
+  const currentTime = new Date();
+
+  if (frompage === "home" && !sparkInformation.isConnected) {
+    return (
+      <div className="transactionContainer">
+        <p className="noTxText">Connecting...</p>
+      </div>
+    );
+  }
 
   if (!sparkInformation?.trasactions?.length) {
     return (
@@ -24,15 +34,13 @@ export default function TransactionContanier({}) {
 
   const transfers = sparkInformation?.trasactions;
 
-  console.log(transfers, "TRANSFERS");
-
   const transferElements = transfers.map((tx, index) => {
     // console.log(tx, index);
     const lastTransaction = transfers[index + 1];
     // console.log(lastTransaction);
-    const currnetTxTime = new Date(tx.createdTime).getTime();
+    const currnetTxTime = new Date(tx.created_at_time).getTime();
     const lastTxTime = lastTransaction
-      ? new Date(lastTransaction.createdTime).getTime()
+      ? new Date(lastTransaction.created_at_time).getTime()
       : 0;
 
     const BUFFER_TIME = 1000 * 10; //10 second buffer time
@@ -43,17 +51,45 @@ export default function TransactionContanier({}) {
       tx?.receiverIdentityPublicKey ===
         "02121157144443ea2d94f5527688adb062b944edec54c21f6f943dc7d5cdfcdbe2";
 
+    if (includedDonations.current) {
+      includedDonations.current = isDonation;
+    }
+
     if (tx.status === "INVOICE_CREATED") return;
 
-    return <TxItem isDonation={isDonation} tx={tx} index={index} />;
+    return (
+      <TxItem
+        isDonation={isDonation}
+        tx={tx}
+        index={index}
+        currentTime={currentTime}
+        currnetTxTime={currnetTxTime}
+      />
+    );
   });
-  return <div className="transactionContainer">{transferElements}</div>;
+
+  console.log(includedDonations);
+  return (
+    <div className="transactionContainer">
+      {transferElements.slice(0, 20)}
+      {transferElements?.length >= 20 && (
+        <p className="viewAllTxText">View all transactions</p>
+      )}
+    </div>
+  );
 }
 
-function TxItem({ tx, index, isDonation }) {
+function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
   const isLightningPayment = tx.type === "PREIMAGE_SWAP";
   const isBitcoinPayment = tx.type == "COOPERATIVE_EXIT";
   const isSparkPayment = tx.type === "TRANSFER";
+
+  const timeDifferenceMs = currentTime - tx.updated_at_time;
+
+  const minutes = timeDifferenceMs / (1000 * 60);
+  const hours = minutes / 60;
+  const days = hours / 24;
+  const years = days / 365;
 
   // BITCOIN PENDING = TRANSFER_STATUS_SENDER_KEY_TWEAK_PENDING
   // BITCOIN CONFIRMED = TRANSFER_STATUS_COMPLETED
@@ -84,10 +120,34 @@ function TxItem({ tx, index, isDonation }) {
             ? "Received"
             : "Sent"}
         </p>
-        <p>{new Date(tx.updated_at_time).toDateString()}</p>
+        <p className="dateText">
+          {`${
+            minutes <= 1
+              ? `Just now`
+              : minutes <= 60
+              ? Math.round(minutes) || ""
+              : hours <= 24
+              ? Math.round(hours)
+              : days <= 365
+              ? Math.round(days)
+              : Math.round(years)
+          } ${
+            minutes <= 1
+              ? ""
+              : minutes <= 60
+              ? "minute" + (Math.round(minutes) === 1 ? "" : "s")
+              : hours <= 24
+              ? "hour" + (Math.round(hours) === 1 ? "" : "s")
+              : days <= 365
+              ? "day" + (Math.round(days) === 1 ? "" : "s")
+              : Math.round(years) === 1
+              ? "year"
+              : "years"
+          } ${minutes < 1 ? "" : "ago"}`}
+        </p>
       </div>
       <p>
-        {tx.transferDirection === TransferDirection.OUTGOING ? "-" : "+"}
+        {tx.transfer_direction === TransferDirection.OUTGOING ? "-" : "+"}
         {tx.total_sent}
       </p>
     </div>

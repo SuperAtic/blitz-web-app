@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import mergeTransactions from "./copyObject";
 
 export const SQL_TABLE_NAME = "SPARK_TRANSACTIONS";
 export const sparkTransactionsEventEmitter = new EventEmitter();
@@ -55,9 +56,12 @@ const idbRequest = (storeName, mode, operation) => {
 
 export const getAllSparkTransactions = async () => {
   try {
-    return await idbRequest(SQL_TABLE_NAME, "readonly", (store) => {
+    const allTxns = await idbRequest(SQL_TABLE_NAME, "readonly", (store) => {
       return store.getAll();
     });
+
+    // Sort by createdTime descending (newest first)
+    return allTxns.sort((a, b) => b.updated_at_time - a.updated_at_time);
   } catch (error) {
     console.error("Error fetching transactions:", error);
     return [];
@@ -126,17 +130,6 @@ export const updateSingleSparkTransaction = async (
 
 export const bulkUpdateSparkTransactions = async (transactions) => {
   if (!Array.isArray(transactions) || transactions.length === 0) return;
-
-  // Merge function (Option 1: Only override if newTx provides a value)
-  const mergeTransactions = (oldTx, newTx) => {
-    const merged = { ...oldTx };
-    for (const key in newTx) {
-      if (newTx[key] !== undefined) {
-        merged[key] = newTx[key];
-      }
-    }
-    return merged;
-  };
 
   try {
     for (const tx of transactions) {
