@@ -2,6 +2,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 .receiveQrPageContent {
   flex: 1;
@@ -12,6 +13,7 @@
 
 .receiveQrPageContent .selectedReceiveOption {
   margin-top: auto;
+  text-transform: capitalize;
 }
 .receiveQrPageContent .qrCodeContainerReceivePage {
   width: max-content;

@@ -14,7 +14,7 @@ export default function ReceiveButtonsContainer({
     <div className="receiveButtonContainer">
       <button
         onClick={() =>
-          navigate("/edit-receive", {
+          navigate("/receiveAmount", {
             state: { from: "receivePage" },
           })
         }
@@ -30,7 +30,7 @@ export default function ReceiveButtonsContainer({
         Copy
       </button>
 
-      <button onClick={() => navigate("/switch-receive-option")}>
+      <button onClick={() => navigate("/receive-options")}>
         Choose format
       </button>
     </div>

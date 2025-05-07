@@ -1,21 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // replaces useNavigation
-// import { useGlobalContextProvider } from "../../../context-store/context";
-// import { ButtonsContainer } from "../../components/admin/homeComponents/receiveBitcoin";
-// import { GlobalThemeView, ThemeText } from "../../functions/CustomElements";
-// import FormattedSatText from "../../functions/CustomElements/satTextDisplay";
-// import { useGlobaleCash } from "../../../context-store/eCash";
-// import GetThemeColors from "../../hooks/themeColors";
-// import ThemeImage from "../../functions/CustomElements/themeImage";
-// import { initializeAddressProcess } from "../../functions/receiveBitcoin/addressGeneration";
-// import FullLoadingScreen from "../../functions/CustomElements/loadingScreen";
-// import QrCodeWrapper from "../../functions/CustomElements/QrWrapper";
-// import { useNodeContext } from "../../../context-store/nodeContext";
-// import { useAppStatus } from "../../../context-store/appStatus";
-// import useHandleBackPressNew from "../../hooks/useHandleBackPressNew";
-// import CustomButton from "../../functions/CustomElements/button";
-// import { crashlyticsLogReport } from "../../functions/crashlyticsLogs";
-// import { ICONS } from "../../constants";
+import { useNavigate, useLocation } from "react-router-dom";
 import copyToClipboard from "../../functions/copyToClipboard";
 import BackArrow from "../../components/backArrow/backArrow";
 import QRCodeQrapper from "../../components/qrCode/qrCode";
@@ -27,20 +11,13 @@ export default function ReceiveQRPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const hasInitialized = useRef(false);
+  const [showReceiveOptions, setShowReceiveOptions] = useState(false);
 
-  //   const { masterInfoObject } = useGlobalContextProvider();
-  //   const { minMaxLiquidSwapAmounts } = useAppStatus();
-  //   const { nodeInformation } = useNodeContext();
-  //   const { ecashWalletInformation } = useGlobaleCash();
-
-  //   const currentMintURL = ecashWalletInformation.mintURL;
-  //   const eCashBalance = ecashWalletInformation.balance;
   const initialSendAmount = location.state?.receiveAmount;
   const paymentDescription = location.state?.description;
-  const selectedRecieveOption =
-    location.state?.selectedRecieveOption || "Lightning";
-
-  //   useHandleBackPressNew();
+  const selectedRecieveOption = (
+    location.state?.selectedRecieveOption || "Lightning"
+  ).toLowerCase();
 
   const [addressState, setAddressState] = useState({
     selectedRecieveOption: selectedRecieveOption,
@@ -58,54 +35,45 @@ export default function ReceiveQRPage() {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
     console.log(
-      "REDERNG",
+      "RENDERING",
       initialSendAmount,
       paymentDescription,
       selectedRecieveOption
     );
-
     initializeAddressProcess({
-      //   nodeInformation,
       userBalanceDenomination: "sats",
       receivingAmount: initialSendAmount,
       description: paymentDescription,
       masterInfoObject: {},
-      //   minMaxSwapAmounts: minMaxLiquidSwapAmounts,
-      //   mintURL: currentMintURL,
       setAddressState,
       selectedRecieveOption,
       navigate,
-      //   eCashBalance,
     });
-  }, [initialSendAmount, paymentDescription, selectedRecieveOption]);
+  }, [initialSendAmount, paymentDescription, selectedRecieveOption, navigate]);
 
   useEffect(() => {
-    if (selectedRecieveOption !== "Bitcoin") return;
-    requestAnimationFrame(() => {
-      navigate("/error", {
-        state: {
-          errorMessage:
-            "Currently, on-chain payment addresses are single-use only...",
-        },
-      });
-    });
-  }, [selectedRecieveOption]);
+    if (selectedRecieveOption !== "bitcoin") return;
+    // requestAnimationFrame(() => {
+    //   navigate("/error", {
+    //     state: {
+    //       errorMessage:
+    //         "Currently, on-chain payment addresses are single-use only...",
+    //     },
+    //   });
+    // });
+  }, [selectedRecieveOption, navigate]);
 
   return (
     <div className="receiveQrPage">
       <TopBar navigate={navigate} />
-
       <div className="receiveQrPageContent">
         <p className="selectedReceiveOption">{selectedRecieveOption}</p>
         <QrCode addressState={addressState} navigate={navigate} />
-
         <ReceiveButtonsContainer
           generatingInvoiceQRCode={addressState.isGeneratingInvoice}
           generatedAddress={addressState.generatedAddress}
         />
-
         <div style={{ marginBottom: "auto" }}></div>
-
         <div
           style={{
             alignItems: "center",
@@ -122,8 +90,6 @@ export default function ReceiveQRPage() {
 }
 
 function QrCode({ addressState, navigate }) {
-  //   const { backgroundOffset } = GetThemeColors();
-
   if (addressState.isGeneratingInvoice) {
     return (
       <div className="qrCodeContainerReceivePage">
@@ -131,7 +97,6 @@ function QrCode({ addressState, navigate }) {
       </div>
     );
   }
-
   if (!addressState.generatedAddress) {
     return (
       <div className="qrCodeContainerReceivePage">
@@ -141,7 +106,6 @@ function QrCode({ addressState, navigate }) {
       </div>
     );
   }
-
   return (
     <div className="qrCodeContainerReceivePage">
       <button

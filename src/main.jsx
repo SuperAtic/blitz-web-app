@@ -113,14 +113,7 @@ function Root() {
                 </SafeAreaComponent>
               }
             />
-            <Route
-              path="/receive-options"
-              element={
-                <SafeAreaComponent>
-                  <SwitchReceiveOption />
-                </SafeAreaComponent>
-              }
-            />
+            <Route path="/receive-options" element={<SwitchReceiveOption />} />
             <Route
               path="/camera"
               element={
