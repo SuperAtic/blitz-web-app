@@ -1,5 +1,6 @@
 import { BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION } from "../constants";
 import { SPARK_TO_LN_FEE, SPARK_TO_SPARK_FEE } from "../constants/math";
+import mergeTransactions from "./copyObject";
 
 import { getSparkTransactions, sendSparkPayment, sparkWallet } from "./spark";
 import {
@@ -14,7 +15,11 @@ export const sparkPaymenWrapper = async ({
   amountSats = 0,
   exitSpeed = "FAST",
   masterInfoObject = {
-    enabledDeveloperSupport: { baseFeePercent: 0.004, baseFee: 4 },
+    enabledDeveloperSupport: {
+      baseFeePercent: 0.004,
+      baseFee: 4,
+      isEnabled: true,
+    },
   },
   fee,
   memo,
@@ -48,7 +53,7 @@ export const sparkPaymenWrapper = async ({
         calculatedFee =
           feeResponse.feeEstimate.originalValue || SPARK_TO_SPARK_FEE;
       }
-      return { didWork: true, fee: calculatedFee + supportFee };
+      return { didWork: true, fee: Math.round(calculatedFee + supportFee) };
     }
 
     let response;
@@ -61,7 +66,7 @@ export const sparkPaymenWrapper = async ({
         }),
         masterInfoObject?.enabledDeveloperSupport?.isEnabled
           ? sendSparkPayment({
-              receiverSparkAddress: process.env.BLITZ_SPARK_SUPPORT_ADDRESSS,
+              receiverSparkAddress: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
               amountSats: supportFee,
             })
           : Promise.resolve(null),
@@ -85,7 +90,7 @@ export const sparkPaymenWrapper = async ({
         }),
         masterInfoObject?.enabledDeveloperSupport?.isEnabled
           ? sendSparkPayment({
-              receiverSparkAddress: process.env.BLITZ_SPARK_SUPPORT_ADDRESSS,
+              receiverSparkAddress: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
               amountSats: supportFee,
             })
           : Promise.resolve(null),
@@ -104,7 +109,7 @@ export const sparkPaymenWrapper = async ({
         sendSparkPayment({ receiverSparkAddress: address, amountSats }),
         masterInfoObject?.enabledDeveloperSupport?.isEnabled
           ? sendSparkPayment({
-              receiverSparkAddress: process.env.BLITZ_SPARK_SUPPORT_ADDRESSS,
+              receiverSparkAddress: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
               amountSats: supportFee,
             })
           : Promise.resolve(null),
@@ -196,35 +201,44 @@ const updatePaymentsState = async (
 ) => {
   try {
     await new Promise((res) => setTimeout(res, 1000));
-    const transactions = await getSparkTransactions(5);
+    const transactionResponse = await getSparkTransactions(5);
+    if (!transactionResponse) throw new Error("Not able to get transactins");
+    const { transfers: transactions } = transactionResponse;
+
     const txHistoryOutgoing =
-      transactions.find(
-        (tx) =>
-          new Date(tx.createdTime).getTime() ===
-          new Date(outgoinPayment.createdAt).getTime()
-      ) || {};
+      transactions.find((tx) => {
+        return (
+          Math.abs(
+            new Date(tx.createdTime).getTime() -
+              new Date(outgoinPayment.createdAt).getTime()
+          ) < 10000 &&
+          tx.receiverIdentityPublicKey !==
+            import.meta.env.VITE_BLITZ_SPARK_PUBKEY
+        );
+      }) || {};
     const txHistorySupport = supportFeePayment
       ? transactions.find(
           (tx) =>
-            new Date(tx.createdTime).getTime() ===
-            new Date(supportFeePayment.createdTime).getTime()
+            Math.abs(
+              new Date(tx.createdTime).getTime() -
+                new Date(supportFeePayment.createdTime).getTime()
+            ) < 10000 &&
+            tx.receiverIdentityPublicKey ===
+              import.meta.env.VITE_BLITZ_SPARK_PUBKEY
         ) || {}
       : null;
 
     const storedPayment = {
-      ...outgoinPayment,
-      ...txHistoryOutgoing,
+      ...mergeTransactions(outgoinPayment, txHistoryOutgoing),
       fee: fee,
       address,
       description: memo,
     };
-
     const supportStoredPayment = supportFeePayment
       ? {
-          ...supportFeePayment,
-          ...txHistorySupport,
+          ...mergeTransactions(supportFeePayment, txHistorySupport),
           description: BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION,
-          address: process.env.BLITZ_SPARK_SUPPORT_ADDRESSS,
+          address: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
           fee: SPARK_TO_SPARK_FEE,
         }
       : null;
@@ -233,6 +247,7 @@ const updatePaymentsState = async (
       ? [storedPayment, supportStoredPayment]
       : [storedPayment];
 
+    console.log(updates, "payment storeage objesct updates");
     await bulkUpdateSparkTransactions(updates);
 
     return storedPayment;
