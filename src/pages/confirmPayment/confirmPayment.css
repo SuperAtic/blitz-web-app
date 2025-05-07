@@ -1,0 +1,27 @@
+.receiveQrPage .confirmTxAnimation {
+  width: 95%;
+  height: auto;
+  max-width: 350px;
+}
+.receiveQrPage .contentContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+.receiveQrPage .contentContainer .paymentStatus {
+  font-weight: 500;
+  font-size: 30px;
+  text-align: center;
+}
+.receiveQrPage .contentContainer .amountText {
+  font-weight: 400;
+  font-size: 30px;
+  text-align: center;
+}
+
+.receiveQrPage .contentContainer .continueBTN {
+  background-color: var(--primaryBlue);
+  color: white;
+  margin-top: auto;
+}
