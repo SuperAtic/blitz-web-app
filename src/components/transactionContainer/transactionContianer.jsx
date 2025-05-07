@@ -34,39 +34,40 @@ export default function TransactionContanier({ frompage }) {
 
   const transfers = sparkInformation?.trasactions;
 
-  const transferElements = transfers.map((tx, index) => {
-    const lastTransaction = transfers[index + 1];
-    const currnetTxTime = new Date(tx.created_at_time).getTime();
-    const lastTxTime = lastTransaction
-      ? new Date(lastTransaction.created_at_time).getTime()
-      : 0;
-    const BUFFER_TIME = 1000 * 15; //15 second buffer time
-    const differnce = Math.abs(currnetTxTime - lastTxTime);
+  const transferElements = transfers
+    .map((tx, index) => {
+      const lastTransaction = transfers[index + 1];
+      const currnetTxTime = new Date(tx.created_at_time).getTime();
+      const lastTxTime = lastTransaction
+        ? new Date(lastTransaction.created_at_time).getTime()
+        : 0;
+      const BUFFER_TIME = 1000 * 15; //15 second buffer time
+      const differnce = Math.abs(currnetTxTime - lastTxTime);
 
-    const isDonation =
-      differnce <= BUFFER_TIME &&
-      tx?.receiver_identity_pubkey ===
-        "02121157144443ea2d94f5527688adb062b944edec54c21f6f943dc7d5cdfcdbe2";
+      const isDonation =
+        differnce <= BUFFER_TIME &&
+        tx?.receiver_identity_pubkey ===
+          "02121157144443ea2d94f5527688adb062b944edec54c21f6f943dc7d5cdfcdbe2";
 
-    if (includedDonations.current) {
-      includedDonations.current = isDonation;
-    }
+      if (includedDonations.current) {
+        includedDonations.current = isDonation;
+      }
 
-    if (tx.status === "INVOICE_CREATED") return;
-    if (frompage === "home" && isDonation) return;
+      if (tx.status === "INVOICE_CREATED") return;
+      if (frompage === "home" && isDonation) return;
 
-    return (
-      <TxItem
-        isDonation={isDonation}
-        tx={tx}
-        index={index}
-        currentTime={currentTime}
-        currnetTxTime={currnetTxTime}
-      />
-    );
-  });
+      return (
+        <TxItem
+          isDonation={isDonation}
+          tx={tx}
+          index={index}
+          currentTime={currentTime}
+          currnetTxTime={currnetTxTime}
+        />
+      );
+    })
+    .filter((item) => item);
 
-  console.log(includedDonations);
   return (
     <div className="transactionContainer">
       {transferElements.slice(0, 20)}
