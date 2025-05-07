@@ -1,4 +1,5 @@
 import { getLatestDepositTxId, SparkWallet } from "@buildonspark/spark-sdk";
+import { getAllSparkTransactions } from "./txStorage";
 // import {
 //   BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION,
 //   IS_DONTATION_PAYMENT_BUFFER,
