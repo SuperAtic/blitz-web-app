@@ -14,9 +14,11 @@
   width: 95%;
   height: auto;
   max-width: 500px;
-  /* min-height: 300px; */
+  min-height: 300px;
   display: flex;
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 50px;
+  align-items: center;
+  justify-content: center;
 }
