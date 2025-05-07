@@ -13,12 +13,16 @@ import {
   getSparkTransactions,
   initializeSparkWallet,
   sparkWallet,
+  useSparkPaymentType,
 } from "../functions/spark";
 import {
   bulkUpdateSparkTransactions,
   getAllSparkTransactions,
   initializeSparkDatabase,
+  SPARK_TX_UPDATE_ENVENT_NAME,
+  sparkTransactionsEventEmitter,
 } from "../functions/txStorage";
+import { restoreSparkTxState } from "../functions/restore";
 
 const SparkContext = createContext();
 
@@ -30,6 +34,7 @@ export const SparkProvier = ({ children, navigate }) => {
     trasactions: [],
     isConnected: null,
   });
+
   const { authState, mnemoinc } = useAuth();
   const initWalletRef = useRef(null);
   const transactionListeners = useRef(null);
@@ -75,6 +80,7 @@ export const SparkProvier = ({ children, navigate }) => {
         selectedSparkTransaction
       );
 
+      console.log("bulnk update response", response);
       if (response) {
         const txs = await getAllSparkTransactions();
         return txs;
@@ -93,7 +99,20 @@ export const SparkProvier = ({ children, navigate }) => {
         trasactions: storedTransaction ? storedTransaction : prev.trasactions,
       };
     });
-    navigate("/wallet");
+    //Go to confirm page when receiving new tx
+    const tx = storedTransaction.find((item) => item.spark_id === transferId);
+
+    navigate("/confirm-page", {
+      state: {
+        for: "",
+        information: {
+          error: "",
+          fee: 0,
+          type: useSparkPaymentType(tx),
+          totalValue: tx.total_sent,
+        },
+      },
+    });
   };
 
   const setWalletState = async () => {
@@ -114,6 +133,8 @@ export const SparkProvier = ({ children, navigate }) => {
     async function initalize() {
       const response = await initializeSparkDatabase();
       await initializeSparkWallet(mnemoinc);
+      const restored = await restoreSparkTxState();
+      await bulkUpdateSparkTransactions(restored.txs);
 
       if (response) {
         setWalletState();
@@ -126,6 +147,12 @@ export const SparkProvier = ({ children, navigate }) => {
     if (!sparkInformation.isConnected) return;
     if (transactionListeners.current) return;
     transactionListeners.current = true;
+    console.log("Adding event listeners...");
+
+    sparkTransactionsEventEmitter.on(
+      SPARK_TX_UPDATE_ENVENT_NAME,
+      setWalletState
+    );
     sparkWallet.on("transfer:claimed", (transferId, balance) => {
       console.log(`Transfer ${transferId} claimed. New balance: ${balance}`);
       handleIncomingPayment(transferId);
@@ -135,8 +162,9 @@ export const SparkProvier = ({ children, navigate }) => {
       handleIncomingPayment(transferId);
     });
     return () => {
-      sparkWallet.off("transfer:claimed");
-      sparkWallet.off("deposit:confirmed");
+      // console.log("removing event listeners...");
+      // sparkWallet.off("transfer:claimed");
+      // sparkWallet.off("deposit:confirmed");
     };
   }, [sparkInformation]);
 
