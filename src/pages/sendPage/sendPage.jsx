@@ -4,12 +4,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import BackArrow from "../../components/backArrow/backArrow";
 import { decodeLNPayment } from "../../functions/sendPayment";
 import { sparkPaymenWrapper } from "../../functions/payments";
+import { useSpark } from "../../contexts/sparkContext";
 export default function SendPage() {
   const location = useLocation();
   const params = location.state || {};
   const [paymentInfo, setPaymentInfo] = useState({});
   const [isSending, setIsSending] = useState(false);
   const navigate = useNavigate();
+  const { sparkInformation } = useSpark();
 
   console.log(params, paymentInfo, import.meta.env.VITE_BLITZ_SPARK_ADDRESS);
   useEffect(() => {
@@ -45,6 +47,7 @@ export default function SendPage() {
           fee: paymentInfo?.fee + paymentInfo?.supportFee,
           memo: paymentInfo?.description,
           passedSupportFee: paymentInfo?.supportFee,
+          userBalance: sparkInformation.balance,
         });
 
         console.log(response);

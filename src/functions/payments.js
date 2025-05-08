@@ -24,6 +24,7 @@ export const sparkPaymenWrapper = async ({
   fee,
   memo,
   passedSupportFee,
+  userBalance = 0,
 }) => {
   try {
     console.log("Begining spark payment");
@@ -64,6 +65,8 @@ export const sparkPaymenWrapper = async ({
     let response;
     let supportFeeResponse;
 
+    if (userBalance < amountSats + fee) throw new Error("Insufficent funds");
+
     if (paymentType === "lightning") {
       const [lightningPayResponse, supportFeeRes] = await Promise.all([
         sparkWallet.payLightningInvoice({
@@ -80,7 +83,7 @@ export const sparkPaymenWrapper = async ({
       response = await updatePaymentsState(
         lightningPayResponse,
         supportFeeRes,
-        passedSupportFee,
+        passedSupportFee - (supportFeeRes ? 0 : passedSupportFee),
         memo,
         address,
         "PREIMAGE_SWAP"
@@ -104,7 +107,7 @@ export const sparkPaymenWrapper = async ({
       response = await updatePaymentsState(
         onChainPayResponse,
         supportFeeRes,
-        passedSupportFee,
+        passedSupportFee - (supportFeeRes ? 0 : passedSupportFee),
         memo,
         address,
         "BITCOIN_WITHDRAWAL"
@@ -124,7 +127,7 @@ export const sparkPaymenWrapper = async ({
       response = await updatePaymentsState(
         sparkPayResponse,
         supportFeeRes,
-        passedSupportFee,
+        passedSupportFee - (supportFeeRes ? 0 : passedSupportFee),
         memo,
         address,
         "SPARK_SEND"
