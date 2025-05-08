@@ -135,25 +135,18 @@ export const bulkUpdateSparkTransactions = async (transactions) => {
     for (const tx of transactions) {
       const timeIdFormatting = new Date(tx.createdTime).getTime();
 
-      // Check if transaction exists
+      console.log("timeIdFormmating for", tx.id);
+
+      console.log("Checking for existing transaction with id:", tx.id);
+
+      // Check if transaction exists by spark_id (tx.id)
       const existingTx = await new Promise((resolve, reject) => {
         const transaction = db.transaction(SQL_TABLE_NAME, "readonly");
         const store = transaction.objectStore(SQL_TABLE_NAME);
-        const index = store.index("created_at_time");
+        const index = store.index("spark_id");
 
-        const range = IDBKeyRange.bound(
-          timeIdFormatting - 10000,
-          timeIdFormatting + 10000,
-          false,
-          false
-        );
-
-        const request = index.openCursor(range);
-        request.onsuccess = (event) => {
-          const cursor = event.target.result;
-          if (cursor) resolve(cursor.value);
-          else resolve(null);
-        };
+        const request = index.get(tx.id);
+        request.onsuccess = (event) => resolve(event.target.result || null);
         request.onerror = (event) => reject(event.target.error);
       });
 
