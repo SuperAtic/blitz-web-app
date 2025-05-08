@@ -25,7 +25,7 @@ export default function SendPage() {
         navigate("/error", {
           state: {
             errorMessage: "Error decoding payment.",
-            customNavigator: () => navigate("/wallet", { replace: true }),
+            navigateBack: "wallet",
           },
         });
       }

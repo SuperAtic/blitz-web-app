@@ -8,22 +8,23 @@ export default function ErrorScreen() {
   const [visible, setVisible] = useState(true); // controls animation
 
   const errorMessage = location?.state?.errorMessage || "Something went wrong.";
-  const navigationFunction = location?.state?.navigationFunction;
-  const customNavigator = location?.state?.customNavigator;
+  const navigateBack = location?.state?.navigateBack;
 
   const handleNavigation = () => {
     setVisible(false); // trigger exit animation
   };
 
   const handleExitComplete = () => {
-    // Navigate AFTER exit animation finishes
-    if (navigationFunction) {
-      navigationFunction.navigator(navigationFunction.destination);
-      navigate(-1);
-    } else if (customNavigator) {
-      customNavigator();
-    } else {
-      navigate(-1);
+    switch (navigateBack) {
+      case "wallet":
+        navigate("/wallet");
+        break;
+      case "homePage":
+        navigate("/");
+        break;
+      // Add other cases as needed
+      default:
+        navigate(-1); // Default: go back one step in history
     }
   };
 
