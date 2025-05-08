@@ -14,11 +14,16 @@
   margin-top: 20px;
   text-align: center;
   max-width: 300px;
+  margin-bottom: auto;
+}
+.seedContainer .keyContainerWrapper {
+  margin: 20px 0;
 }
 .seedContainer .firstWarningText {
   text-align: center;
   margin: 0;
   max-width: 322px;
+  margin-top: auto;
 }
 .seedContainer .secondWarningText {
   text-transform: uppercase;

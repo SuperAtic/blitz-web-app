@@ -7,7 +7,7 @@ import { encrypt } from "../../functions/encription";
 import { useAuth } from "../../contexts/authContext";
 function CreatePassword() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, setMnemoinc } = useAuth();
   const location = useLocation();
   const { mnemoinc } = location.state || {};
   const [password, setPassword] = useState({
@@ -24,6 +24,7 @@ function CreatePassword() {
       return;
 
     const encripted = encrypt(mnemoinc, password.checkPass);
+    setMnemoinc(mnemoinc);
     login(encripted);
   };
   return (

@@ -30,7 +30,9 @@ function CreateSeed() {
           money!
         </p>
 
-        <KeyContainer keys={seed} />
+        <div className="keyContainerWrapper">
+          <KeyContainer keys={seed} />
+        </div>
         <p className="firstWarningText">
           Write it down with a pen and paper and keep it safe!
         </p>

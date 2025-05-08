@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Storage from "../functions/localStorage";
+import { deleteSparkTransactionTable } from "../functions/txStorage";
 
 const AuthContext = createContext();
 
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children, navigate }) => {
   const deleteWallet = () => {
     Storage.removeItem("walletKey");
     Storage.removeItem("lastSession");
+    deleteSparkTransactionTable();
     setAuthState({
       isAuthenticated: false,
       walletKey: null,
