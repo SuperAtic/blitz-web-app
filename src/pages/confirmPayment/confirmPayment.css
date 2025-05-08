@@ -1,7 +1,7 @@
 .receiveQrPage .confirmTxAnimation {
   width: 95%;
   height: auto;
-  max-width: 350px;
+  max-width: 250px;
 }
 .receiveQrPage .contentContainer {
   display: flex;
@@ -11,8 +11,21 @@
 }
 .receiveQrPage .contentContainer .paymentStatus {
   font-weight: 500;
-  font-size: 30px;
+  font-size: 25px;
   text-align: center;
+}
+.receiveQrPage .contentContainer .errorText {
+  width: 95%;
+  text-align: center;
+}
+.receiveQrPage .contentContainer .errorMessageTextContainer {
+  width: 95%;
+  border-radius: 8px;
+  background-color: white;
+  max-width: 300px;
+  min-height: 100px;
+  padding: 10px;
+  margin: 10px;
 }
 .receiveQrPage .contentContainer .amountText {
   font-weight: 400;

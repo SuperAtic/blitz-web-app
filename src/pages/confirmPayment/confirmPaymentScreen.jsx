@@ -71,7 +71,7 @@ export default function ConfirmPayment() {
 
         {didSucceed && <h2 className="amountText">{amount} sats</h2>}
 
-        <p>
+        <p className="errorText">
           {didSucceed
             ? showPendingMessage
               ? "Your balance will be updated shortly"
@@ -105,17 +105,7 @@ export default function ConfirmPayment() {
         )}
 
         {!didSucceed && (
-          <div
-            style={{
-              backgroundColor: "#f8d7da",
-              borderRadius: 8,
-              width: "95%",
-              maxWidth: 300,
-              minHeight: 100,
-              padding: 10,
-              marginBottom: 10,
-            }}
-          >
+          <div className="errorMessageTextContainer">
             <p>{errorMessage}</p>
           </div>
         )}
