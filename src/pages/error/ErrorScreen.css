@@ -1,0 +1,40 @@
+.error-screen-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.error-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 95%;
+  max-width: 300px;
+}
+
+.error-message {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.error-divider {
+  height: 1px;
+  background-color: #ccc;
+  margin: 10px 0;
+}
+
+.error-ok-button {
+  display: block;
+  margin: 0 auto;
+  padding: 10px 20px;
+  background-color: var(--primaryBlue);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
