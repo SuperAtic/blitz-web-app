@@ -150,7 +150,7 @@ function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
       </div>
       <p>
         {tx.transfer_direction === TransferDirection.OUTGOING ? "-" : "+"}
-        {tx.total_sent}
+        {tx.total_sent + (tx.fee || 0)}
       </p>
     </div>
   );

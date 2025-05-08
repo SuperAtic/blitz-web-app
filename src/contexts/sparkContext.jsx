@@ -134,7 +134,7 @@ export const SparkProvier = ({ children, navigate }) => {
 
     navigate("/confirm-page", {
       state: {
-        for: "",
+        for: "invoicePaid",
         information: {
           error: "",
           fee: 0,
