@@ -23,6 +23,7 @@ import {
   sparkTransactionsEventEmitter,
 } from "../functions/txStorage";
 import { restoreSparkTxState } from "../functions/restore";
+import mergeTransactions from "../functions/copyObject";
 
 const SparkContext = createContext();
 
@@ -44,17 +45,19 @@ export const SparkProvier = ({ children, navigate }) => {
   const handleTransactionUpdate = async (recevedTxId) => {
     try {
       // First we need to get recent spark transfers
-      const transactions = await getSparkTransactions(5, undefined);
+      const [transactions, txs] = await Promise.all([
+        getSparkTransactions(5, undefined),
+        getAllSparkTransactions(),
+      ]);
+
       console.log(transactions, "stored transactions");
       if (!transactions)
         throw new Error("Unable to get transactions from spark");
       const { transfers } = transactions;
       console.log(transfers, recevedTxId);
-      const selectedSparkTransaction = transfers.filter(
+      const selectedSparkTransaction = transfers.find(
         (tx) => tx.id === recevedTxId
       );
-
-      console.log(selectedSparkTransaction, selectedSparkTransaction?.[0]);
 
       // Posibly need to format spark transactions to match DB
       // {
@@ -72,13 +75,25 @@ export const SparkProvier = ({ children, navigate }) => {
       //   fee?: number;
       // }
 
-      if (!selectedSparkTransaction.length)
+      if (!selectedSparkTransaction || !txs)
         throw new Error("Not able to get recent transfer");
 
-      // This will update lightning txs to add the reqiured information but save the payumetn description. And this will add spark or bitcoin transactions since no previous information is added
-      const response = await bulkUpdateSparkTransactions(
+      const savedTransaction =
+        txs.find((tx) => {
+          return (
+            tx.total_sent == selectedSparkTransaction?.totalValue &&
+            tx.type == selectedSparkTransaction?.type &&
+            tx.transfer_direction == selectedSparkTransaction?.transferDirection
+          );
+        }) || {};
+
+      const merged = mergeTransactions(
+        savedTransaction,
         selectedSparkTransaction
       );
+
+      // This will update lightning txs to add the reqiured information but save the payumetn description. And this will add spark or bitcoin transactions since no previous information is added
+      const response = await bulkUpdateSparkTransactions([merged]);
 
       console.log("bulnk update response", response);
       if (response) {
@@ -134,6 +149,7 @@ export const SparkProvier = ({ children, navigate }) => {
       const response = await initializeSparkDatabase();
       await initializeSparkWallet(mnemoinc);
       const restored = await restoreSparkTxState();
+      console.log(restored);
       await bulkUpdateSparkTransactions(restored.txs);
 
       if (response) {

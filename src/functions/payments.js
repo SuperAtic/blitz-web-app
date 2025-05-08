@@ -146,7 +146,7 @@ export const sparkReceivePaymentWrapper = async ({
         amountSats,
         memo,
       });
-      console.log("SAVING");
+
       // SAVE TEMP TX TO DATABASE HERE
       const tempTransaction = {
         id: invoice.id,
@@ -157,7 +157,7 @@ export const sparkReceivePaymentWrapper = async ({
         updatedTime: invoice.invoice.updatedAt,
         expiryTime: invoice.invoice.expiresAt,
         type: "PREIMAGE_SWAP",
-        transferDirection: "OUTGOING",
+        transferDirection: "INCOMING",
         totalValue: amountSats,
         initial_sent: amountSats,
         description: memo || "",
