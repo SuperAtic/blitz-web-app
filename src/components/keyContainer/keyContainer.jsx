@@ -19,7 +19,7 @@ export function KeyContainer(props) {
     tempArr.push(
       <div key={element} className="seedPill">
         <span className="seedText" style={styles.numberText}>
-          {id}.
+          {id + 1}.
         </span>
         <input
           className="seedText"
