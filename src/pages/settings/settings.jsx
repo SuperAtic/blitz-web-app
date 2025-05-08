@@ -8,18 +8,16 @@ import shareIcon from "../../assets/share.png";
 import trashIcon from "../../assets/trashIcon.png";
 import { useAuth } from "../../contexts/authContext";
 import { useNavigate } from "react-router-dom";
+import PageNavBar from "../../components/navBar/navBar";
 export default function SettingsHome() {
   const navigate = useNavigate();
-  const { sparkInformation } = useSpark();
+  const { sparkInformation, clearSparkSession } = useSpark();
   const { logout, deleteWallet } = useAuth();
   console.log(sparkInformation);
 
   return (
     <div className="settingsPage">
-      <div className="nav">
-        <BackArrow />
-        <h1>Settings</h1>
-      </div>
+      <PageNavBar text="Settings" />
       <div className="contentContainer">
         <div className="techincalContainer">
           <div className="technicalRow">
@@ -66,7 +64,12 @@ export default function SettingsHome() {
         <button onClick={() => navigate("/key")}>
           <img src={keyIcon} alt="" srcset="" /> Backup recovery phrase
         </button>
-        <button onClick={logout}>
+        <button
+          onClick={() => {
+            logout();
+            clearSparkSession();
+          }}
+        >
           <img
             style={{ transform: "rotate(90deg)" }}
             src={shareIcon}
@@ -75,7 +78,12 @@ export default function SettingsHome() {
           />
           Logout
         </button>
-        <button onClick={deleteWallet}>
+        <button
+          onClick={() => {
+            deleteWallet();
+            clearSparkSession();
+          }}
+        >
           <img src={trashIcon} alt="" srcset="" /> Deleate wallet
         </button>
       </div>
