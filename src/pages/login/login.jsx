@@ -18,7 +18,10 @@ function Login() {
     const storedKey = Storage.getItem("walletKey");
 
     const decryted = decrypt(storedKey, password);
-    if (!decryted) return;
+    if (!decryted) {
+      navigate("/error", { state: { errorMessage: "Incorrect password" } });
+      return;
+    }
     setMnemoinc(decryted);
     login(storedKey);
   };

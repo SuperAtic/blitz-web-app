@@ -3,6 +3,7 @@
   flex-direction: column;
   flex: 1;
   position: relative;
+  overflow: hidden;
 }
 .viewMnemoincContainer .warning1 {
   width: 95%;

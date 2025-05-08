@@ -22,16 +22,6 @@ export default function TransactionContanier({ frompage }) {
     );
   }
 
-  if (!sparkInformation?.trasactions?.length) {
-    return (
-      <div className="transactionContainer">
-        <p className="noTxText">
-          Send or receive a transaction for it to show up here.
-        </p>
-      </div>
-    );
-  }
-
   const transfers = sparkInformation?.trasactions;
 
   const transferElements = transfers
@@ -52,8 +42,9 @@ export default function TransactionContanier({ frompage }) {
       if (includedDonations.current) {
         includedDonations.current = isDonation;
       }
+      if (tx?.type === "PREIMAGE_SWAP" && tx?.status === "INVOICE_CREATED")
+        return;
 
-      if (tx.status === "INVOICE_CREATED") return;
       if (frompage === "home" && isDonation) return;
 
       return (
@@ -69,6 +60,15 @@ export default function TransactionContanier({ frompage }) {
     })
     .filter((item) => item);
 
+  if (!transferElements?.length) {
+    return (
+      <div className="transactionContainer">
+        <p className="noTxText">
+          Send or receive a transaction for it to show up here.
+        </p>
+      </div>
+    );
+  }
   return (
     <div className="transactionContainer">
       {transferElements.slice(0, 20)}

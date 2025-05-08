@@ -107,16 +107,14 @@ function QrCode({ addressState, navigate }) {
     );
   }
   return (
-    <div className="qrCodeContainerReceivePage">
-      <button
-        onClick={() => copyToClipboard(addressState.generatedAddress, navigate)}
-        style={{ all: "unset", cursor: "pointer", textAlign: "center" }}
-      >
-        <QRCodeQrapper data={addressState.generatedAddress} />
-        {addressState.errorMessageText.text && (
-          <p>{addressState.errorMessageText.text}</p>
-        )}
-      </button>
+    <div
+      onClick={() => copyToClipboard(addressState.generatedAddress, navigate)}
+      className="qrCodeContainerReceivePage"
+    >
+      <QRCodeQrapper data={addressState.generatedAddress} />
+      {addressState.errorMessageText.text && (
+        <p>{addressState.errorMessageText.text}</p>
+      )}
     </div>
   );
 }

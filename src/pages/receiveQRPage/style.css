@@ -18,7 +18,7 @@
 .receiveQrPageContent .qrCodeContainerReceivePage {
   width: max-content;
   background-color: var(--lightModeBackgroundOffset);
-  padding: 10px;
+
   border-radius: 8px;
   min-height: 275px;
   height: auto;
