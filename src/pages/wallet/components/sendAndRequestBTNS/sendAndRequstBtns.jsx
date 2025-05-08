@@ -6,15 +6,18 @@ export default function SendAndRequestBtns() {
   const naigate = useNavigate();
   return (
     <div className="sendAndRequstContainer">
-      <div className="buttonContainer buttonWhite">
+      <div
+        onClick={() => naigate("/camera")}
+        className="buttonContainer buttonWhite"
+      >
         <img className="buttonImage send" src={arrow} alt="small arrow" />
       </div>
-      <div
+      {/* <div
         onClick={() => naigate("/camera")}
         className="buttonContainer buttonBlue"
       >
         <img className="buttonImage" src={Qr} alt="small arrow" />
-      </div>
+      </div> */}
       <div
         onClick={() => naigate("/receiveAmount")}
         className="buttonContainer buttonWhite"

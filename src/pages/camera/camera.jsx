@@ -139,18 +139,19 @@ export default function Camera() {
     <div className="cameraContainer">
       <BackArrow />
       <div className="contentContainer">
-        <p>Scan or paste an address/invoice</p>
+        <p>Scan or paste an bolt11 invoice</p>
         <div className="scanContianer">
           {!isCameraReady && (
             <div className="cameraLoading">Loading camera...</div>
           )}
           <video
             ref={videoRef}
+            className="videoElement"
             style={{ width: "100%", display: isCameraReady ? "block" : "none" }}
           />
         </div>
         <button onClick={handlePaste} disabled={didScan.current}>
-          Paste Address / Invoice
+          Paste Invoice
         </button>
         <canvas ref={canvasRef} style={{ display: "none" }} />
       </div>
