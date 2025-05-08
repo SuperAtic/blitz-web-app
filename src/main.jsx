@@ -27,6 +27,10 @@ import SwitchReceiveOption from "./pages/switchReceiveOption/switchReceiveOption
 import { AnimatePresence } from "framer-motion";
 import SendPage from "./pages/sendPage/sendPage.jsx";
 import ConfirmPayment from "./pages/confirmPayment/confirmPaymentScreen.jsx";
+import SettingsHome from "./pages/settings/settings.jsx";
+import ViewMnemoinc from "./pages/viewkey/viewKey.jsx";
+import RestoreWallet from "./pages/restoreWallet/restoreWallet.jsx";
+import ErrorScreen from "./pages/error/error.jsx";
 
 function Root() {
   const navigate = useNavigate();
@@ -130,6 +134,31 @@ function Root() {
                 </SafeAreaComponent>
               }
             />
+            <Route
+              path="/settings"
+              element={
+                <SafeAreaComponent>
+                  <SettingsHome />
+                </SafeAreaComponent>
+              }
+            />
+            <Route
+              path="/key"
+              element={
+                <SafeAreaComponent>
+                  <ViewMnemoinc />
+                </SafeAreaComponent>
+              }
+            />
+            <Route
+              path="/restore"
+              element={
+                <SafeAreaComponent>
+                  <RestoreWallet />
+                </SafeAreaComponent>
+              }
+            />
+            <Route path="/error" element={<ErrorScreen />} />
           </Routes>
         </AnimatePresence>
       </SparkProvier>
