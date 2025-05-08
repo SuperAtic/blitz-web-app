@@ -40,6 +40,17 @@ export const SparkProvier = ({ children, navigate }) => {
     sparkAddress: "",
   });
 
+  const clearSparkSession = () => {
+    initWalletRef.current = false;
+    setSparkInformation({
+      balance: 0,
+      trasactions: [],
+      isConnected: null,
+      pubKey: "",
+      sparkAddress: "",
+    });
+  };
+
   const { authState, mnemoinc } = useAuth();
   const initWalletRef = useRef(null);
   const transactionListeners = useRef(null);
@@ -193,7 +204,9 @@ export const SparkProvier = ({ children, navigate }) => {
   }, [sparkInformation]);
 
   return (
-    <SparkContext.Provider value={{ sparkInformation, setSparkInformation }}>
+    <SparkContext.Provider
+      value={{ sparkInformation, setSparkInformation, clearSparkSession }}
+    >
       {children}
     </SparkContext.Provider>
   );
