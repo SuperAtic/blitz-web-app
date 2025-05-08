@@ -55,8 +55,6 @@ export const SparkProvier = ({ children, navigate }) => {
   const initWalletRef = useRef(null);
   const transactionListeners = useRef(null);
 
-  console.log(sparkInformation, "spark information");
-
   const handleTransactionUpdate = async (recevedTxId) => {
     try {
       // First we need to get recent spark transfers
@@ -65,11 +63,10 @@ export const SparkProvier = ({ children, navigate }) => {
         getAllSparkTransactions(),
       ]);
 
-      console.log(transactions, "stored transactions");
       if (!transactions)
         throw new Error("Unable to get transactions from spark");
       const { transfers } = transactions;
-      console.log(transfers, recevedTxId);
+
       const selectedSparkTransaction = transfers.find(
         (tx) => tx.id === recevedTxId
       );
@@ -150,7 +147,6 @@ export const SparkProvier = ({ children, navigate }) => {
     const balance = await getSparkBalance();
     const id = await getSparkIdentityPublicKey();
     const sparkAddress = await getSparkAddress();
-    console.log(balance?.balance, txs, balance);
     setSparkInformation({
       isConnected: true,
       balance: balance ? balance.balance : 0,
@@ -168,7 +164,7 @@ export const SparkProvier = ({ children, navigate }) => {
       const response = await initializeSparkDatabase();
       await initializeSparkWallet(mnemoinc);
       const restored = await restoreSparkTxState();
-      console.log(restored);
+
       await bulkUpdateSparkTransactions(restored.txs);
 
       if (response) {

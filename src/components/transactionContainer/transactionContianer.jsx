@@ -26,18 +26,11 @@ export default function TransactionContanier({ frompage }) {
 
   const transferElements = transfers
     .map((tx, index) => {
-      const lastTransaction = transfers[index + 1];
       const currnetTxTime = new Date(tx.created_at_time).getTime();
-      const lastTxTime = lastTransaction
-        ? new Date(lastTransaction.created_at_time).getTime()
-        : 0;
-      const BUFFER_TIME = 1000 * 15; //15 second buffer time
-      const differnce = Math.abs(currnetTxTime - lastTxTime);
 
       const isDonation =
-        differnce <= BUFFER_TIME &&
-        tx?.receiver_identity_pubkey ===
-          "02121157144443ea2d94f5527688adb062b944edec54c21f6f943dc7d5cdfcdbe2";
+        tx.transfer_direction === "OUTGOING" &&
+        import.meta.env.VITE_BLITZ_SPARK_PUBKEY;
 
       if (includedDonations.current) {
         includedDonations.current = isDonation;
