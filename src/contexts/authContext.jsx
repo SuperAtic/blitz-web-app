@@ -28,8 +28,18 @@ export const AuthProvider = ({ children, navigate }) => {
     navigate("/wallet");
   };
 
-  const logout = () => {
+  const deleteWallet = () => {
     Storage.removeItem("walletKey");
+    Storage.removeItem("lastSession");
+    setAuthState({
+      isAuthenticated: false,
+      walletKey: null,
+      lastSession: null,
+    });
+    navigate("/");
+  };
+
+  const logout = () => {
     Storage.removeItem("lastSession");
     setAuthState({
       isAuthenticated: false,
@@ -59,6 +69,7 @@ export const AuthProvider = ({ children, navigate }) => {
         setMnemoinc,
         mnemoinc,
         setAuthState,
+        deleteWallet,
       }}
     >
       {children}

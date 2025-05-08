@@ -9,7 +9,9 @@ import { useNavigate } from "react-router-dom";
 import Storage from "../functions/localStorage";
 import { useAuth } from "./authContext";
 import {
+  getSparkAddress,
   getSparkBalance,
+  getSparkIdentityPublicKey,
   getSparkTransactions,
   initializeSparkWallet,
   sparkWallet,
@@ -34,6 +36,8 @@ export const SparkProvier = ({ children, navigate }) => {
     balance: 0,
     trasactions: [],
     isConnected: null,
+    pubKey: "",
+    sparkAddress: "",
   });
 
   const { authState, mnemoinc } = useAuth();
@@ -133,11 +137,15 @@ export const SparkProvier = ({ children, navigate }) => {
   const setWalletState = async () => {
     const txs = await getAllSparkTransactions();
     const balance = await getSparkBalance();
+    const id = await getSparkIdentityPublicKey();
+    const sparkAddress = await getSparkAddress();
     console.log(balance?.balance, txs, balance);
     setSparkInformation({
       isConnected: true,
       balance: balance ? balance.balance : 0,
       trasactions: txs,
+      pubKey: id,
+      sparkAddress,
     });
   };
   useEffect(() => {

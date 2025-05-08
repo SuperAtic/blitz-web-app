@@ -1,0 +1,61 @@
+.viewMnemoincContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+}
+.viewMnemoincContainer .warning1 {
+  width: 95%;
+  font-size: 25px;
+  margin: auto auto 0;
+  text-align: center;
+}
+.viewMnemoincContainer .warning2 {
+  width: 95%;
+  font-size: 20px;
+  margin: 0 auto;
+  text-align: center;
+  color: red;
+  font-weight: 300;
+  margin-bottom: 20px;
+}
+.viewMnemoincContainer .mnemoincContainer {
+  margin-bottom: auto;
+}
+.viewMnemoincContainer .mnemoincCover {
+  position: absolute;
+  background-color: var(--lightModeBackground);
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  transition: top 0.8s ease-in-out;
+  display: flex;
+  flex-direction: column;
+}
+.viewMnemoincContainer .mnemoincCover .coverContent {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
+.viewMnemoincContainer .mnemoincCover .coverContent .viewMnemoincText {
+  font-size: 20px;
+  text-align: center;
+}
+.viewMnemoincContainer .mnemoincCover .coverContent .buttonContianer {
+  width: 95%;
+  max-width: 250px;
+  display: grid;
+  column-gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+.viewMnemoincContainer
+  .mnemoincCover
+  .coverContent
+  .buttonContianer
+  button:first-child {
+  background-color: var(--primaryBlue);
+  color: white;
+}
