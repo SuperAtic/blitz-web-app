@@ -1,0 +1,36 @@
+.sendContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.sendContainer .decodeInvoiceLoadingText {
+  margin: auto;
+  font-size: 20px;
+  text-align: center;
+}
+
+.sendContainer .paymentInfoContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sendContainer .paymentInfoContainer .paymentAmount {
+  font-weight: 500;
+  margin-top: auto;
+  margin-bottom: 0;
+}
+.sendContainer .paymentInfoContainer .paymentFeeDesc {
+  margin-top: 30px;
+  margin-bottom: 0;
+}
+.sendContainer .paymentInfoContainer .paymentFeeVal {
+  margin-top: 0;
+  margin-bottom: 30px;
+}
+.sendContainer .paymentInfoContainer button {
+  width: 100%;
+  margin-top: auto;
+}

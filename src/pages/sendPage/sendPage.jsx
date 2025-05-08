@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import "./send.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import BackArrow from "../../components/backArrow/backArrow";
-// import bolt11 from "bolt11";
-import { decode } from "light-bolt11-decoder";
 import { decodeLNPayment } from "../../functions/sendPayment";
 import { sparkPaymenWrapper } from "../../functions/payments";
 export default function SendPage() {
@@ -46,10 +44,22 @@ export default function SendPage() {
         if (response.didWork) {
           navigate("/confirm-page", {
             state: {
-              for: "",
+              for: "paymentsucceed",
               information: {
                 error: "",
                 fee: paymentInfo?.fee,
+                type: "Lightning",
+                totalValue: paymentInfo.amount / 1000,
+              },
+            },
+          });
+        } else {
+          navigate("/confirm-page", {
+            state: {
+              for: "paymentFailed",
+              information: {
+                error: response.error,
+                fee: 0,
                 type: "Lightning",
                 totalValue: paymentInfo.amount / 1000,
               },
@@ -66,7 +76,9 @@ export default function SendPage() {
     return (
       <div className="sendContainer">
         <BackArrow />
-        <p>Loading</p>
+        <p className="decodeInvoiceLoadingText">
+          Getting invoice information...
+        </p>
       </div>
     );
   }
@@ -75,12 +87,13 @@ export default function SendPage() {
       <BackArrow />
 
       <div className="paymentInfoContainer">
-        <h1>{paymentInfo.amount / 1000} sats</h1>
-        <p>Fee: {paymentInfo.fee} sats</p>
+        <h1 className="paymentAmount">{paymentInfo.amount / 1000} sats</h1>
+        <p className="paymentFeeDesc">Fee & speed</p>
+        <p className="paymentFeeVal">{paymentInfo.fee} sats and Instant</p>
+        <button onClick={handleSend}>
+          {isSending ? "Sending..." : "Send Payment"}
+        </button>
       </div>
-      <button onClick={handleSend}>
-        {isSending ? "Sending" : "Send Payment"}
-      </button>
     </div>
   );
 }
