@@ -150,6 +150,8 @@ export const bulkUpdateSparkTransactions = async (transactions) => {
         request.onerror = (event) => reject(event.target.error);
       });
 
+      console.log("Has existing tx", existingTx);
+
       const txData = {
         spark_id: tx.id,
         sender_identity_pubkey: tx.senderIdentityPublicKey,

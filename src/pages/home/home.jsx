@@ -9,7 +9,7 @@ function Home() {
 
       <div className="buttonContainer">
         <button onClick={() => navigate("/disclaimer")}>Make new wallet</button>
-        <button>Enter seed phrase</button>
+        <button onClick={() => navigate("/restore")}>Enter seed phrase</button>
       </div>
       <p>Your Wallet, your coins, 100% open-source</p>
     </div>

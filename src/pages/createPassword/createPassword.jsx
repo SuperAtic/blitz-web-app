@@ -4,7 +4,6 @@ import BackArrow from "../../components/backArrow/backArrow";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { encrypt } from "../../functions/encription";
-import Storage from "../../functions/localStorage";
 import { useAuth } from "../../contexts/authContext";
 function CreatePassword() {
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ function CreatePassword() {
       <div className="inputContainer">
         <p className="containerDescription">Set Your Wallet Password</p>
         <p className="topText">
-          This password encrypts your wallet locally. Choose a strong password.
+          This password protects your wallet locally. Choose a strong password.
         </p>
         <p>Password</p>
         <input

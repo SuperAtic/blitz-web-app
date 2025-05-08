@@ -1,7 +1,7 @@
 .safeAreaContainer {
   width: 95%;
   max-width: 1500px;
-  height: calc(100% - 40px);
+  height: 100%;
   padding: 20px 0;
   margin: 0 auto;
   display: flex;

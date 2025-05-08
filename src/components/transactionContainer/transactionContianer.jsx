@@ -58,6 +58,7 @@ export default function TransactionContanier({ frompage }) {
 
       return (
         <TxItem
+          key={index}
           isDonation={isDonation}
           tx={tx}
           index={index}
@@ -101,8 +102,6 @@ function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
   // LIGHTNING CONFIRMED = TRANSFER_STATUS_COMPLETED
 
   const description = tx.description;
-
-  console.log(description, "desct");
 
   return (
     <div className="transaction" key={index}>

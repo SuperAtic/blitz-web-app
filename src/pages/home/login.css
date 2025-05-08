@@ -11,6 +11,7 @@
   margin-top: auto;
   color: var(--primaryBlue);
   font-size: min(100px, 35vw);
+  margin-bottom: 50px;
 }
 .loginComponenet .buttonContainer {
   width: 95%;

@@ -1,17 +1,23 @@
 .disclaimerContainer {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .disclaimerContainer h1 {
   text-align: center;
   font-weight: 500;
   font-size: 40px;
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 .disclaimerContentContainer {
   height: calc(100% - 30px);
   text-align: center;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow-y: scroll;
 }
 .disclaimerContainer .recoveryText {
   max-width: 400px;
@@ -25,7 +31,7 @@
 .disclaimerContainer .quoteText {
   margin-bottom: auto;
   max-width: 300px;
-  margin: 0 auto auto;
+  margin: 0 auto 20px;
 }
 .disclaimerContainer button {
   background-color: var(--primaryBlue);

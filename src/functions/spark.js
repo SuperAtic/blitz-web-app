@@ -22,6 +22,14 @@ export const initializeSparkWallet = async (mnemonic) => {
     return { isConnected: true }; //make sure to switch back to false
   }
 };
+export const getSparkIdentityPublicKey = async () => {
+  try {
+    if (!sparkWallet) throw new Error("sparkWallet not initialized");
+    return await sparkWallet.getIdentityPublicKey();
+  } catch (err) {
+    console.log("Get spark balance error", err);
+  }
+};
 
 export const getSparkBalance = async () => {
   try {
