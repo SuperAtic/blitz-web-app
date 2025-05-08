@@ -1,0 +1,12 @@
+.pageNavBar {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.pageNavBar .pageHeaderText {
+  font-size: 20px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
