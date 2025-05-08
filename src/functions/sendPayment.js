@@ -21,9 +21,11 @@ export async function decodeLNPayment(address) {
       description: decoded.sections.find((item) => item.name === "description")
         .value,
       fee: feeResponse.fee,
+      supportFee: feeResponse.supportFee,
       paymentType: "lightning",
     };
   } catch (error) {
     console.log("bolt11 decode error", error);
+    throw new Error(error.message);
   }
 }

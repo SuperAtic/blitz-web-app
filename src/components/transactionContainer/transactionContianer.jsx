@@ -30,7 +30,7 @@ export default function TransactionContanier({ frompage }) {
 
       const isDonation =
         tx.transfer_direction === "OUTGOING" &&
-        import.meta.env.VITE_BLITZ_SPARK_PUBKEY;
+        tx.receiver_identity_pubkey === import.meta.env.VITE_BLITZ_SPARK_PUBKEY;
 
       if (includedDonations.current) {
         includedDonations.current = isDonation;
@@ -52,6 +52,7 @@ export default function TransactionContanier({ frompage }) {
       );
     })
     .filter((item) => item);
+  console.log(transferElements);
 
   if (!transferElements?.length) {
     return (

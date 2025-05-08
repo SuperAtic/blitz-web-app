@@ -23,6 +23,7 @@ export const sparkPaymenWrapper = async ({
   },
   fee,
   memo,
+  passedSupportFee,
 }) => {
   try {
     console.log("Begining spark payment");
@@ -53,7 +54,11 @@ export const sparkPaymenWrapper = async ({
         calculatedFee =
           feeResponse.feeEstimate.originalValue || SPARK_TO_SPARK_FEE;
       }
-      return { didWork: true, fee: Math.round(calculatedFee + supportFee) };
+      return {
+        didWork: true,
+        fee: Math.round(calculatedFee),
+        supportFee: Math.round(supportFee),
+      };
     }
 
     let response;
@@ -75,7 +80,7 @@ export const sparkPaymenWrapper = async ({
       response = await updatePaymentsState(
         lightningPayResponse,
         supportFeeRes,
-        fee,
+        passedSupportFee,
         memo,
         address,
         "PREIMAGE_SWAP"
@@ -99,7 +104,7 @@ export const sparkPaymenWrapper = async ({
       response = await updatePaymentsState(
         onChainPayResponse,
         supportFeeRes,
-        fee,
+        passedSupportFee,
         memo,
         address,
         "BITCOIN_WITHDRAWAL"
@@ -119,7 +124,7 @@ export const sparkPaymenWrapper = async ({
       response = await updatePaymentsState(
         sparkPayResponse,
         supportFeeRes,
-        fee,
+        passedSupportFee,
         memo,
         address,
         "SPARK_SEND"

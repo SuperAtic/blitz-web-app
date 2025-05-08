@@ -22,6 +22,12 @@ export default function SendPage() {
         }
       } catch (err) {
         console.log("Error decoding payment", err);
+        navigate("/error", {
+          state: {
+            errorMessage: "Error decoding payment.",
+            customNavigator: () => navigate("/wallet", { replace: true }),
+          },
+        });
       }
     }
     decodeSendAddress();
@@ -36,8 +42,9 @@ export default function SendPage() {
           address: paymentInfo.invoice,
           paymentType: "lightning",
           amountSats: paymentInfo.amount / 1000,
-          fee: paymentInfo?.fee,
+          fee: paymentInfo?.fee + paymentInfo?.supportFee,
           memo: paymentInfo?.description,
+          passedSupportFee: paymentInfo?.supportFee,
         });
 
         console.log(response);
@@ -47,7 +54,7 @@ export default function SendPage() {
               for: "paymentsucceed",
               information: {
                 error: "",
-                fee: paymentInfo?.fee,
+                fee: paymentInfo?.fee + paymentInfo?.supportFee,
                 type: "Lightning",
                 totalValue: paymentInfo.amount / 1000,
               },
@@ -89,7 +96,10 @@ export default function SendPage() {
       <div className="paymentInfoContainer">
         <h1 className="paymentAmount">{paymentInfo.amount / 1000} sats</h1>
         <p className="paymentFeeDesc">Fee & speed</p>
-        <p className="paymentFeeVal">{paymentInfo.fee} sats and Instant</p>
+        <p className="paymentFeeVal">
+          {(paymentInfo?.fee || 0) + (paymentInfo?.supportFee || 0)} sats and
+          Instant
+        </p>
         <button onClick={handleSend}>
           {isSending ? "Sending..." : "Send Payment"}
         </button>
