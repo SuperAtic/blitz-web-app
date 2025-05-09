@@ -5,15 +5,17 @@ import React, {
   useContext,
   useRef,
 } from "react";
-import { useNavigate } from "react-router-dom";
-import Storage from "../functions/localStorage";
+
 import { useAuth } from "./authContext";
 import {
+  claimSparkBitcoinL1Transaction,
   getSparkAddress,
   getSparkBalance,
   getSparkIdentityPublicKey,
   getSparkTransactions,
+  getUnusedSparkBitcoinL1Address,
   initializeSparkWallet,
+  querySparkBitcoinL1Transaction,
   sparkWallet,
   useSparkPaymentType,
 } from "../functions/spark";
@@ -26,6 +28,7 @@ import {
 } from "../functions/txStorage";
 import { restoreSparkTxState } from "../functions/restore";
 import mergeTransactions from "../functions/copyObject";
+import { getLatestDepositTxId } from "@buildonspark/spark-sdk";
 
 const SparkContext = createContext();
 
@@ -54,6 +57,7 @@ export const SparkProvier = ({ children, navigate }) => {
   const { authState, mnemoinc } = useAuth();
   const initWalletRef = useRef(null);
   const transactionListeners = useRef(null);
+  const depositAddressIntervalRef = useRef(null);
 
   const handleTransactionUpdate = async (recevedTxId) => {
     try {
@@ -162,42 +166,166 @@ export const SparkProvier = ({ children, navigate }) => {
 
     async function initalize() {
       const response = await initializeSparkDatabase();
-      await initializeSparkWallet(mnemoinc);
-      const restored = await restoreSparkTxState();
+      const connectionResponse = await initializeSparkWallet(mnemoinc);
 
-      await bulkUpdateSparkTransactions(restored.txs);
+      if (response && connectionResponse.isConnected) {
+        const restored = await restoreSparkTxState();
 
-      if (response) {
+        await bulkUpdateSparkTransactions(restored.txs);
         setWalletState();
+      } else {
+        setSparkInformation((prev) => ({
+          ...prev,
+          isConnected: false,
+        }));
       }
     }
     initalize();
   }, [authState]);
 
-  useEffect(() => {
-    if (!sparkInformation.isConnected) return;
-    if (transactionListeners.current) return;
-    transactionListeners.current = true;
-    console.log("Adding event listeners...");
+  // useEffect(() => {
+  //   if (!sparkInformation.isConnected) return;
+  //   if (transactionListeners.current) return;
+  //   transactionListeners.current = true;
+  //   console.log("Adding event listeners...");
 
+  //   sparkTransactionsEventEmitter.on(
+  //     SPARK_TX_UPDATE_ENVENT_NAME,
+  //     setWalletState
+  //   );
+  //   sparkWallet.on("transfer:claimed", (transferId, balance) => {
+  //     console.log(`Transfer ${transferId} claimed. New balance: ${balance}`);
+  //     handleIncomingPayment(transferId);
+  //   });
+  //   sparkWallet.on("deposit:confirmed", (transferId, balance) => {
+  //     console.log(`Transfer ${transferId} claimed. New balance: ${balance}`);
+  //     handleIncomingPayment(transferId);
+  //   });
+  //   return () => {
+  //     // console.log("removing event listeners...");
+  //     // sparkWallet.off("transfer:claimed");
+  //     // sparkWallet.off("deposit:confirmed");
+  //   };
+  // }, [sparkInformation]);
+
+  useEffect(() => {
+    const onTransferClaimed = (transferId, balance) => {
+      console.log(`Transfer ${transferId} claimed. New balance: ${balance}`);
+      handleIncomingPayment(transferId);
+    };
+
+    const onDepositConfirmed = (transferId, balance) => {
+      console.log(`Deposit ${transferId} confirmed. New balance: ${balance}`);
+      handleIncomingPayment(transferId);
+    };
+
+    const addListeners = async () => {
+      console.log("Adding listeners...");
+      sparkWallet.on("transfer:claimed", onTransferClaimed);
+      sparkWallet.on("deposit:confirmed", onDepositConfirmed);
+      console.log("Listeners added");
+      if (!transactionListeners.current) {
+        console.log("blocking first listeners run");
+        transactionListeners.current = true;
+        return;
+      }
+      const restored = await restoreSparkTxState();
+      console.log(restored, "restore resposne");
+      if (restored.txs.length) {
+        await bulkUpdateSparkTransactions(restored.txs);
+        const tx = restored.txs[0];
+        console.log(tx, "got transaction");
+        navigate("/confirm-page", {
+          state: {
+            for:
+              tx.transfer_direction === "INCOMING"
+                ? "invoicePaid"
+                : "paymentsucceed",
+            information: {
+              error: "",
+              fee: 0,
+              type: useSparkPaymentType(tx),
+              totalValue: tx.totalValue,
+            },
+          },
+        });
+      }
+
+      console.log(transactionListeners.current);
+    };
+
+    const removeListeners = () => {
+      console.log("removing listeners...");
+      sparkWallet.off("transfer:claimed", onTransferClaimed);
+      sparkWallet.off("deposit:confirmed", onDepositConfirmed);
+      console.log("Listeners removed");
+    };
+
+    const handleTabBlur = () => removeListeners();
+    const handleTabFocus = () => addListeners();
+    const handleBeforeUnload = () => removeListeners();
+
+    if (!sparkWallet) return;
+
+    // Initial attach
+    addListeners();
+    window.addEventListener("blur", handleTabBlur);
+    window.addEventListener("focus", handleTabFocus);
+    window.addEventListener("beforeunload", handleBeforeUnload);
     sparkTransactionsEventEmitter.on(
       SPARK_TX_UPDATE_ENVENT_NAME,
       setWalletState
     );
-    sparkWallet.on("transfer:claimed", (transferId, balance) => {
-      console.log(`Transfer ${transferId} claimed. New balance: ${balance}`);
-      handleIncomingPayment(transferId);
-    });
-    sparkWallet.on("deposit:confirmed", (transferId, balance) => {
-      console.log(`Transfer ${transferId} claimed. New balance: ${balance}`);
-      handleIncomingPayment(transferId);
-    });
-    return () => {
-      // console.log("removing event listeners...");
-      // sparkWallet.off("transfer:claimed");
-      // sparkWallet.off("deposit:confirmed");
+
+    // return () => {
+    //   removeListeners();
+    //   window.removeEventListener("blur", handleTabBlur);
+    //   window.removeEventListener("focus", handleTabFocus);
+    //   window.removeEventListener("beforeunload", handleBeforeUnload);
+    // };
+  }, [sparkWallet, handleIncomingPayment]);
+
+  useEffect(() => {
+    // Interval to check deposit addresses to see if they were paid
+    const handleDepositAddressCheck = async () => {
+      try {
+        console.log("l1Deposit check running....");
+        const depoistAddresses = await getUnusedSparkBitcoinL1Address();
+        console.log("Reteived deposit addresses", depoistAddresses);
+        if (!depoistAddresses || !depoistAddresses.length) return;
+        const newTransactions = await Promise.all(
+          depoistAddresses.map(async (address) => {
+            const result = await querySparkBitcoinL1Transaction(address);
+            console.log("bitcoin address query result", result);
+            if (result) {
+              const response = await claimSparkBitcoinL1Transaction(address);
+              // make sure to add address to tx item and format it like it needs to be for the sql database
+              console.log("Bitcoin claim response", response);
+              if (!response) return false;
+              return { ...response, address: address, fee: 0 };
+            }
+          })
+        );
+        const filteredTxs = newTransactions.filter(Boolean);
+
+        await bulkUpdateSparkTransactions(filteredTxs);
+
+        // Eventualy save the claimed txs to the transaction array
+      } catch (err) {
+        console.log("Handle deposit address check error", err);
+      }
     };
-  }, [sparkInformation]);
+
+    if (depositAddressIntervalRef.current) {
+      clearInterval(depositAddressIntervalRef.current);
+    }
+
+    return;
+    depositAddressIntervalRef.current = setInterval(
+      handleDepositAddressCheck,
+      1_000 * 60
+    );
+  }, []);
 
   return (
     <SparkContext.Provider

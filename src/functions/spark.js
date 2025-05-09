@@ -19,7 +19,7 @@ export const initializeSparkWallet = async (mnemonic) => {
     return { isConnected: true };
   } catch (err) {
     console.log("Initialize spark wallet error", err);
-    return { isConnected: true }; //make sure to switch back to false
+    return { isConnected: false }; //make sure to switch back to false
   }
 };
 export const getSparkIdentityPublicKey = async () => {
@@ -52,9 +52,7 @@ export const getSparkBitcoinL1Address = async () => {
 export const getUnusedSparkBitcoinL1Address = async () => {
   try {
     if (!sparkWallet) throw new Error("sparkWallet not initialized");
-    return new Array.from(
-      new Set((await sparkWallet.getUnusedDepositAddresses()) || [])
-    );
+    return (await sparkWallet.getUnusedDepositAddresses()) || [];
   } catch (err) {
     console.log("Get Bitcoin mainchain address error", err);
   }

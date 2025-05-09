@@ -19,7 +19,11 @@ export default function TransactionContanier({ frompage }) {
   if (frompage === "home" && !sparkInformation.isConnected) {
     return (
       <div className="transactionContainer">
-        <p className="noTxText">Connecting...</p>
+        <p className="noTxText">
+          {sparkInformation.isConnected === null
+            ? "Connecting..."
+            : "Error connecting to spark."}
+        </p>
       </div>
     );
   }
@@ -32,6 +36,7 @@ export default function TransactionContanier({ frompage }) {
 
       const isDonation =
         tx.transfer_direction === "OUTGOING" &&
+        tx.type === "TRANSFER" &&
         tx.receiver_identity_pubkey === import.meta.env.VITE_BLITZ_SPARK_PUBKEY;
 
       if (includedDonations.current) {
@@ -40,7 +45,7 @@ export default function TransactionContanier({ frompage }) {
       if (tx?.type === "PREIMAGE_SWAP" && tx?.status === "INVOICE_CREATED")
         return;
 
-      if (frompage === "home" && isDonation) return;
+      if (isDonation) return;
 
       return (
         <TxItem
@@ -54,7 +59,6 @@ export default function TransactionContanier({ frompage }) {
       );
     })
     .filter((item) => item);
-  console.log(transferElements);
 
   if (!transferElements?.length) {
     return (
