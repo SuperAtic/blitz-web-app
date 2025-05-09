@@ -59,7 +59,7 @@ export default function SendPage() {
               : 0,
             type:
               paymentInfo.paymentType === "bitcoin" ? "Bitcoin" : "Lightning",
-            totalValue: paymentInfo.amount / 1000,
+            totalValue: paymentInfo.amount,
           },
         },
       });
