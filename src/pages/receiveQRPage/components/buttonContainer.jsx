@@ -25,7 +25,10 @@ export default function ReceiveButtonsContainer({
         style={{
           opacity: generatingInvoiceQRCode ? 0.5 : 1,
         }}
-        onClick={() => copyToClipboard(generatedAddress)}
+        onClick={() => {
+          if (!generatedAddress) return;
+          copyToClipboard(generatedAddress);
+        }}
       >
         Copy
       </button>

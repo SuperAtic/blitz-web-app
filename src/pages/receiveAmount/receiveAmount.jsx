@@ -27,7 +27,7 @@ const EditReceivePaymentInformation = (props) => {
         receiveAmount: Number(localSatAmount),
         description: paymentDescription,
       },
-      replace: fromPage === "homepage",
+      replace: fromPage !== "homepage",
     });
 
     setAmountValue("");
