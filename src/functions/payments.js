@@ -1,7 +1,6 @@
 import { BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION } from "../constants";
 import { SPARK_TO_LN_FEE, SPARK_TO_SPARK_FEE } from "../constants/math";
 import mergeTransactions from "./copyObject";
-
 import { getSparkTransactions, sendSparkPayment, sparkWallet } from "./spark";
 import {
   addSingleSparkTransaction,
@@ -27,12 +26,13 @@ export const sparkPaymenWrapper = async ({
   userBalance = 0,
 }) => {
   try {
-    console.log("Begining spark payment");
+    console.log("Beginning spark payment");
     if (!sparkWallet) throw new Error("sparkWallet not initialized");
     const supportFee =
       Math.ceil(
         amountSats * masterInfoObject?.enabledDeveloperSupport.baseFeePercent
       ) + masterInfoObject?.enabledDeveloperSupport?.baseFee;
+
     if (getFee) {
       console.log("Calculating spark payment fee");
       let calculatedFee = 0;
@@ -63,81 +63,137 @@ export const sparkPaymenWrapper = async ({
     }
 
     let response;
-    let supportFeeResponse;
+    if (userBalance < amountSats + fee) throw new Error("Insufficient funds");
 
-    if (userBalance < amountSats + fee) throw new Error("Insufficent funds");
-
+    // Handle the main payment first
     if (paymentType === "lightning") {
-      const [lightningPayResponse, supportFeeRes] = await Promise.all([
-        sparkWallet.payLightningInvoice({
-          invoice: address,
-        }),
-        masterInfoObject?.enabledDeveloperSupport?.isEnabled
-          ? sendSparkPayment({
-              receiverSparkAddress: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
-              amountSats: supportFee,
-            })
-          : Promise.resolve(null),
-      ]);
-      supportFeeResponse = supportFeeRes;
+      const lightningPayResponse = await sparkWallet.payLightningInvoice({
+        invoice: address,
+      });
+
       response = await updatePaymentsState(
         lightningPayResponse,
-        supportFeeRes,
-        passedSupportFee - (supportFeeRes ? 0 : passedSupportFee),
+        null,
+        passedSupportFee,
         memo,
         address,
         "PREIMAGE_SWAP"
       );
+
+      // Process support fee in the background if enabled
+      if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
+        processSupportFeeInBackground(
+          "lightning",
+          response,
+          supportFee,
+          passedSupportFee
+        );
+      }
     } else if (paymentType === "bitcoin") {
-      // make sure to import exist speed
-      const [onChainPayResponse, supportFeeRes] = await Promise.all([
-        sparkWallet.withdraw({
-          onchainAddress: address,
-          exitSpeed,
-          amountSats,
-        }),
-        masterInfoObject?.enabledDeveloperSupport?.isEnabled
-          ? sendSparkPayment({
-              receiverSparkAddress: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
-              amountSats: supportFee,
-            })
-          : Promise.resolve(null),
-      ]);
-      supportFeeResponse = supportFeeRes;
+      const onChainPayResponse = await sparkWallet.withdraw({
+        onchainAddress: address,
+        exitSpeed,
+        amountSats,
+      });
+
       response = await updatePaymentsState(
         onChainPayResponse,
-        supportFeeRes,
-        passedSupportFee - (supportFeeRes ? 0 : passedSupportFee),
+        null,
+        passedSupportFee,
         memo,
         address,
         "BITCOIN_WITHDRAWAL"
       );
-    } else {
-      const [sparkPayResponse, supportFeeRes] = await Promise.all([
-        sendSparkPayment({ receiverSparkAddress: address, amountSats }),
-        masterInfoObject?.enabledDeveloperSupport?.isEnabled
-          ? sendSparkPayment({
-              receiverSparkAddress: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
-              amountSats: supportFee,
-            })
-          : Promise.resolve(null),
-      ]);
 
-      supportFeeResponse = supportFeeRes;
+      // Process support fee in the background if enabled
+      if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
+        processSupportFeeInBackground(
+          "bitcoin",
+          response,
+          supportFee,
+          passedSupportFee
+        );
+      }
+    } else {
+      const sparkPayResponse = await sendSparkPayment({
+        receiverSparkAddress: address,
+        amountSats,
+      });
+
       response = await updatePaymentsState(
         sparkPayResponse,
-        supportFeeRes,
-        passedSupportFee - (supportFeeRes ? 0 : passedSupportFee),
+        null,
+        passedSupportFee,
         memo,
         address,
         "SPARK_SEND"
       );
+
+      // Process support fee in the background if enabled
+      if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
+        processSupportFeeInBackground(
+          "spark",
+          response,
+          supportFee,
+          passedSupportFee
+        );
+      }
     }
 
-    return { didWork: true, response, supportFeeResponse };
+    return { didWork: true, response };
   } catch (err) {
     console.log("Send lightning payment error", err);
     return { didWork: false, error: err.message };
+  }
+};
+
+// Helper function to process support fee in the background
+const processSupportFeeInBackground = async (
+  paymentType,
+  mainPaymentResponse,
+  supportFee,
+  passedSupportFee
+) => {
+  try {
+    const supportFeeResponse = await sendSparkPayment({
+      receiverSparkAddress: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
+      amountSats: supportFee,
+    });
+
+    // Wait a bit to allow the transaction to be registered
+    await new Promise((res) => setTimeout(res, 1000));
+
+    // Get recent transactions to find our support fee transaction
+    const transactionResponse = await getSparkTransactions(5);
+    if (!transactionResponse) return;
+
+    const { transfers: transactions } = transactionResponse;
+    const txHistorySupport =
+      transactions.find(
+        (tx) =>
+          Math.abs(
+            new Date(tx.createdTime).getTime() -
+              new Date(supportFeeResponse.createdTime).getTime()
+          ) < 10000 &&
+          tx.receiverIdentityPublicKey ===
+            import.meta.env.VITE_BLITZ_SPARK_PUBKEY
+      ) || {};
+
+    const supportStoredPayment = {
+      ...mergeTransactions(supportFeeResponse, txHistorySupport),
+      description: BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION,
+      address: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
+      fee: SPARK_TO_SPARK_FEE,
+    };
+
+    // Update just the support fee transaction
+    await bulkUpdateSparkTransactions([supportStoredPayment]);
+
+    console.log("Support fee processed successfully in the background");
+  } catch (error) {
+    console.error("Failed to process support fee in background:", error);
+    // Note: We intentionally don't throw the error since this is a background process
+    // and shouldn't affect the user's main payment flow
   }
 };
 
@@ -148,13 +204,11 @@ export const sparkReceivePaymentWrapper = async ({
 }) => {
   try {
     if (!sparkWallet) throw new Error("sparkWallet not initialized");
-
     if (paymentType === "lightning") {
       const invoice = await sparkWallet.createLightningInvoice({
         amountSats,
         memo,
       });
-
       // SAVE TEMP TX TO DATABASE HERE
       const tempTransaction = {
         id: invoice.id,
@@ -200,7 +254,7 @@ export const sparkReceivePaymentWrapper = async ({
 };
 
 const updatePaymentsState = async (
-  outgoinPayment,
+  outgoingPayment,
   supportFeePayment,
   fee,
   memo,
@@ -210,57 +264,44 @@ const updatePaymentsState = async (
   try {
     await new Promise((res) => setTimeout(res, 1000));
     const transactionResponse = await getSparkTransactions(5);
-    if (!transactionResponse) throw new Error("Not able to get transactins");
+    if (!transactionResponse) throw new Error("Not able to get transactions");
     const { transfers: transactions } = transactionResponse;
-
     const txHistoryOutgoing =
       transactions.find((tx) => {
         return (
           Math.abs(
             new Date(tx.createdTime).getTime() -
-              new Date(outgoinPayment.createdAt).getTime()
+              new Date(outgoingPayment.createdAt).getTime()
           ) < 10000 &&
           tx.receiverIdentityPublicKey !==
             import.meta.env.VITE_BLITZ_SPARK_PUBKEY
         );
       }) || {};
-    const txHistorySupport = supportFeePayment
-      ? transactions.find(
-          (tx) =>
-            Math.abs(
-              new Date(tx.createdTime).getTime() -
-                new Date(supportFeePayment.createdTime).getTime()
-            ) < 10000 &&
-            tx.receiverIdentityPublicKey ===
-              import.meta.env.VITE_BLITZ_SPARK_PUBKEY
-        ) || {}
-      : null;
 
     const storedPayment = {
-      ...mergeTransactions(outgoinPayment, txHistoryOutgoing),
+      ...mergeTransactions(outgoingPayment, txHistoryOutgoing),
       fee: fee,
       address,
       description: memo,
     };
-    const supportStoredPayment = supportFeePayment
-      ? {
-          ...mergeTransactions(supportFeePayment, txHistorySupport),
-          description: BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION,
-          address: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
-          fee: SPARK_TO_SPARK_FEE,
-        }
-      : null;
 
-    const updates = supportStoredPayment
-      ? [storedPayment, supportStoredPayment]
+    const updates = supportFeePayment
+      ? [
+          storedPayment,
+          {
+            ...mergeTransactions(supportFeePayment, {}),
+            description: BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION,
+            address: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
+            fee: SPARK_TO_SPARK_FEE,
+          },
+        ]
       : [storedPayment];
 
-    console.log(updates, "payment storeage objesct updates");
+    console.log(updates, "payment storage object updates");
     await bulkUpdateSparkTransactions(updates);
-
     return storedPayment;
   } catch (err) {
     console.log("update payment state error", err);
-    return outgoinPayment;
+    return outgoingPayment;
   }
 };
