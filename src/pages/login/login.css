@@ -1,6 +1,8 @@
 .passwordContainer {
+  width: 100%;
   display: flex;
   flex-direction: column;
+  margin: auto;
 }
 .passwordContainer p {
   margin: 0;

@@ -33,6 +33,7 @@ export async function initializeAddressProcess(wolletInfo) {
         amountSats: wolletInfo.receivingAmount,
         memo: wolletInfo.description,
       });
+      console.log(response, "lightning resposne ");
       // const response = await generateLightningAddress(wolletInfo);
       if (!response.didWork) throw new Error("Error with lightning");
       stateTracker = {

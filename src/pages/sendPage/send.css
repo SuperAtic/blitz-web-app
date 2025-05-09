@@ -18,9 +18,13 @@
 }
 
 .sendContainer .paymentInfoContainer .paymentAmount {
+  width: 100%;
+  overflow-x: scroll;
   font-weight: 500;
   margin-top: auto;
   margin-bottom: 0;
+  text-align: center;
+  text-wrap-mode: nowrap;
 }
 .sendContainer .paymentInfoContainer .paymentFeeDesc {
   margin-top: 30px;

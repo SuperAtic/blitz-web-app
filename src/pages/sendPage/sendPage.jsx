@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./send.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import BackArrow from "../../components/backArrow/backArrow";
-import { decodeLNPayment } from "../../functions/sendPayment";
+import { processInputType } from "../../functions/sendPayment";
 import { sparkPaymenWrapper } from "../../functions/payments";
 import { useSpark } from "../../contexts/sparkContext";
 export default function SendPage() {
@@ -17,11 +17,12 @@ export default function SendPage() {
   useEffect(() => {
     async function decodeSendAddress() {
       try {
-        const lightningPayment = await decodeLNPayment(params.btcAddress);
-        if (lightningPayment) {
-          setPaymentInfo(lightningPayment);
-          return;
-        }
+        const decodedInvoice = await processInputType(
+          params.btcAddress,
+          paymentInfo
+        );
+        if (!decodedInvoice) throw new Error("Invalid address");
+        setPaymentInfo(decodedInvoice);
       } catch (err) {
         console.log("Error decoding payment", err);
         navigate("/error", {
@@ -43,7 +44,7 @@ export default function SendPage() {
         const response = await sparkPaymenWrapper({
           address: paymentInfo.invoice,
           paymentType: "lightning",
-          amountSats: paymentInfo.amount / 1000,
+          amountSats: paymentInfo.amount,
           fee: paymentInfo?.fee + paymentInfo?.supportFee,
           memo: paymentInfo?.description,
           passedSupportFee: paymentInfo?.supportFee,
@@ -82,6 +83,25 @@ export default function SendPage() {
     }
   };
 
+  const handleSave = async () => {
+    try {
+      const decodedInvoice = await processInputType(
+        params.btcAddress,
+        paymentInfo
+      );
+      if (!decodedInvoice) throw new Error("Invalid address");
+      setPaymentInfo(decodedInvoice);
+    } catch (err) {
+      console.log("Error decoding payment", err);
+      navigate("/error", {
+        state: {
+          errorMessage: "Error decoding payment.",
+          navigateBack: "wallet",
+        },
+      });
+    }
+  };
+
   if (!Object.keys(paymentInfo).length) {
     return (
       <div className="sendContainer">
@@ -97,14 +117,71 @@ export default function SendPage() {
       <BackArrow />
 
       <div className="paymentInfoContainer">
-        <h1 className="paymentAmount">{paymentInfo.amount / 1000} sats</h1>
+        <h1 className="paymentAmount">
+          {paymentInfo.amount || 0} {""}sats
+        </h1>
         <p className="paymentFeeDesc">Fee & speed</p>
         <p className="paymentFeeVal">
           {(paymentInfo?.fee || 0) + (paymentInfo?.supportFee || 0)} sats and
           Instant
         </p>
-        <button onClick={handleSend}>
-          {isSending ? "Sending..." : "Send Payment"}
+        {paymentInfo?.canEdit && (
+          <div
+            style={{ marginBottom: 0, marginTop: "auto" }}
+            className="number-keyboard"
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "⌫"].map((num) => (
+              <button
+                key={num}
+                className="keyboard-key"
+                onClick={() => {
+                  if (num === "⌫") {
+                    setPaymentInfo((prev) => {
+                      return {
+                        ...prev,
+                        amount: String(prev.amount).slice(0, -1),
+                      };
+                    });
+                    // setAmountValue((prev) => prev.slice(0, -1));
+                  } else if (num === "C" && inputDenomination === "sats") {
+                    setPaymentInfo((prev) => {
+                      return {
+                        ...prev,
+                        amount: "",
+                      };
+                    });
+                    // setAmountValue("");
+                  } else {
+                    setPaymentInfo((prev) => {
+                      return {
+                        ...prev,
+                        amount: String(prev.amount) + num,
+                      };
+                    });
+                    // setAmountValue((prev) => prev + num);
+                  }
+                }}
+              >
+                {num}
+              </button>
+            ))}
+          </div>
+        )}
+        <button
+          style={{ marginTop: paymentInfo?.canEdit ? 0 : "auto" }}
+          onClick={() => {
+            if (paymentInfo?.canEdit) {
+              handleSave();
+            } else {
+              handleSend();
+            }
+          }}
+        >
+          {paymentInfo?.canEdit
+            ? "Save"
+            : isSending
+            ? "Sending..."
+            : "Send Payment"}
         </button>
       </div>
     </div>

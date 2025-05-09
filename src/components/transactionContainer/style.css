@@ -6,6 +6,9 @@
 
 .transactionContainer .noTxText {
   text-align: center;
+  width: 95%;
+  margin: 0 auto;
+  max-width: 300px;
 }
 
 .transactionContainer .transaction {
