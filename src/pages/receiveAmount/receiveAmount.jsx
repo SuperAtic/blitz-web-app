@@ -53,39 +53,39 @@ const EditReceivePaymentInformation = (props) => {
         />
       </div>
 
-      {!isKeyboardFocused && (
-        <div className="keyboard-container">
-          <div className="number-keyboard">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, ".", 0, "⌫"].map((num) => (
-              <button
-                key={num}
-                className="keyboard-key"
-                onClick={() => {
-                  if (num === "⌫") {
-                    setAmountValue((prev) => prev.slice(0, -1));
-                  } else if (num === "." && inputDenomination === "sats") {
-                    return;
-                  } else {
-                    setAmountValue((prev) => prev + num);
-                  }
-                }}
-              >
-                {num}
-              </button>
-            ))}
-          </div>
-
-          <button
-            className={`submit-button ${
-              !Number(localSatAmount) ? "disabled" : ""
-            }`}
-            onClick={handleSubmit}
-            disabled={!Number(localSatAmount)}
-          >
-            {"Request"}
-          </button>
+      {/* {!isKeyboardFocused && ( */}
+      <div className="keyboard-container">
+        <div className="number-keyboard">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "⌫"].map((num) => (
+            <button
+              key={num}
+              className="keyboard-key"
+              onClick={() => {
+                if (num === "⌫") {
+                  setAmountValue((prev) => prev.slice(0, -1));
+                } else if (num === "C" && inputDenomination === "sats") {
+                  setAmountValue("");
+                } else {
+                  setAmountValue((prev) => prev + num);
+                }
+              }}
+            >
+              {num}
+            </button>
+          ))}
         </div>
-      )}
+
+        <button
+          className={`submit-button ${
+            !Number(localSatAmount) ? "disabled" : ""
+          }`}
+          onClick={handleSubmit}
+          disabled={!Number(localSatAmount)}
+        >
+          {"Request"}
+        </button>
+      </div>
+      {/* )} */}
     </div>
   );
 };

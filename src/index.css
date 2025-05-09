@@ -21,13 +21,15 @@
 * {
   box-sizing: border-box;
 }
+input {
+  font-size: 18px;
+}
 input:focus {
   outline: none;
   box-shadow: none;
 }
 a {
   font-weight: 500;
-  color: #646cff;
   text-decoration: inherit;
 }
 
@@ -43,6 +45,9 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
+p {
+  font-size: 18px;
+}
 
 button {
   border-radius: 8px;
@@ -52,6 +57,7 @@ button {
   font-weight: 500;
   font-family: inherit;
   background-color: #fff;
+  color: #121212;
   cursor: pointer;
   transition: border-color 0.25s;
 }
