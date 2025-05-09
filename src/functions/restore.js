@@ -1,4 +1,5 @@
 import { getSparkTransactions } from "./spark";
+import { getAllSparkTransactions } from "./txStorage";
 
 const BATCH_SIZE = 500;
 const MAX_GAP = 1;
@@ -8,6 +9,17 @@ export const restoreSparkTxState = async () => {
     let start = 0;
     let noProofsFoundCounter = 0;
     const noProofsFoundLimit = MAX_GAP;
+    const savedTxs = await getAllSparkTransactions();
+    if (savedTxs) {
+      const txCount = savedTxs.filter((tx) => {
+        if (tx?.type === "PREIMAGE_SWAP" && tx?.status === "INVOICE_CREATED")
+          return;
+        else return true;
+      }).length;
+      start = txCount - 10;
+    }
+
+    console.log("start");
 
     do {
       const txs = await getSparkTransactions(start + BATCH_SIZE, start);
