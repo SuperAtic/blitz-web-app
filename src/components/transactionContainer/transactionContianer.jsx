@@ -8,11 +8,13 @@ import {
 import { TransferDirection } from "@buildonspark/spark-sdk/types";
 import "./style.css";
 import arrow from "../../assets/arrow-left-blue.png";
+import { useNavigate } from "react-router-dom";
 
 export default function TransactionContanier({ frompage }) {
   const { sparkInformation } = useSpark();
   const includedDonations = useRef(null);
   const currentTime = new Date();
+  const navigate = useNavigate();
 
   if (frompage === "home" && !sparkInformation.isConnected) {
     return (
@@ -65,9 +67,14 @@ export default function TransactionContanier({ frompage }) {
   }
   return (
     <div className="transactionContainer">
-      {transferElements.slice(0, 20)}
-      {transferElements?.length >= 20 && (
-        <p className="viewAllTxText">View all transactions</p>
+      {transferElements.slice(0, frompage === "home" ? 20 : undefined)}
+      {transferElements?.length >= 20 && frompage === "home" && (
+        <p
+          onClick={() => navigate("/viewAllTransactions")}
+          className="viewAllTxText"
+        >
+          View all transactions
+        </p>
       )}
     </div>
   );

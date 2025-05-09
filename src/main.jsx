@@ -32,6 +32,7 @@ import ViewMnemoinc from "./pages/viewkey/viewKey.jsx";
 import RestoreWallet from "./pages/restoreWallet/restoreWallet.jsx";
 import ErrorScreen from "./pages/error/error.jsx";
 import { NavigationStackProvider } from "./contexts/navigationLogger.jsx";
+import ViewAllTxsPage from "./pages/viewAllTx/viewAllTxPage.jsx";
 
 function Root() {
   const navigate = useNavigate();
@@ -160,6 +161,14 @@ function Root() {
                 element={
                   <SafeAreaComponent>
                     <RestoreWallet />
+                  </SafeAreaComponent>
+                }
+              />
+              <Route
+                path="/viewAllTransactions"
+                element={
+                  <SafeAreaComponent>
+                    <ViewAllTxsPage />
                   </SafeAreaComponent>
                 }
               />
