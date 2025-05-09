@@ -1,6 +1,7 @@
 .passwordContainer {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 .passwordContainer p {
   margin: 0;
