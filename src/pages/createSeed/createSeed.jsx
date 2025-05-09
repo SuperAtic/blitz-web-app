@@ -24,38 +24,36 @@ function CreateSeed() {
   return (
     <div className="seedContainer">
       <BackArrow />
-      <div className="contentContainer">
-        <p className="headerInfoText">
-          This is your password to your money, if you lose it you will lose your
-          money!
-        </p>
+      <p className="headerInfoText">
+        This is your password to your money, if you lose it you will lose your
+        money!
+      </p>
 
-        <div className="keyContainerWrapper">
-          <KeyContainer keys={seed} />
-        </div>
-        <p className="firstWarningText">
-          Write it down with a pen and paper and keep it safe!
-        </p>
-        <p className="secondWarningText">WE CAN NOT help you if you lose it</p>
+      <div className="keyContainerWrapper">
+        <KeyContainer keys={seed} />
+      </div>
+      <p className="firstWarningText">
+        Write it down with a pen and paper and keep it safe!
+      </p>
+      <p className="secondWarningText">WE CAN NOT help you if you lose it</p>
 
-        <div className="buttonsContainer">
-          <button
-            onClick={() => {
-              copyToClipboard(seed.join(" "));
-            }}
-          >
-            Copy
-          </button>
-          <button
-            onClick={() =>
-              navigate("/createPassword", {
-                state: { mnemoinc: seed.join(" ") },
-              })
-            }
-          >
-            Next
-          </button>
-        </div>
+      <div className="buttonsContainer">
+        <button
+          onClick={() => {
+            copyToClipboard(seed.join(" "));
+          }}
+        >
+          Copy
+        </button>
+        <button
+          onClick={() =>
+            navigate("/createPassword", {
+              state: { mnemoinc: seed.join(" ") },
+            })
+          }
+        >
+          Next
+        </button>
       </div>
     </div>
   );

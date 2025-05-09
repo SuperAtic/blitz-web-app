@@ -60,6 +60,7 @@ button {
   color: #121212;
   cursor: pointer;
   transition: border-color 0.25s;
+  min-height: 45px;
 }
 
 /* Hide scrollbars for all elements */

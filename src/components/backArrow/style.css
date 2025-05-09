@@ -5,6 +5,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  margin-right: auto;
 }
 .backArrowContainer img {
   width: 30px;

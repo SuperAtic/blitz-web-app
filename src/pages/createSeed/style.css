@@ -1,13 +1,8 @@
 .seedContainer {
-  width: 100%;
-  height: 100%;
-}
-.seedContainer .contentContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: calc(100% - 30px);
 }
 
 .seedContainer .headerInfoText {
@@ -34,11 +29,14 @@
 }
 .seedContainer .buttonsContainer {
   width: 100%;
-  max-width: 350px;
+  max-width: 300px;
   margin-top: 20px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: 10px;
+}
+.seedContainer .buttonsContainer button {
+  max-width: 150px;
 }
 .seedContainer .buttonsContainer button:first-child {
   background-color: var(--primaryBlue);

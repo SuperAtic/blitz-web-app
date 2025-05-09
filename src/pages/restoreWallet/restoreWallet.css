@@ -3,7 +3,6 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
 }
 .restoreContainer .pageNavBar {
   margin-bottom: auto;
@@ -18,17 +17,14 @@
   grid-template-columns: 1fr 1fr;
   row-gap: 10px;
   column-gap: 10px;
-  height: 100%;
   width: 100%;
   max-width: 500px;
-  max-height: 300px;
-  overflow-y: scroll;
   margin-bottom: 20px;
   margin: 30px auto;
 }
 
 .restoreContainer .seedPill {
-  max-height: 60px;
+  height: 45px;
   padding: 0 0 0 10px;
   background-color: #fff;
   border-radius: 8px;

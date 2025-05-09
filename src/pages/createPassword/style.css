@@ -1,5 +1,4 @@
 .passwordContainer {
-  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -32,7 +31,6 @@
 .passwordContainer input[type="password"] {
   border-radius: 8px;
   border: 0;
-  height: 30px;
   border: 2px solid gainsboro;
   padding-left: 10px;
 }
