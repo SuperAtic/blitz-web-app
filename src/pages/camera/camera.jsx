@@ -139,7 +139,9 @@ export default function Camera() {
     <div className="cameraContainer">
       <BackArrow />
       <div className="contentContainer">
-        <p>Scan or paste a lightning invoice</p>
+        <p>
+          Scan or paste a lightning invoice, spark address, or bitcoin address
+        </p>
         <div className="scanContianer">
           {!isCameraReady && (
             <div className="cameraLoading">Loading camera...</div>

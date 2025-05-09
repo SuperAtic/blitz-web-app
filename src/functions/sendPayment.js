@@ -1,12 +1,15 @@
 import { decode } from "light-bolt11-decoder";
 import { sparkPaymenWrapper } from "./payments";
+import * as bitcoin from "bitcoinjs-lib";
 export async function processInputType(address, paymentInfo) {
   try {
     if (address.toLowerCase().startsWith("lnbc")) {
       return await decodeLNPayment(address);
     } else if (address.toLowerCase().startsWith("sp1pg")) {
       return await decodeSparkPayment(address, paymentInfo);
-    } else {
+    } else if (isValidBitcoinAddress(address))
+      return await decodeBitcoinPayment(address, paymentInfo);
+    else {
       return null;
     }
   } catch (err) {
@@ -43,6 +46,40 @@ async function decodeLNPayment(address) {
     return false;
   }
 }
+async function decodeBitcoinPayment(address, paymentInfo) {
+  try {
+    let fee = 0;
+    let supportFee = 0;
+
+    console.log(address, paymentInfo, !!Object.keys(paymentInfo).length);
+
+    if (Object.keys(paymentInfo).length) {
+      const feeResponse = await sparkPaymenWrapper({
+        getFee: true,
+        address: address,
+        paymentType: "bitcoin",
+        amountSats: Number(paymentInfo.amount),
+      });
+
+      if (!feeResponse.didWork) throw new Error(feeResponse.error);
+      fee = feeResponse.fee;
+      supportFee = feeResponse.supportFee;
+    }
+
+    return {
+      invoice: address,
+      amount: Object.keys(paymentInfo).length ? paymentInfo.amount : "",
+      description: "",
+      fee,
+      supportFee,
+      paymentType: "bitcoin",
+      canEdit: !Object.keys(paymentInfo).length,
+    };
+  } catch (error) {
+    console.log("spark decode error", error);
+    return false;
+  }
+}
 
 async function decodeSparkPayment(address, paymentInfo) {
   try {
@@ -75,6 +112,15 @@ async function decodeSparkPayment(address, paymentInfo) {
     };
   } catch (error) {
     console.log("spark decode error", error);
+    return false;
+  }
+}
+
+function isValidBitcoinAddress(address) {
+  try {
+    bitcoin.address.toOutputScript(address);
+    return true;
+  } catch (_) {
     return false;
   }
 }
