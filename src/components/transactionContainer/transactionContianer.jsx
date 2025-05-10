@@ -8,7 +8,12 @@ import {
 import { TransferDirection } from "@buildonspark/spark-sdk/types";
 import "./style.css";
 import arrow from "../../assets/arrow-left-blue.png";
+import pendingTx from "../../assets/pendingTx.png";
 import { useNavigate } from "react-router-dom";
+import {
+  useIsSparkPaymentPending,
+  useSparkPaymentType,
+} from "../../functions/spark";
 
 export default function TransactionContanier({ frompage }) {
   const { sparkInformation } = useSpark();
@@ -31,7 +36,9 @@ export default function TransactionContanier({ frompage }) {
   const transfers = sparkInformation?.trasactions;
 
   const transferElements = transfers
+
     .map((tx, index) => {
+      console.log(tx);
       const currnetTxTime = new Date(tx.created_at_time).getTime();
 
       const isDonation =
@@ -95,6 +102,8 @@ function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
   const hours = minutes / 60;
   const days = hours / 24;
   const years = days / 365;
+  const paymentType = useSparkPaymentType(tx);
+  const isPending = useIsSparkPaymentPending(tx, paymentType);
 
   // BITCOIN PENDING = TRANSFER_STATUS_SENDER_KEY_TWEAK_PENDING
   // BITCOIN CONFIRMED = TRANSFER_STATUS_COMPLETED
@@ -113,10 +122,14 @@ function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
       <img
         style={{
           transform: `rotate(${
-            tx.transfer_direction === "INCOMING" ? "310deg" : "130deg"
+            isPending
+              ? "0deg"
+              : tx.transfer_direction === "INCOMING"
+              ? "310deg"
+              : "130deg"
           })`,
         }}
-        src={arrow}
+        src={isPending ? pendingTx : arrow}
         alt=""
       />
       <div className="textContainer">
