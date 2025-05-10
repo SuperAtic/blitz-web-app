@@ -1,3 +1,4 @@
+import "./fonts.css";
 import "./index.css";
 import App from "./App.jsx";
 import { StrictMode } from "react";
@@ -124,14 +125,7 @@ function Root() {
                 path="/receive-options"
                 element={<SwitchReceiveOption />}
               />
-              <Route
-                path="/camera"
-                element={
-                  <SafeAreaComponent>
-                    <Camera />
-                  </SafeAreaComponent>
-                }
-              />
+              <Route path="/camera" element={<Camera />} />
               <Route
                 path="/confirm-page"
                 element={

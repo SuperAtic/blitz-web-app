@@ -28,7 +28,7 @@
 .settingsPage .contentContainer .techincalContainer {
   background-color: white;
   margin: 20px 0;
-  padding: 15px;
+  padding: 0 15px;
   border-radius: 8px;
 }
 .settingsPage .contentContainer .techincalContainer .technicalRow {
@@ -55,6 +55,7 @@
 .settingsPage button {
   margin: 10px 0;
   text-align: left;
+  padding: 0 10px;
 
   display: flex;
   align-items: center;

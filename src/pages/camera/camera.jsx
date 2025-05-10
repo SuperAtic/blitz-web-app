@@ -1,9 +1,11 @@
 import { useRef, useEffect, useState } from "react";
 import jsQR from "jsqr";
 import BackArrow from "../../components/backArrow/backArrow";
+
 import "./style.css";
 import getDataFromClipboard from "../../functions/getDataFromClipboard";
 import { useNavigate } from "react-router-dom";
+import SafeAreaComponent from "../../components/safeAreaContainer";
 
 export default function Camera() {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ export default function Camera() {
     let isMounted = true;
 
     const scan = () => {
+      return;
       if (!isMounted || !video || video.readyState !== video.HAVE_ENOUGH_DATA) {
         animationFrameId.current = requestAnimationFrame(scan);
         return;
@@ -136,30 +139,47 @@ export default function Camera() {
   };
 
   return (
-    <div className="cameraContainer">
-      <BackArrow />
-      <div className="contentContainer">
-        <p>
-          Scan or paste a lightning invoice, spark address, or bitcoin address
-        </p>
-        <div className="scanContianer">
-          {!isCameraReady && (
-            <div className="cameraLoading">Loading camera...</div>
-          )}
-          <video
-            ref={videoRef}
-            className="videoElement"
-            style={{ width: "100%", display: isCameraReady ? "block" : "none" }}
-          />
+    <div className="camera-page">
+      <video ref={videoRef} className="camera-video" playsInline muted />
+      <canvas ref={canvasRef} style={{ display: "none" }} />
+      <div className="camera-overlay">
+        <div className="overlay">
+          <div className="backContainer">
+            <BackArrow showWhite={true} />
+          </div>
+          {/* <div className="top-row">
+            <div className="qr-vertical-buttons"> */}
+          {/* <button onClick={toggleFlash}>
+            <img
+              className="icon"
+              src={
+                isFlashOn ? ICONS.FlashLightIcon : ICONS.flashlightNoFillWhite
+              }
+              alt="Flash Toggle"
+            />
+          </button>
+          <button onClick={getPhoto}>
+            <img className="icon" src={ICONS.ImagesIcon} alt="Gallery" />
+          </button> */}
+          {/* </div>
+          </div> */}
         </div>
-        <button
-          className="pasteBTN"
-          onClick={handlePaste}
-          disabled={didScan.current}
-        >
-          Paste Invoice
-        </button>
-        <canvas ref={canvasRef} style={{ display: "none" }} />
+
+        <div className="middle-row">
+          <div className="overlay" />
+          <div className="qr-box-outline">
+            {!isCameraReady && <p>Loading Camera...</p>}
+          </div>
+          <div className="overlay" />
+        </div>
+
+        <div className="overlay">
+          <div className="bottom-controls">
+            <button className="paste-btn" onClick={handlePaste}>
+              Paste
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

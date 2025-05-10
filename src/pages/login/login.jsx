@@ -7,6 +7,9 @@ import { decrypt, encrypt } from "../../functions/encription";
 
 import { useAuth } from "../../contexts/authContext";
 import Storage from "../../functions/localStorage";
+import SwipeButton from "../../components/swipeThumb/swipeThumb";
+import { keyframes } from "@emotion/react";
+
 function Login() {
   const navigate = useNavigate();
   const { login, setMnemoinc } = useAuth();

@@ -5,7 +5,7 @@
   align-items: center;
 }
 .pageNavBar .pageHeaderText {
-  font-size: 20px;
+  font-size: 25px;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);

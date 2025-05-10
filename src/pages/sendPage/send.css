@@ -20,7 +20,7 @@
 .sendContainer .paymentInfoContainer .paymentAmount {
   width: 100%;
   overflow-x: scroll;
-  font-weight: 500;
+  font-weight: 400;
   margin-top: auto;
   margin-bottom: 0;
   text-align: center;
@@ -38,4 +38,32 @@
   width: 100%;
   max-width: 200px;
   margin-top: auto;
+}
+
+.sendContainer .navBar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.sendContainer .navBar img {
+  height: 30px;
+  width: 30px;
+}
+.sendContainer .navBar .label {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sendContainer .navBar .label img {
+  height: 20px;
+  width: 20px;
+  margin-right: 5px;
+}
+.sendContainer .navBar .label p {
+  font-size: 20px;
+  margin: 0;
 }

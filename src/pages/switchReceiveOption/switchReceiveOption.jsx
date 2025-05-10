@@ -15,7 +15,10 @@ export default function SwitchReceiveOption() {
 
   useEffect(() => {
     if (!selectedOption) return;
-    naigate("/receive", { state: { selectedRecieveOption: selectedOption } });
+    naigate("/receive", {
+      state: { selectedRecieveOption: selectedOption },
+      replace: true,
+    });
   }, [selectedOption]);
   return (
     <motion.div

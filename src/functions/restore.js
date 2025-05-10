@@ -1,9 +1,8 @@
 import { getSparkTransactions } from "./spark";
 import { getAllSparkTransactions } from "./txStorage";
 
-const BATCH_SIZE = 25;
 const MAX_GAP = 1;
-export const restoreSparkTxState = async () => {
+export const restoreSparkTxState = async (BATCH_SIZE) => {
   let restoredTxs = [];
   try {
     let start = 0;

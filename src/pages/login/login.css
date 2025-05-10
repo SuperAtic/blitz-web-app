@@ -24,7 +24,7 @@
   flex-direction: column;
 }
 .passwordContainer .containerDescription {
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 20px;
 }
 
@@ -43,4 +43,12 @@
   background-color: var(--primaryBlue);
   color: #fff;
   margin-top: 20px;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

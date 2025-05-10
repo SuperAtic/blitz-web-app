@@ -5,12 +5,15 @@ import BackArrow from "../../components/backArrow/backArrow";
 import { processInputType } from "../../functions/sendPayment";
 import { sparkPaymenWrapper } from "../../functions/payments";
 import { useSpark } from "../../contexts/sparkContext";
+import walletIcon from "../../assets/adminHomeWallet_dark.png";
+import arrowIcon from "../../assets/arrow-left-blue.png";
 
 export default function SendPage() {
   const location = useLocation();
   const params = location.state || {};
   const [paymentInfo, setPaymentInfo] = useState({});
   const [isSending, setIsSending] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { sparkInformation } = useSpark();
 
@@ -70,14 +73,17 @@ export default function SendPage() {
 
   const handleSave = async () => {
     try {
+      setIsLoading(true);
       const decodedInvoice = await processInputType(
         params.btcAddress,
         paymentInfo
       );
       if (!decodedInvoice) throw new Error("Invalid address");
       setPaymentInfo(decodedInvoice);
+      setIsLoading(false);
     } catch (err) {
       console.error("Error saving payment info", err);
+      setIsLoading(false);
       navigate("/error", {
         state: {
           errorMessage: "Error decoding payment.",
@@ -114,8 +120,7 @@ export default function SendPage() {
 
   return (
     <div className="sendContainer">
-      <BackArrow />
-
+      <NabBar sparkInformation={sparkInformation} />
       <div className="paymentInfoContainer">
         <h1 className="paymentAmount">{paymentInfo.amount || 0} sats</h1>
         <p className="paymentFeeDesc">Fee & speed</p>
@@ -144,11 +149,26 @@ export default function SendPage() {
           disabled={isSending}
         >
           {paymentInfo.canEdit
-            ? "Save"
+            ? isLoading
+              ? "Loading..."
+              : "Save"
             : isSending
             ? "Sending..."
             : "Send Payment"}
         </button>
+      </div>
+    </div>
+  );
+}
+
+function NabBar({ sparkInformation }) {
+  const navigate = useNavigate();
+  return (
+    <div className="navBar">
+      <img onClick={() => navigate(-1)} src={arrowIcon} alt="" />
+      <div className="label">
+        <img src={walletIcon} alt="" />
+        <p>{sparkInformation.balance} stats</p>
       </div>
     </div>
   );

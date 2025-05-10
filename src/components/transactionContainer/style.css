@@ -12,8 +12,8 @@
 }
 
 .transactionContainer .transaction {
-  padding: 10px;
-  margin: 10px;
+  width: 90%;
+  margin: 20px auto;
   display: flex;
   align-items: center;
   border-radius: 8px;
@@ -32,6 +32,9 @@
 .transactionContainer .transaction .dateText {
   font-weight: 300;
   font-size: 14px;
+}
+.transactionContainer .transaction .amountText {
+  align-self: flex-start;
 }
 .transactionContainer .viewAllTxText {
   text-align: center;

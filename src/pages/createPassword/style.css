@@ -23,7 +23,7 @@
   flex-direction: column;
 }
 .passwordContainer .containerDescription {
-  font-weight: 600;
+  font-weight: 500;
 }
 .passwordContainer .topText {
   margin-bottom: 20px;

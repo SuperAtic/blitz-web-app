@@ -63,15 +63,16 @@
   background: transparent;
   cursor: pointer;
 }
+.number-keyboard img {
+  width: 25px;
+  height: 25px;
+}
+.submit-button {
+  border: none;
+}
 
 .submit-button {
-  max-width: 300px;
-  width: 90%;
-  background: #007bff;
-  color: white;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
 .submit-button.disabled {

@@ -169,7 +169,7 @@ export const SparkProvier = ({ children, navigate }) => {
       const connectionResponse = await initializeSparkWallet(mnemoinc);
 
       if (response && connectionResponse.isConnected) {
-        const restored = await restoreSparkTxState();
+        const restored = await restoreSparkTxState(100);
 
         await bulkUpdateSparkTransactions(restored.txs);
         setWalletState();
@@ -182,31 +182,6 @@ export const SparkProvier = ({ children, navigate }) => {
     }
     initalize();
   }, [authState]);
-
-  // useEffect(() => {
-  //   if (!sparkInformation.isConnected) return;
-  //   if (transactionListeners.current) return;
-  //   transactionListeners.current = true;
-  //   console.log("Adding event listeners...");
-
-  //   sparkTransactionsEventEmitter.on(
-  //     SPARK_TX_UPDATE_ENVENT_NAME,
-  //     setWalletState
-  //   );
-  //   sparkWallet.on("transfer:claimed", (transferId, balance) => {
-  //     console.log(`Transfer ${transferId} claimed. New balance: ${balance}`);
-  //     handleIncomingPayment(transferId);
-  //   });
-  //   sparkWallet.on("deposit:confirmed", (transferId, balance) => {
-  //     console.log(`Transfer ${transferId} claimed. New balance: ${balance}`);
-  //     handleIncomingPayment(transferId);
-  //   });
-  //   return () => {
-  //     // console.log("removing event listeners...");
-  //     // sparkWallet.off("transfer:claimed");
-  //     // sparkWallet.off("deposit:confirmed");
-  //   };
-  // }, [sparkInformation]);
 
   useEffect(() => {
     const onTransferClaimed = (transferId, balance) => {
@@ -229,12 +204,23 @@ export const SparkProvier = ({ children, navigate }) => {
         transactionListeners.current = true;
         return;
       }
-      const restored = await restoreSparkTxState();
+
+      await new Promise((res) => setTimeout(res, 1000));
+      const restored = await restoreSparkTxState(10);
+
       console.log(restored, "restore resposne");
       if (restored.txs.length) {
         await bulkUpdateSparkTransactions(restored.txs);
+        const balance = await getSparkBalance();
+        setSparkInformation((prev) => ({ ...prev, balance }));
         const tx = restored.txs[0];
-        console.log(tx, "got transaction");
+        if (
+          tx.type === "TRANSFER" &&
+          tx.transferDirection === "OUTGOING" &&
+          tx.receiverIdentityPublicKey ===
+            import.meta.env.VITE_BLITZ_SPARK_PUBKEY
+        )
+          return;
         navigate("/confirm-page", {
           state: {
             for:
@@ -277,12 +263,16 @@ export const SparkProvier = ({ children, navigate }) => {
       setWalletState
     );
 
-    // return () => {
-    //   removeListeners();
-    //   window.removeEventListener("blur", handleTabBlur);
-    //   window.removeEventListener("focus", handleTabFocus);
-    //   window.removeEventListener("beforeunload", handleBeforeUnload);
-    // };
+    return () => {
+      removeListeners();
+      window.removeEventListener("blur", handleTabBlur);
+      window.removeEventListener("focus", handleTabFocus);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      sparkTransactionsEventEmitter.off(
+        SPARK_TX_UPDATE_ENVENT_NAME,
+        setWalletState
+      );
+    };
   }, [sparkWallet, handleIncomingPayment]);
 
   useEffect(() => {

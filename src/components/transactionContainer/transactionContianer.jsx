@@ -153,9 +153,9 @@ function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
           } ${minutes < 1 ? "" : "ago"}`}
         </p>
       </div>
-      <p>
+      <p className="amountText">
         {tx.transfer_direction === TransferDirection.OUTGOING ? "-" : "+"}
-        {tx.total_sent + (tx.fee || 0)}
+        {tx.total_sent + (tx.fee || 0)} sats
       </p>
     </div>
   );
