@@ -61,8 +61,7 @@ export default function SendPage() {
             fee: response.didWork
               ? (paymentInfo.fee || 0) + (paymentInfo.supportFee || 0)
               : 0,
-            type:
-              paymentInfo.paymentType === "bitcoin" ? "Bitcoin" : "Lightning",
+            type: paymentInfo.paymentType,
             totalValue: paymentInfo.amount,
           },
         },

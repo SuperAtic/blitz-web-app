@@ -99,7 +99,7 @@ export default function ConfirmPayment() {
               }}
             >
               <p>Type</p>
-              <p>{paymentNetwork}</p>
+              <p className="paymentNetwork">{paymentNetwork}</p>
             </div>
           </div>
         )}
