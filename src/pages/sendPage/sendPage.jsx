@@ -7,6 +7,7 @@ import { sparkPaymenWrapper } from "../../functions/payments";
 import { useSpark } from "../../contexts/sparkContext";
 import walletIcon from "../../assets/adminHomeWallet_dark.png";
 import arrowIcon from "../../assets/arrow-left-blue.png";
+import deleteIcon from "../../assets/leftCheveronDark.png";
 
 export default function SendPage() {
   const location = useLocation();
@@ -108,36 +109,40 @@ export default function SendPage() {
 
   const handleKeypad = (key) => {
     setPaymentInfo((prev) => {
-      if (key === "⌫") {
+      if (key === "delete") {
         return { ...prev, amount: String(prev.amount).slice(0, -1) };
-      } else if (key === "C") {
+      } else if (key === "C" && inputDenomination === "sats") {
         return { ...prev, amount: "" };
       } else {
         return { ...prev, amount: String(prev.amount) + key };
       }
     });
   };
-
+  console.log(paymentInfo);
   return (
     <div className="sendContainer">
       <NabBar sparkInformation={sparkInformation} />
       <div className="paymentInfoContainer">
         <h1 className="paymentAmount">{paymentInfo.amount || 0} sats</h1>
-        <p className="paymentFeeDesc">Fee & speed</p>
-        <p className="paymentFeeVal">{totalFee} sats and Instant</p>
+        {!paymentInfo.canEdit && (
+          <>
+            <p className="paymentFeeDesc">Fee & speed</p>
+            <p className="paymentFeeVal">{totalFee} sats and Instant</p>
+          </>
+        )}
 
         {paymentInfo.canEdit && (
           <div
             style={{ marginBottom: 0, marginTop: "auto" }}
             className="number-keyboard"
           >
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "⌫"].map((num) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "delete"].map((num) => (
               <button
                 key={num}
                 className="keyboard-key"
                 onClick={() => handleKeypad(num)}
               >
-                {num}
+                {num === "delete" ? <img src={deleteIcon} /> : num}
               </button>
             ))}
           </div>
