@@ -36,9 +36,7 @@ export default function TransactionContanier({ frompage }) {
   const transfers = sparkInformation?.trasactions;
 
   const transferElements = transfers
-
     .map((tx, index) => {
-      console.log(tx);
       const currnetTxTime = new Date(tx.created_at_time).getTime();
 
       const isDonation =
@@ -104,6 +102,7 @@ function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
   const years = days / 365;
   const paymentType = useSparkPaymentType(tx);
   const isPending = useIsSparkPaymentPending(tx, paymentType);
+  if (isPending) console.log(tx);
 
   // BITCOIN PENDING = TRANSFER_STATUS_SENDER_KEY_TWEAK_PENDING
   // BITCOIN CONFIRMED = TRANSFER_STATUS_COMPLETED
