@@ -212,7 +212,10 @@ export const SparkProvier = ({ children, navigate }) => {
       if (restored.txs.length) {
         await bulkUpdateSparkTransactions(restored.txs);
         const balance = await getSparkBalance();
-        setSparkInformation((prev) => ({ ...prev, balance }));
+        setSparkInformation((prev) => ({
+          ...prev,
+          balance: balance ? balance.balance : 0,
+        }));
         const tx = restored.txs[0];
         if (
           tx.type === "TRANSFER" &&
