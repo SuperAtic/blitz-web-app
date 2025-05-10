@@ -4,6 +4,10 @@
   margin: 0 auto;
 }
 
+.transactionContainer .dateBannerText {
+  margin: 10px 0 5px;
+  text-align: center;
+}
 .transactionContainer .noTxText {
   text-align: center;
   width: 95%;

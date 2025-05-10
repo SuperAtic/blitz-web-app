@@ -34,38 +34,49 @@ export default function TransactionContanier({ frompage }) {
   }
 
   const transfers = sparkInformation?.trasactions;
+  const groupedTransfers = [];
+  let lastBanner = null;
 
-  const transferElements = transfers
-    .map((tx, index) => {
-      const currnetTxTime = new Date(tx.created_at_time).getTime();
+  transfers.forEach((tx, index) => {
+    const currnetTxTime = new Date(tx.created_at_time).getTime();
 
-      const isDonation =
-        tx.transfer_direction === "OUTGOING" &&
-        tx.type === "TRANSFER" &&
-        tx.receiver_identity_pubkey === import.meta.env.VITE_BLITZ_SPARK_PUBKEY;
+    const isDonation =
+      tx.transfer_direction === "OUTGOING" &&
+      tx.type === "TRANSFER" &&
+      tx.receiver_identity_pubkey === import.meta.env.VITE_BLITZ_SPARK_PUBKEY;
 
-      if (includedDonations.current) {
-        includedDonations.current = isDonation;
-      }
-      if (tx?.type === "PREIMAGE_SWAP" && tx?.status === "INVOICE_CREATED")
-        return;
+    if (includedDonations.current) {
+      includedDonations.current = isDonation;
+    }
 
-      if (isDonation) return;
+    if (tx?.type === "PREIMAGE_SWAP" && tx?.status === "INVOICE_CREATED")
+      return;
+    if (isDonation) return;
 
-      return (
-        <TxItem
-          key={index}
-          isDonation={isDonation}
-          tx={tx}
-          index={index}
-          currentTime={currentTime}
-          currnetTxTime={currnetTxTime}
-        />
+    const bannerText = getBannerText(currentTime, currnetTxTime);
+
+    if (bannerText !== lastBanner && frompage !== "home") {
+      lastBanner = bannerText;
+      groupedTransfers.push(
+        <p key={`banner-${index}`} className="dateBannerText">
+          {bannerText}
+        </p>
       );
-    })
-    .filter((item) => item);
+    }
 
-  if (!transferElements?.length) {
+    groupedTransfers.push(
+      <TxItem
+        key={index}
+        isDonation={isDonation}
+        tx={tx}
+        index={index}
+        currentTime={currentTime}
+        currnetTxTime={currnetTxTime}
+      />
+    );
+  });
+
+  if (!groupedTransfers?.length) {
     return (
       <div className="transactionContainer">
         <p className="noTxText">
@@ -76,8 +87,8 @@ export default function TransactionContanier({ frompage }) {
   }
   return (
     <div className="transactionContainer">
-      {transferElements.slice(0, frompage === "home" ? 20 : undefined)}
-      {transferElements?.length >= 20 && frompage === "home" && (
+      {groupedTransfers.slice(0, frompage === "home" ? 20 : undefined)}
+      {groupedTransfers?.length >= 20 && frompage === "home" && (
         <p
           onClick={() => navigate("/viewAllTransactions")}
           className="viewAllTxText"
@@ -171,4 +182,22 @@ function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
       </p>
     </div>
   );
+}
+
+function getBannerText(currentTime, txTime) {
+  const timeDifferenceMs = currentTime - txTime;
+  const minutes = timeDifferenceMs / (1000 * 60);
+  const hours = minutes / 60;
+  const days = hours / 24;
+  const years = days / 365;
+
+  if (days < 0.5) return "Today";
+  if (days >= 0.5 && days < 1) return "Yesterday";
+  if (days < 30)
+    return `${Math.round(days)} day${Math.round(days) === 1 ? "" : "s"} ago`;
+  if (days < 365)
+    return `${Math.floor(days / 30)} month${
+      Math.floor(days / 30) === 1 ? "" : "s"
+    } ago`;
+  return `${Math.floor(years)} year${Math.floor(years) === 1 ? "" : "s"} ago`;
 }
