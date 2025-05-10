@@ -233,7 +233,7 @@ export const SparkProvier = ({ children, navigate }) => {
         navigate("/confirm-page", {
           state: {
             for:
-              tx.transfer_direction === "INCOMING"
+              tx.transferDirection === "INCOMING"
                 ? "invoicePaid"
                 : "paymentsucceed",
             information: {
