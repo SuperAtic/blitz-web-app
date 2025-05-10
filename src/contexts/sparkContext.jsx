@@ -9,6 +9,7 @@ import React, {
 import { useAuth } from "./authContext";
 import {
   claimSparkBitcoinL1Transaction,
+  claimSparkBitcoinL1TransactionWithTxID,
   getSparkAddress,
   getSparkBalance,
   getSparkIdentityPublicKey,
@@ -296,7 +297,9 @@ export const SparkProvier = ({ children, navigate }) => {
             const result = await querySparkBitcoinL1Transaction(address);
             console.log("bitcoin address query result", result);
             if (result) {
-              const response = await claimSparkBitcoinL1Transaction(address);
+              const response = await claimSparkBitcoinL1TransactionWithTxID(
+                result
+              );
               // make sure to add address to tx item and format it like it needs to be for the sql database
               console.log("Bitcoin claim response", response);
               if (!response) return false;

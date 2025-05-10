@@ -78,7 +78,15 @@ export const claimSparkBitcoinL1Transaction = async (depositAddress) => {
     console.log("Claim bitcoin mainnet payment error", err);
   }
 };
-
+export const claimSparkBitcoinL1TransactionWithTxID = async (txid) => {
+  try {
+    if (!sparkWallet) throw new Error("sparkWallet not initialized");
+    const response = await sparkWallet.claimDeposit(txid);
+    return response;
+  } catch (err) {
+    console.log("Claim bitcoin mainnet payment error", err);
+  }
+};
 export const getSparkAddress = async () => {
   try {
     if (!sparkWallet) throw new Error("sparkWallet not initialized");

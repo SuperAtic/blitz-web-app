@@ -23,6 +23,7 @@
 }
 .sliderContainer .optionsContainer .option:nth-child(2) {
   margin-top: 20px;
+  /* margin: 20px 0; */
 }
 .sliderContainer .optionsContainer .option img {
   width: 30px;
