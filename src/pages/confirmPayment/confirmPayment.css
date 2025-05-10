@@ -10,9 +10,11 @@
   flex: 1;
 }
 .receiveQrPage .contentContainer .paymentStatus {
-  font-weight: 500;
+  font-weight: 400;
   font-size: 25px;
   text-align: center;
+  margin: 0;
+  margin-bottom: 10px;
 }
 .receiveQrPage .contentContainer .errorText {
   width: 95%;
@@ -31,6 +33,7 @@
   font-weight: 400;
   font-size: 30px;
   text-align: center;
+  margin: 0;
 }
 
 .receiveQrPage .contentContainer .continueBTN {

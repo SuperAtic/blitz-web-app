@@ -23,7 +23,6 @@ export default function Camera() {
     let isMounted = true;
 
     const scan = () => {
-      return;
       if (!isMounted || !video || video.readyState !== video.HAVE_ENOUGH_DATA) {
         animationFrameId.current = requestAnimationFrame(scan);
         return;
