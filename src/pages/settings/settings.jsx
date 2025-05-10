@@ -84,7 +84,7 @@ export default function SettingsHome() {
             clearSparkSession();
           }}
         >
-          <img src={trashIcon} alt="" srcset="" /> Deleate wallet
+          <img src={trashIcon} alt="" srcset="" /> Delete wallet
         </button>
       </div>
     </div>
