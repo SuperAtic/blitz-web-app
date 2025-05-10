@@ -1,12 +1,58 @@
-# React + Vite
+<img src=".github/assets/images/wordmark.png" alt="Project Logo" width="100%">
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<hr/>
 
-Currently, two official plugins are available:
+Blitz Wallet Web App is a React application that allows users to interact with the Bitcoin Lighting Network in a self-custodial way. By using Spark, we aim to create a seamless and simple payment experience to intantly show anyone how easy it is to use the Bitcoin network for payments.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<hr>
 
-## Expanding the ESLint configuration
+⚠️ This is a SELF-CUSTODIAL Bitcoin Lightning wallet. We do not have access to your seed phrase or funds. If you lose your seed phrase, access to your funds will be lost. Also, do not share your seed phrase with anyone. If you do, they will be able to steal your funds.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Features
+
+- Send Bitcoin payments
+  - From camera
+  - From clipboard
+- Receive Bitcoin payments
+  - Using a Lightning QR code
+  - Using a Spark QR code
+- Wallet recovery
+
+## TODO
+
+- [] Receive Bitcoin payments
+- [] Dark modes
+- [] Fiat currencies
+- [] Add Blitz Contacts
+
+## Contribute
+
+We rely on GitHub for bug tracking. Before reporting a new bug, please take a moment to search the <a href='https://github.com/BlitzWallet/BlitzWallet/issues'>existing issues</a> to see if your problem has already been addressed. If you can't find an existing report, feel free to create a new issue.
+
+Moreover, we encourage contributions to the project by submitting pull requests to improve the codebase or introduce new features. All pull requests will be thoroughly reviewed by members of the Blitz team. Your contributions are invaluable to us!
+
+## Build
+
+To run the project locally, follow these steps:
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/BlitzWallet/blitz-web-app
+   cd blitz-web-app
+   ```
+2. **Install deendencies**
+   ```
+   npm install
+   # or
+   yarn
+   ```
+3. **Start the development server**
+   ```
+   npm run dev
+    # or
+    yarn dev
+   ```
+
+## License
+
+Blitz is released under the terms of the Apache 2.0 license. See LICENSE for more information.
