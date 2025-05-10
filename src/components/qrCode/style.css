@@ -11,8 +11,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
+.qrContainer .imageContainer {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
 
-.receiveQrPageContent .feeText {
-  margin: 0;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.qrContainer img {
+  width: 60%;
+  height: 60%;
+  /* padding: 10px; */
 }
