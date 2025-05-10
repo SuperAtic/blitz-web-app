@@ -61,7 +61,9 @@ export const getAllSparkTransactions = async () => {
     });
 
     // Sort by createdTime descending (newest first)
-    return allTxns.sort((a, b) => b.updated_at_time - a.updated_at_time);
+    return allTxns.sort(
+      (a, b) => (b.updated_at_time || 0) - (a.updated_at_time || 0)
+    );
   } catch (error) {
     console.error("Error fetching transactions:", error);
     return [];
@@ -128,7 +130,10 @@ export const updateSingleSparkTransaction = async (
   }
 };
 
-export const bulkUpdateSparkTransactions = async (transactions) => {
+export const bulkUpdateSparkTransactions = async (
+  transactions,
+  formatType = "spark"
+) => {
   if (!Array.isArray(transactions) || transactions.length === 0) return;
 
   try {
@@ -153,18 +158,39 @@ export const bulkUpdateSparkTransactions = async (transactions) => {
       console.log("Has existing tx", existingTx);
 
       const txData = {
-        spark_id: tx.id,
-        sender_identity_pubkey: tx.senderIdentityPublicKey,
-        receiver_identity_pubkey: tx.receiverIdentityPublicKey,
-        status: tx.status,
-        created_at_time: timeIdFormatting,
-        updated_at_time: new Date(tx.updatedTime ?? tx.createdTime).getTime(),
-        expires_at_time: new Date(tx.expiryTime).getTime(),
+        spark_id: tx[formatType === "spark" ? "id" : "spark_id"],
+        sender_identity_pubkey:
+          tx[
+            formatType === "spark"
+              ? "senderIdentityPublicKey"
+              : "sender_identity_pubkey"
+          ],
+        receiver_identity_pubkey:
+          tx[
+            formatType === "spark"
+              ? "receiverIdentityPublicKey"
+              : "receiver_identity_pubkey"
+          ],
+        status: tx["status"],
+        created_at_time:
+          formatType === "spark" ? timeIdFormatting : tx["created_at_time"],
+        updated_at_time:
+          formatType === "spark"
+            ? new Date(tx.updatedTime ?? tx.createdTime).getTime()
+            : tx["updated_at_time"],
+        expires_at_time:
+          formatType === "spark"
+            ? new Date(tx.expiryTime).getTime()
+            : tx["expires_at_time"],
         type: tx.type,
-        transfer_direction: tx.transferDirection,
-        total_sent: tx.totalValue,
-        initial_sent: tx.initial_sent,
-        description: tx.description,
+        transfer_direction:
+          tx[
+            formatType === "spark" ? "transferDirection" : "transfer_direction"
+          ],
+        total_sent: tx[formatType === "spark" ? "totalValue" : "total_sent"],
+        initial_sent:
+          tx[formatType === "spark" ? "initial_sent" : "initial_sent"],
+        initial_sent: tx.description,
         fee: tx.fee,
         address: tx.address,
       };

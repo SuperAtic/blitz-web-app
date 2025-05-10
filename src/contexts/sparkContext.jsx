@@ -17,6 +17,7 @@ import {
   initializeSparkWallet,
   querySparkBitcoinL1Transaction,
   sparkWallet,
+  useIsSparkPaymentPending,
   useSparkPaymentType,
 } from "../functions/spark";
 import {
@@ -28,6 +29,9 @@ import {
 } from "../functions/txStorage";
 import { restoreSparkTxState } from "../functions/restore";
 import mergeTransactions from "../functions/copyObject";
+import { EventEmitter } from "events";
+export const pendingTxEventEmitter = new EventEmitter();
+export const PENDING_SPARK_EVENT_NAME = "ADD_PENDING_TX";
 import { getLatestDepositTxId } from "@buildonspark/spark-sdk";
 
 const SparkContext = createContext();
@@ -58,6 +62,7 @@ export const SparkProvier = ({ children, navigate }) => {
   const initWalletRef = useRef(null);
   const transactionListeners = useRef(null);
   const depositAddressIntervalRef = useRef(null);
+  const pendingTxList = useRef(null);
 
   const handleTransactionUpdate = async (recevedTxId) => {
     try {
@@ -319,6 +324,52 @@ export const SparkProvier = ({ children, navigate }) => {
       1_000 * 60
     );
   }, []);
+
+  useEffect(() => {
+    // const handleNewTx = ({ txid }) => {
+    //   pendingTxList.current = [...pendingTxList.current, txid];
+    // };
+
+    const hanlePaymentStateUpdate = async () => {
+      const savedTransactions = await getAllSparkTransactions();
+      const pendingTxs = savedTransactions.filter((tx) => {
+        const paymentType = useSparkPaymentType(tx);
+        const isPending = useIsSparkPaymentPending(tx, paymentType);
+        return isPending;
+      });
+      console.log(pendingTxs, "pending txs");
+
+      if (!pendingTxs.length) return;
+
+      const transactions = await getSparkTransactions(20);
+
+      if (!transactions) reutrn;
+      const { transfers } = transactions;
+
+      const filterdTransfers = transfers.filter((tx) =>
+        pendingTxs.find((pendingTx) => pendingTx.spark_id === tx.id)
+      );
+      console.log(filterdTransfers, "filtered transactions");
+
+      const updates = pendingTxs.map((pendingTx) => ({
+        ...pendingTx,
+        id: pendingTx.spark_id,
+        status: filterdTransfers.find(
+          (txListTx) => pendingTx.spark_id === txListTx.id
+        ).status,
+      }));
+
+      console.log(updates);
+      await bulkUpdateSparkTransactions(updates, "blitz");
+    };
+    if (!sparkWallet) return;
+    if (pendingTxList.current) return;
+    pendingTxList.current = true;
+    // sparkTransactionsEventEmitter.on(PENDING_SPARK_EVENT_NAME, handleNewTx);
+    console.log("adding payments state update listener ");
+    hanlePaymentStateUpdate();
+    setInterval(hanlePaymentStateUpdate, 1_000 * 30);
+  }, [sparkWallet]);
 
   return (
     <SparkContext.Provider
