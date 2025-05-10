@@ -1,4 +1,5 @@
 import { QRCodeSVG } from "qrcode.react";
+import logo from "../../assets/qrImage.png";
 import "./style.css";
 export default function QRCodeQrapper({ data }) {
   return (
@@ -8,6 +9,12 @@ export default function QRCodeQrapper({ data }) {
         width={"100%"}
         bgColor="transparent"
         value={data}
+        imageSettings={{
+          src: logo,
+          width: 20,
+          height: 20,
+          excavate: true,
+        }}
       />
     </div>
   );
