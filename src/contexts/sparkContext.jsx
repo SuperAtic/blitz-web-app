@@ -344,7 +344,7 @@ export const SparkProvier = ({ children, navigate }) => {
 
       if (!pendingTxs.length) return;
 
-      const transactions = await getSparkTransactions(20);
+      const transactions = await getSparkTransactions(50);
 
       if (!transactions) reutrn;
       const { transfers } = transactions;
@@ -354,13 +354,19 @@ export const SparkProvier = ({ children, navigate }) => {
       );
       console.log(filterdTransfers, "filtered transactions");
 
-      const updates = pendingTxs.map((pendingTx) => ({
-        ...pendingTx,
-        id: pendingTx.spark_id,
-        status: filterdTransfers.find(
-          (txListTx) => pendingTx.spark_id === txListTx.id
-        ).status,
-      }));
+      const updates = pendingTxs
+        .map((pendingTx) => {
+          const status = filterdTransfers.find(
+            (txListTx) => pendingTx.spark_id === txListTx.id
+          )?.status;
+          if (!status) return false;
+          return {
+            ...pendingTx,
+            id: pendingTx.spark_id,
+            status: status,
+          };
+        })
+        .filter(Boolean);
 
       console.log(updates);
       await bulkUpdateSparkTransactions(updates, "blitz");

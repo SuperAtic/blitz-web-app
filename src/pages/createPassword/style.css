@@ -34,6 +34,7 @@
   border: 0;
   border: 2px solid gainsboro;
   padding-left: 10px;
+  min-height: 35px;
 }
 .passwordContainer .initialPass {
   margin-bottom: 20px;
