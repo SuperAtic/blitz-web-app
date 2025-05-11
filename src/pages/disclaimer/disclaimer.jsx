@@ -14,8 +14,9 @@ function DisclaimerPage() {
           Blitz cannot access your funds or help recover them if lost. By
           continuing, you agree to Blitz Wallet's terms and conditions.
         </p>
-        <img src={disclaimerKeys} />
-
+        <div className="imgContainer">
+          <img loading="lazy" src={disclaimerKeys} />
+        </div>
         <p className="quoteText">
           "With great power comes great responsibility" - Uncle Ben
         </p>
