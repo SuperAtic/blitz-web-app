@@ -69,7 +69,7 @@ export const SparkProvier = ({ children, navigate }) => {
     try {
       // First we need to get recent spark transfers
       const [transactions, txs] = await Promise.all([
-        getSparkTransactions(5, undefined),
+        getSparkTransactions(50, undefined),
         getAllSparkTransactions(),
       ]);
 
@@ -305,24 +305,26 @@ export const SparkProvier = ({ children, navigate }) => {
               // make sure to add address to tx item and format it like it needs to be for the sql database
               console.log("Bitcoin claim response", response);
               if (!response) return false;
+              const [data] = response;
               return {
-                ...response,
+                ...data,
                 address: address,
                 fee: 0,
-                receiverIdentityPublicKey: response.ownerIdentityPublicKey,
-                senderIdentityPublicKey: response.verifyingPublicKey,
+                receiverIdentityPublicKey: data.ownerIdentityPublicKey,
+                senderIdentityPublicKey: data.ownerIdentityPublicKey,
                 createdTime: new Date().getTime(),
                 expiryTime: new Date("9999-12-31T23:59:59.999Z").getTime(),
                 type: "TRANSFER",
                 transferDirection: "INCOMING",
-                initial_sent: response.value,
+                initial_sent: data.value,
+                totalValue: data.value,
               };
             }
           })
         );
         const filteredTxs = newTransactions.filter(Boolean);
         console.log(filteredTxs, "filtered TXs");
-
+        return;
         await bulkUpdateSparkTransactions(filteredTxs);
 
         // Eventualy save the claimed txs to the transaction array
@@ -335,7 +337,6 @@ export const SparkProvier = ({ children, navigate }) => {
       clearInterval(depositAddressIntervalRef.current);
     }
 
-    return;
     depositAddressIntervalRef.current = setInterval(
       handleDepositAddressCheck,
       1_000 * 60

@@ -232,10 +232,10 @@ export const useIsSparkPaymentPending = (tx, transactionPaymentType) => {
   try {
     return (
       (transactionPaymentType === "bitcoin" &&
-        (tx.status === "TRANSFER_STATUS_SENDER_KEY_TWEAK_PENDING" ||
-          tx.status === "CREATING")) ||
+        tx.status === "TRANSFER_STATUS_SENDER_KEY_TWEAK_PENDING") ||
       (transactionPaymentType === "spark" &&
-        tx.status === "TRANSFER_STATUS_SENDER_KEY_TWEAKED") ||
+        (tx.status === "TRANSFER_STATUS_SENDER_KEY_TWEAKED" ||
+          tx.status === "CREATING")) ||
       (transactionPaymentType === "lightning" &&
         tx.status === "LIGHTNING_PAYMENT_INITIATED")
     );
