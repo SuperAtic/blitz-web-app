@@ -67,3 +67,25 @@
   font-size: 20px;
   margin: 0;
 }
+
+.number-keyboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 20px;
+}
+
+.keyboard-key {
+  padding: 15px;
+  font-size: 18px;
+  /* border: 1px solid #ccc; */
+  /* border-radius: 5px; */
+  background: transparent;
+  cursor: pointer;
+}
+.number-keyboard img {
+  width: 25px;
+  height: 25px;
+}
