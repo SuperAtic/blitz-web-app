@@ -1,7 +1,10 @@
 import {
   brodcastTokenAnnouncement,
   fundL1TokenAddress,
+  getTokenPublicKey,
   mintSparkToken,
+  sendSparkToken,
+  sparkTokenWallet,
 } from "../../functions/sparkAssets";
 
 export default function AssetsHome() {
@@ -40,8 +43,15 @@ export default function AssetsHome() {
       </button>
       <button
         onClick={async () => {
-          const annoucementTx = await mintSparkToken(100_000);
-          console.log(annoucementTx);
+          const pubKey = await getTokenPublicKey();
+          const transactionId = await sendSparkToken({
+            tokenPublicKey: pubKey,
+            tokenAmount: BigInt(10_000),
+            receiverSparkAddress:
+              "sp1pgssyys32u2ygsl29k2025nk3zkmqc4egnk7c4xzraheg0w86hxleklz6hxww3",
+          });
+
+          console.log("Spark Transaction ID:", transactionId);
         }}
       >
         Send Token
