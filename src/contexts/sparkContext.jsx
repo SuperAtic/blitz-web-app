@@ -320,13 +320,13 @@ export const SparkProvier = ({ children, navigate }) => {
     if (depositAddressIntervalRef.current) {
       clearInterval(depositAddressIntervalRef.current);
     }
-
-    return;
+    if (!sparkWallet) return;
+    handleDepositAddressCheck();
     depositAddressIntervalRef.current = setInterval(
       handleDepositAddressCheck,
       1_000 * 60
     );
-  }, []);
+  }, [sparkWallet]);
 
   useEffect(() => {
     // const handleNewTx = ({ txid }) => {

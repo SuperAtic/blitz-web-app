@@ -5,6 +5,7 @@ import clipbardIcon from "../../assets/clipboardIcon.png";
 import copyToClipboard from "../../functions/copyToClipboard";
 import keyIcon from "../../assets/keyIcon.png";
 import shareIcon from "../../assets/share.png";
+import coinsIcon from "../../assets/coins.png";
 import trashIcon from "../../assets/trashIcon.png";
 import { useAuth } from "../../contexts/authContext";
 import { useNavigate } from "react-router-dom";
@@ -63,6 +64,14 @@ export default function SettingsHome() {
         </div>
         <button onClick={() => navigate("/key")}>
           <img src={keyIcon} alt="" srcset="" /> Backup recovery phrase
+        </button>
+        <button
+          onClick={() => {
+            navigate("/assets");
+          }}
+        >
+          <img src={coinsIcon} alt="" srcset="" />
+          Assets
         </button>
         <button
           onClick={() => {
