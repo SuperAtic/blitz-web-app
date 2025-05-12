@@ -119,15 +119,15 @@ export const sparkPaymenWrapper = async ({
         receiverSparkAddress: address,
         amountSats,
       });
-
-      response = await updatePaymentsState(
-        sparkPayResponse,
-        null,
-        passedSupportFee,
-        memo,
-        address,
-        "SPARK_SEND"
-      );
+      if (!response)
+        response = await updatePaymentsState(
+          sparkPayResponse,
+          null,
+          passedSupportFee,
+          memo,
+          address,
+          "SPARK_SEND"
+        );
 
       // Process support fee in the background if enabled
       if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {

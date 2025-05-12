@@ -106,6 +106,7 @@ export const sendSparkPayment = async ({
     return await sparkWallet.transfer({ receiverSparkAddress, amountSats });
   } catch (err) {
     console.log("Send spark payment error", err);
+    throw new Error(err.message);
   }
 };
 
