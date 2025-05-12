@@ -303,11 +303,23 @@ export const SparkProvier = ({ children, navigate }) => {
               // make sure to add address to tx item and format it like it needs to be for the sql database
               console.log("Bitcoin claim response", response);
               if (!response) return false;
-              return { ...response, address: address, fee: 0 };
+              return {
+                ...response,
+                address: address,
+                fee: 0,
+                receiverIdentityPublicKey: response.ownerIdentityPublicKey,
+                senderIdentityPublicKey: response.verifyingPublicKey,
+                createdTime: new Date().getTime(),
+                expiryTime: new Date("9999-12-31T23:59:59.999Z").getTime(),
+                type: "TRANSFER",
+                transferDirection: "INCOMING",
+                initial_sent: response.value,
+              };
             }
           })
         );
         const filteredTxs = newTransactions.filter(Boolean);
+        console.log(filteredTxs, "filtered TXs");
 
         await bulkUpdateSparkTransactions(filteredTxs);
 

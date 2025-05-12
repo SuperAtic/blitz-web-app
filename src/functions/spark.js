@@ -1,5 +1,6 @@
 import { getLatestDepositTxId, SparkWallet } from "@buildonspark/spark-sdk";
 import { getAllSparkTransactions } from "./txStorage";
+import { TransferType } from "@buildonspark/spark-sdk/proto/spark";
 // import {
 //   BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION,
 //   IS_DONTATION_PAYMENT_BUFFER,
@@ -231,7 +232,8 @@ export const useIsSparkPaymentPending = (tx, transactionPaymentType) => {
   try {
     return (
       (transactionPaymentType === "bitcoin" &&
-        tx.status === "TRANSFER_STATUS_SENDER_KEY_TWEAK_PENDING") ||
+        (tx.status === "TRANSFER_STATUS_SENDER_KEY_TWEAK_PENDING" ||
+          tx.status === "CREATING")) ||
       (transactionPaymentType === "spark" &&
         tx.status === "TRANSFER_STATUS_SENDER_KEY_TWEAKED") ||
       (transactionPaymentType === "lightning" &&
