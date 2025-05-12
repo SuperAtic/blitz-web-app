@@ -175,8 +175,10 @@ const processSupportFeeInBackground = async (
             new Date(tx.createdTime).getTime() -
               new Date(supportFeeResponse.createdTime).getTime()
           ) < 10000 &&
-          tx.receiverIdentityPublicKey ===
-            import.meta.env.VITE_BLITZ_SPARK_PUBKEY
+          (tx.receiverIdentityPublicKey ===
+            import.meta.env.VITE_BLITZ_SPARK_PUBKEY ||
+            tx.receiver_identity_pubkey ===
+              import.meta.env.VITE_BLITZ_SPARK_PUBKEY_OLD)
       ) || {};
 
     const supportStoredPayment = {
@@ -274,7 +276,9 @@ const updatePaymentsState = async (
               new Date(outgoingPayment.createdAt).getTime()
           ) < 10000 &&
           tx.receiverIdentityPublicKey !==
-            import.meta.env.VITE_BLITZ_SPARK_PUBKEY
+            import.meta.env.VITE_BLITZ_SPARK_PUBKEY &&
+          tx.receiver_identity_pubkey !==
+            import.meta.env.VITE_BLITZ_SPARK_PUBKEY_OLD
         );
       }) || {};
 

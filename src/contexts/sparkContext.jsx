@@ -226,8 +226,10 @@ export const SparkProvier = ({ children, navigate }) => {
         if (
           tx.type === "TRANSFER" &&
           tx.transferDirection === "OUTGOING" &&
-          tx.receiverIdentityPublicKey ===
-            import.meta.env.VITE_BLITZ_SPARK_PUBKEY
+          (tx.receiverIdentityPublicKey ===
+            import.meta.env.VITE_BLITZ_SPARK_PUBKEY ||
+            tx.receiver_identity_pubkey ===
+              import.meta.env.VITE_BLITZ_SPARK_PUBKEY_OLD)
         )
           return;
         navigate("/confirm-page", {

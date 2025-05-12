@@ -9,10 +9,13 @@ import { useAuth } from "../../contexts/authContext";
 import Storage from "../../functions/localStorage";
 import SwipeButton from "../../components/swipeThumb/swipeThumb";
 import { keyframes } from "@emotion/react";
+import { useSpark } from "../../contexts/sparkContext";
 
 function Login() {
   const navigate = useNavigate();
-  const { login, setMnemoinc } = useAuth();
+  const { login, setMnemoinc, deleteWallet, logout } = useAuth();
+  const { clearSparkSession } = useSpark();
+
   const [password, setPassword] = useState("");
 
   const handlePassEncription = () => {
@@ -40,14 +43,25 @@ function Login() {
           name=""
           id="inialPass"
         />
-        <button
-          style={{
-            opacity: !password ? 0.5 : 1,
-          }}
-          onClick={handlePassEncription}
-        >
-          Unlock wallet
-        </button>
+        <div className="buttonsContainer">
+          <button
+            style={{
+              opacity: !password ? 0.5 : 1,
+            }}
+            onClick={handlePassEncription}
+          >
+            Unlock wallet
+          </button>
+          <button
+            onClick={() => {
+              deleteWallet();
+              clearSparkSession();
+              logout();
+            }}
+          >
+            Delete wallet
+          </button>
+        </div>
       </div>
     </div>
   );

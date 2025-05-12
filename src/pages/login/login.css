@@ -23,6 +23,11 @@
   display: flex;
   flex-direction: column;
 }
+.passwordContainer .buttonsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 10px;
+}
 .passwordContainer .containerDescription {
   font-weight: 500;
   margin-bottom: 20px;
@@ -39,10 +44,15 @@
 .passwordContainer .initialPass {
   margin-bottom: 20px;
 }
-.passwordContainer button {
+.passwordContainer .buttonsContainer button:first-child {
   background-color: var(--primaryBlue);
   color: #fff;
-  margin-top: 20px;
+  /* margin-top: 20px; */
+}
+.passwordContainer .buttonsContainer button:last-child {
+  background-color: #121212;
+  color: #fff;
+  /* margin-top: 20px; */
 }
 @keyframes rotate {
   from {

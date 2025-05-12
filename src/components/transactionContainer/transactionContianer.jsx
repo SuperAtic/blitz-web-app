@@ -43,7 +43,10 @@ export default function TransactionContanier({ frompage }) {
     const isDonation =
       tx.transfer_direction === "OUTGOING" &&
       tx.type === "TRANSFER" &&
-      tx.receiver_identity_pubkey === import.meta.env.VITE_BLITZ_SPARK_PUBKEY;
+      (tx.receiver_identity_pubkey ===
+        import.meta.env.VITE_BLITZ_SPARK_PUBKEY ||
+        tx.receiver_identity_pubkey ===
+          import.meta.env.VITE_BLITZ_SPARK_PUBKEY_OLD);
 
     if (includedDonations.current) {
       includedDonations.current = isDonation;
