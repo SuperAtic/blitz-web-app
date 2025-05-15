@@ -23,6 +23,32 @@ export const initializeSparkWallet = async (mnemonic) => {
     return { isConnected: false }; //make sure to switch back to false
   }
 };
+export const sparkListeners = async () => {
+  try {
+    if (!sparkWallet) throw new Error("sparkWallet not initialized");
+    return await sparkWallet.listeners("transfer:claimed");
+  } catch (err) {
+    console.log("Get spark balance error", err);
+  }
+};
+export const removeTransferClaimed = async () => {
+  try {
+    if (!sparkWallet) throw new Error("sparkWallet not initialized");
+    const [transferClaimedListener] = await sparkListeners();
+    return sparkWallet.off("transfer:claimed", transferClaimedListener);
+  } catch (err) {
+    console.log("Get spark balance error", err);
+  }
+};
+export const cleanupSparkConnections = async () => {
+  try {
+    if (!sparkWallet) throw new Error("sparkWallet not initialized");
+    return await sparkWallet.cleanupConnections();
+  } catch (err) {
+    console.log("Get spark balance error", err);
+  }
+};
+
 export const getSparkIdentityPublicKey = async () => {
   try {
     if (!sparkWallet) throw new Error("sparkWallet not initialized");
@@ -32,6 +58,14 @@ export const getSparkIdentityPublicKey = async () => {
   }
 };
 
+export const getSparkLightningRequest = async (requestID) => {
+  try {
+    if (!sparkWallet) throw new Error("sparkWallet not initialized");
+    return await sparkWallet.getLightningReceiveRequest(requestID);
+  } catch (err) {
+    console.log("Get spark balance error", err);
+  }
+};
 export const getSparkBalance = async () => {
   try {
     if (!sparkWallet) throw new Error("sparkWallet not initialized");

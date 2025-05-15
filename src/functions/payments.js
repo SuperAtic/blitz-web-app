@@ -1,7 +1,12 @@
 import { BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION } from "../constants";
 import { SPARK_TO_LN_FEE, SPARK_TO_SPARK_FEE } from "../constants/math";
 import mergeTransactions from "./copyObject";
-import { getSparkTransactions, sendSparkPayment, sparkWallet } from "./spark";
+import {
+  getSparkLightningRequest,
+  getSparkTransactions,
+  sendSparkPayment,
+  sparkWallet,
+} from "./spark";
 import {
   addSingleSparkTransaction,
   bulkUpdateSparkTransactions,
@@ -289,17 +294,18 @@ const updatePaymentsState = async (
       description: memo,
     };
 
-    const updates = supportFeePayment
-      ? [
-          storedPayment,
-          {
-            ...mergeTransactions(supportFeePayment, {}),
-            description: BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION,
-            address: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
-            fee: SPARK_TO_SPARK_FEE,
-          },
-        ]
-      : [storedPayment];
+    const updates = [storedPayment];
+    // supportFeePayment
+    //   ? [
+    //       storedPayment,
+    //       {
+    //         ...mergeTransactions(supportFeePayment, {}),
+    //         description: BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION,
+    //         address: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
+    //         fee: SPARK_TO_SPARK_FEE,
+    //       },
+    //     ]
+    //   : [storedPayment];
 
     console.log(updates, "payment storage object updates");
     await bulkUpdateSparkTransactions(updates);
