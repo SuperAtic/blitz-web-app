@@ -48,6 +48,22 @@ export const cleanupSparkConnections = async () => {
     console.log("Get spark balance error", err);
   }
 };
+export const getSparkLightningSendRequest = async (id) => {
+  try {
+    if (!sparkWallet) throw new Error("sparkWallet not initialized");
+    return await sparkWallet.getLightningSendRequest(id);
+  } catch (err) {
+    console.log("Get spark balance error", err);
+  }
+};
+export const getSparkCooperativeExitRequest = async (id) => {
+  try {
+    if (!sparkWallet) throw new Error("sparkWallet not initialized");
+    return await sparkWallet.getCoopExitRequest(id);
+  } catch (err) {
+    console.log("Get spark balance error", err);
+  }
+};
 
 export const getSparkIdentityPublicKey = async () => {
   try {
