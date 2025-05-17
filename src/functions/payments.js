@@ -2,7 +2,7 @@ import { BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION } from "../constants";
 import { SPARK_TO_LN_FEE, SPARK_TO_SPARK_FEE } from "../constants/math";
 import mergeTransactions from "./copyObject";
 import {
-  getSparkLightningRequest,
+  getSparkLightningSendRequest,
   getSparkTransactions,
   sendSparkPayment,
   sparkWallet,
@@ -68,23 +68,15 @@ export const sparkPaymenWrapper = async ({
     }
 
     let response;
-    if (userBalance < amountSats + fee) throw new Error("Insufficient funds");
+    if (userBalance < amountSats + (paymentType === "bitcoin" ? 0 : fee))
+      throw new Error("Insufficient funds");
 
     // Handle the main payment first
     if (paymentType === "lightning") {
       const lightningPayResponse = await sparkWallet.payLightningInvoice({
         invoice: address,
+        maxFeeSats: fee,
       });
-
-      response = await updatePaymentsState(
-        lightningPayResponse,
-        null,
-        passedSupportFee,
-        memo,
-        address,
-        "PREIMAGE_SWAP"
-      );
-
       // Process support fee in the background if enabled
       if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
         processSupportFeeInBackground(
@@ -94,22 +86,49 @@ export const sparkPaymenWrapper = async ({
           passedSupportFee
         );
       }
+
+      console.log(lightningPayResponse, "lightning pay response");
+      let sparkQueryResponse = null;
+      let count = 0;
+      while (!sparkQueryResponse && count < 5) {
+        const sparkResponse = await getSparkLightningSendRequest(
+          lightningPayResponse.id
+        );
+
+        if (sparkResponse.transfer) {
+          sparkQueryResponse = sparkResponse;
+        } else {
+          console.log("Waiting for response...");
+          await new Promise((res) => setTimeout(res, 2000));
+        }
+        count += 1;
+      }
+
+      console.log(sparkQueryResponse, "AFTEWR");
+      await bulkUpdateSparkTransactions([
+        {
+          id: sparkQueryResponse.transfer.sparkId,
+          senderIdentityPublicKey: "",
+          receiverIdentityPublicKey: "",
+          status: sparkQueryResponse.status,
+          createdTime: sparkQueryResponse.createdAt,
+          updatedTime: sparkQueryResponse.updatedAt,
+          expiryTime: 999999999,
+          type: "PREIMAGE_SWAP",
+          transferDirection: "OUTGOING",
+          totalValue: amountSats,
+          initial_sent: amountSats,
+          description: memo,
+          fee: passedSupportFee,
+          address,
+        },
+      ]);
     } else if (paymentType === "bitcoin") {
       const onChainPayResponse = await sparkWallet.withdraw({
         onchainAddress: address,
         exitSpeed,
         amountSats,
       });
-
-      response = await updatePaymentsState(
-        onChainPayResponse,
-        null,
-        passedSupportFee,
-        memo,
-        address,
-        "BITCOIN_WITHDRAWAL"
-      );
-
       // Process support fee in the background if enabled
       if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
         processSupportFeeInBackground(
@@ -119,21 +138,20 @@ export const sparkPaymenWrapper = async ({
           passedSupportFee
         );
       }
+
+      response = await updatePaymentsState(
+        onChainPayResponse,
+        null,
+        passedSupportFee,
+        memo,
+        address,
+        "BITCOIN_WITHDRAWAL"
+      );
     } else {
       const sparkPayResponse = await sendSparkPayment({
         receiverSparkAddress: address,
         amountSats,
       });
-      if (!response)
-        response = await updatePaymentsState(
-          sparkPayResponse,
-          null,
-          passedSupportFee,
-          memo,
-          address,
-          "SPARK_SEND"
-        );
-
       // Process support fee in the background if enabled
       if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
         processSupportFeeInBackground(
@@ -143,6 +161,15 @@ export const sparkPaymenWrapper = async ({
           passedSupportFee
         );
       }
+      console.log(sparkPayResponse, "spark pay response");
+      response = await updatePaymentsState(
+        sparkPayResponse,
+        null,
+        passedSupportFee,
+        memo,
+        address,
+        "SPARK_SEND"
+      );
     }
 
     return { didWork: true, response };
