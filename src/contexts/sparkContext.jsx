@@ -381,9 +381,15 @@ export const SparkProvier = ({ children, navigate }) => {
             status: status,
           };
         })
+        .filter(Boolean)
+        .filter((tx) => {
+          const paymentType = useSparkPaymentType(tx);
+          return !useIsSparkPaymentPending(tx, paymentType);
+        })
         .filter(Boolean);
 
       console.log(updates);
+      if (!updates.length) return;
       await bulkUpdateSparkTransactions(updates, "blitz");
     };
     if (!sparkWallet) return;
