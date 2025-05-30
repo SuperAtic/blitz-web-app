@@ -23,6 +23,21 @@ export const initializeSparkWallet = async (mnemonic) => {
     return { isConnected: false }; //make sure to switch back to false
   }
 };
+export const lnurlinitializeSparkWallet = async (mnemonic) => {
+  try {
+    const { wallet: w } = await SparkWallet.initialize({
+      mnemonicOrSeed: mnemonic,
+      options: { network: "MAINNET" },
+    });
+
+    console.log("Wallet initialized:");
+    return w;
+  } catch (err) {
+    console.log("Initialize spark wallet error", err);
+    return { isConnected: false }; //make sure to switch back to false
+  }
+};
+
 export const sparkListeners = async () => {
   try {
     if (!sparkWallet) throw new Error("sparkWallet not initialized");

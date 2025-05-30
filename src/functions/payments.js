@@ -2,6 +2,7 @@ import { BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION } from "../constants";
 import { SPARK_TO_LN_FEE, SPARK_TO_SPARK_FEE } from "../constants/math";
 import mergeTransactions from "./copyObject";
 import {
+  getSparkLightningPaymentStatus,
   getSparkLightningSendRequest,
   getSparkTransactions,
   sendSparkPayment,
@@ -129,6 +130,7 @@ export const sparkPaymenWrapper = async ({
         exitSpeed,
         amountSats,
       });
+      console.log("onchain payment response", onChainPayResponse);
       // Process support fee in the background if enabled
       if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
         processSupportFeeInBackground(
@@ -243,6 +245,7 @@ export const sparkReceivePaymentWrapper = async ({
         amountSats,
         memo,
       });
+
       // SAVE TEMP TX TO DATABASE HERE
       const tempTransaction = {
         id: invoice.id,
@@ -314,6 +317,7 @@ const updatePaymentsState = async (
         );
       }) || {};
 
+    console.log(txHistoryOutgoing, "found payment from payment state");
     const storedPayment = {
       ...mergeTransactions(outgoingPayment, txHistoryOutgoing),
       fee: fee,

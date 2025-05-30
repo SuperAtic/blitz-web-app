@@ -361,7 +361,7 @@ export const SparkProvier = ({ children, navigate }) => {
 
       const transactions = await getSparkTransactions(50);
 
-      if (!transactions) reutrn;
+      if (!transactions) return;
       const { transfers } = transactions;
 
       const filterdTransfers = transfers.filter((tx) =>
