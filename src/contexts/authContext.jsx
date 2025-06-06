@@ -26,7 +26,7 @@ export const AuthProvider = ({ children, navigate }) => {
       walletKey,
       lastSession: Date.now().toString(),
     });
-    navigate("/wallet");
+    navigate("/connecting");
   };
 
   const deleteWallet = () => {

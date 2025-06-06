@@ -2,9 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import MascotWalking from "../../components/mascotWalking";
 import "./style.css";
 import ThemeText from "../../components/themeText/themeText";
+import getBitcoinPriceData from "../../functions/getBitcoinPriceData";
+import { useBitcoinPriceContext } from "../../contexts/bitcoinPriceContext";
+import { useAuth } from "../../contexts/authContext";
+import initializeUserSettings from "../../functions/initializeUserSettings";
 
 export default function LoadingScreen() {
   const didInitializeMessageIntervalRef = useRef(false);
+  const didInitializeWalletRef = useRef(false);
+  const { mnemoinc } = useAuth();
+  const {
+    setBitcoinPriceArray,
+    toggleSelectedBitcoinPrice,
+    bitcoinPriceArray,
+    selectedBitcoinPrice,
+  } = useBitcoinPriceContext();
   const [loadingMessage, setLoadingMessage] = useState(
     "Please don't leave the tab"
   );
@@ -23,6 +35,30 @@ export default function LoadingScreen() {
 
     return () => clearInterval(intervalRef);
   }, []);
+
+  useEffect(() => {
+    async function retriveExternalData() {
+      const initWallet = await initializeUserSettings(mnemoinc);
+      const bitcoinPriceData = await getBitcoinPriceData();
+      if (bitcoinPriceData) {
+        const priceArray = Object.values(bitcoinPriceData);
+        const selectedPrice = priceArray.find(
+          (item) => item.symbol.toLowerCase() === "usd"
+        );
+        setBitcoinPriceArray(priceArray);
+        toggleSelectedBitcoinPrice({
+          value: selectedPrice?.["15m"],
+          symbol: "usd",
+        });
+      }
+    }
+    if (!mnemoinc) return;
+    if (didInitializeWalletRef.current) return;
+    didInitializeWalletRef.current = true;
+    retriveExternalData();
+  }, [mnemoinc]);
+
+  console.log(selectedBitcoinPrice, bitcoinPriceArray);
   return (
     <div id="loadingScreenContainer">
       <div className="mascotContainer">
