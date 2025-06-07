@@ -6,11 +6,24 @@ import getBitcoinPriceData from "../../functions/getBitcoinPriceData";
 import { useBitcoinPriceContext } from "../../contexts/bitcoinPriceContext";
 import { useAuth } from "../../contexts/authContext";
 import initializeUserSettings from "../../functions/initializeUserSettings";
+import { useKeysContext } from "../../contexts/keysContext";
+import { useGlobalContextProvider } from "../../contexts/masterInfoObject";
+import { useGlobalAppData } from "../../contexts/appDataContext";
+import { useGlobalContacts } from "../../contexts/globalContacts";
+import { initializeDatabase } from "../../functions/messaging/cachedMessages";
+import { initializePOSTransactionsDatabase } from "../../functions/pos";
+import { initializeSparkDatabase } from "../../functions/spark/transactions";
 
 export default function LoadingScreen() {
   const didInitializeMessageIntervalRef = useRef(false);
   const didInitializeWalletRef = useRef(false);
+  const { toggleMasterInfoObject, masterInfoObject, setMasterInfoObject } =
+    useGlobalContextProvider();
   const { mnemoinc } = useAuth();
+  const { toggleContactsPrivateKey } = useKeysContext();
+  const { toggleGlobalContactsInformation, globalContactsInformation } =
+    useGlobalContacts();
+  const { toggleGlobalAppDataInformation } = useGlobalAppData();
   const {
     setBitcoinPriceArray,
     toggleSelectedBitcoinPrice,
@@ -38,27 +51,49 @@ export default function LoadingScreen() {
 
   useEffect(() => {
     async function retriveExternalData() {
-      const initWallet = await initializeUserSettings(mnemoinc);
-      const bitcoinPriceData = await getBitcoinPriceData();
-      if (bitcoinPriceData) {
-        const priceArray = Object.values(bitcoinPriceData);
-        const selectedPrice = priceArray.find(
-          (item) => item.symbol.toLowerCase() === "usd"
+      try {
+        const [didOpen, posTransactions, sparkTxs] = await Promise.all([
+          initializeDatabase(),
+          initializePOSTransactionsDatabase(),
+          initializeSparkDatabase(),
+        ]);
+        if (!didOpen || !posTransactions || !sparkTxs)
+          throw new Error("Database initialization failed");
+
+        const initWallet = await initializeUserSettings(
+          mnemoinc,
+          toggleContactsPrivateKey,
+          setMasterInfoObject,
+          toggleGlobalContactsInformation,
+          toggleGlobalAppDataInformation
         );
-        setBitcoinPriceArray(priceArray);
-        toggleSelectedBitcoinPrice({
-          value: selectedPrice?.["15m"],
-          symbol: "usd",
-        });
+        const bitcoinPriceData = await getBitcoinPriceData();
+
+        if (bitcoinPriceData && initWallet) {
+          const priceArray = Object.values(bitcoinPriceData);
+          const selectedPrice = priceArray.find(
+            (item) => item.symbol.toLowerCase() === "usd"
+          );
+          setBitcoinPriceArray(priceArray);
+          toggleSelectedBitcoinPrice({
+            value: selectedPrice?.["15m"],
+            symbol: "usd",
+          });
+        } else {
+          console.log("ERRROR");
+        }
+
+        if (!mnemoinc) return;
+        if (didInitializeWalletRef.current) return;
+        didInitializeWalletRef.current = true;
+      } catch (err) {
+        console.log(err, "error loading data");
       }
     }
-    if (!mnemoinc) return;
-    if (didInitializeWalletRef.current) return;
-    didInitializeWalletRef.current = true;
     retriveExternalData();
   }, [mnemoinc]);
 
-  console.log(selectedBitcoinPrice, bitcoinPriceArray);
+  console.log(selectedBitcoinPrice, bitcoinPriceArray, masterInfoObject);
   return (
     <div id="loadingScreenContainer">
       <div className="mascotContainer">

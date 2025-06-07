@@ -28,9 +28,8 @@ export async function initializeFirebase(publicKey, privateKey) {
   try {
     // Initialize App Check first
     // Sign in anonymously;
-    if (true) {
+    if (import.meta.env.MODE === "development") {
       connectFunctionsEmulator(functions, "localhost", 5001);
-      //   getFunctions().useEmulator('localhost', 5001);
     }
 
     const currentUser = auth.currentUser;

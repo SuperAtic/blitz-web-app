@@ -14,7 +14,7 @@ import {
 import SafeAreaComponent from "./components/safeAreaContainer.jsx";
 import { AuthProvider } from "./contexts/authContext.jsx";
 import AuthGate from "./components/authGate.jsx";
-import { SparkProvier } from "./contexts/sparkContext.jsx";
+import { SparkWalletProvider } from "./contexts/sparkContext.jsx";
 import { AnimatePresence } from "framer-motion";
 import { NavigationStackProvider } from "./contexts/navigationLogger.jsx";
 
@@ -43,6 +43,12 @@ import ConfirmPayment from "./pages/confirmPayment/confirmPaymentScreen.jsx";
 import { ThemeContextProvider } from "./contexts/themeContext.jsx";
 import LoadingScreen from "./pages/loadingScreen/index.jsx";
 import { BitcoinPriceProvider } from "./contexts/bitcoinPriceContext.jsx";
+import { KeysContextProvider } from "./contexts/keysContext.jsx";
+import { GlobalContextProvider } from "./contexts/masterInfoObject.jsx";
+import { GlobalAppDataProvider } from "./contexts/appDataContext.jsx";
+import { GlobalContactsList } from "./contexts/globalContacts.jsx";
+import { AppStatusProvider } from "./contexts/appStatus.jsx";
+import { GLobalNodeContextProider } from "./contexts/nodeContext.jsx";
 // const ConfirmPayment = lazy(() =>
 //   import("./pages/confirmPayment/confirmPaymentScreen.jsx")
 // );
@@ -62,164 +68,182 @@ function Root() {
 
   return (
     <NavigationStackProvider>
-      <BitcoinPriceProvider>
-        <ThemeContextProvider>
-          <AuthProvider navigate={navigate}>
-            <SparkProvier navigate={navigate}>
-              <AuthGate />
-              <AnimatePresence mode="wait">
-                <Suspense
-                  fallback={
-                    <SafeAreaComponent>
-                      <div
-                        style={{
-                          flex: 1,
-                          width: "100%",
-                          height: "100%",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        Loading...
-                      </div>
-                    </SafeAreaComponent>
-                  }
-                >
-                  <Routes location={location} key={location.pathname}>
-                    {/* Public Routes */}
-                    <Route
-                      path="/"
-                      element={
-                        <SafeAreaComponent>
-                          <Home />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/disclaimer"
-                      element={
-                        <SafeAreaComponent>
-                          <DisclaimerPage />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/createAccount"
-                      element={
-                        <SafeAreaComponent>
-                          <CreateSeed />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/createPassword"
-                      element={
-                        <SafeAreaComponent>
-                          <CreatePassword />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/login"
-                      element={
-                        <SafeAreaComponent>
-                          <Login />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/wallet"
-                      element={
-                        <SafeAreaComponent>
-                          <WalletHome />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/receiveAmount"
-                      element={
-                        <SafeAreaComponent>
-                          <EditReceivePaymentInformation />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/receive"
-                      element={
-                        <SafeAreaComponent>
-                          <ReceiveQRPage />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/send"
-                      element={
-                        <SafeAreaComponent>
-                          <SendPage />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/receive-options"
-                      element={<SwitchReceiveOption />}
-                    />
-                    <Route path="/camera" element={<Camera />} />
-                    <Route
-                      path="/confirm-page"
-                      element={
-                        <SafeAreaComponent>
-                          <ConfirmPayment />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/settings"
-                      element={
-                        <SafeAreaComponent>
-                          <SettingsHome />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/key"
-                      element={
-                        <SafeAreaComponent>
-                          <ViewMnemoinc />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/restore"
-                      element={
-                        <SafeAreaComponent>
-                          <RestoreWallet />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/viewAllTransactions"
-                      element={
-                        <SafeAreaComponent>
-                          <ViewAllTxsPage />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route
-                      path="/connecting"
-                      element={
-                        <SafeAreaComponent>
-                          <LoadingScreen />
-                        </SafeAreaComponent>
-                      }
-                    />
-                    <Route path="/error" element={<ErrorScreen />} />
-                  </Routes>
-                </Suspense>
-              </AnimatePresence>
-            </SparkProvier>
-          </AuthProvider>
-        </ThemeContextProvider>
-      </BitcoinPriceProvider>
+      <KeysContextProvider>
+        <GlobalContactsList>
+          <AppStatusProvider>
+            <ThemeContextProvider>
+              <GLobalNodeContextProider>
+                <SparkWalletProvider navigate={navigate}>
+                  <GlobalContextProvider>
+                    <BitcoinPriceProvider>
+                      <GlobalAppDataProvider>
+                        <AuthProvider navigate={navigate}>
+                          <AuthGate />
+                          <AnimatePresence mode="wait">
+                            <Suspense
+                              fallback={
+                                <SafeAreaComponent>
+                                  <div
+                                    style={{
+                                      flex: 1,
+                                      width: "100%",
+                                      height: "100%",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                    }}
+                                  >
+                                    Loading...
+                                  </div>
+                                </SafeAreaComponent>
+                              }
+                            >
+                              <Routes
+                                location={location}
+                                key={location.pathname}
+                              >
+                                {/* Public Routes */}
+                                <Route
+                                  path="/"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <Home />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/disclaimer"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <DisclaimerPage />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/createAccount"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <CreateSeed />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/createPassword"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <CreatePassword />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/login"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <Login />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/wallet"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <WalletHome />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/receiveAmount"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <EditReceivePaymentInformation />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/receive"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <ReceiveQRPage />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/send"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <SendPage />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/receive-options"
+                                  element={<SwitchReceiveOption />}
+                                />
+                                <Route path="/camera" element={<Camera />} />
+                                <Route
+                                  path="/confirm-page"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <ConfirmPayment />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/settings"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <SettingsHome />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/key"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <ViewMnemoinc />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/restore"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <RestoreWallet />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/viewAllTransactions"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <ViewAllTxsPage />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/connecting"
+                                  element={
+                                    <SafeAreaComponent>
+                                      <LoadingScreen />
+                                    </SafeAreaComponent>
+                                  }
+                                />
+                                <Route
+                                  path="/error"
+                                  element={<ErrorScreen />}
+                                />
+                              </Routes>
+                            </Suspense>
+                          </AnimatePresence>
+                        </AuthProvider>
+                      </GlobalAppDataProvider>
+                    </BitcoinPriceProvider>
+                  </GlobalContextProvider>
+                </SparkWalletProvider>
+              </GLobalNodeContextProider>
+            </ThemeContextProvider>
+          </AppStatusProvider>
+        </GlobalContactsList>
+      </KeysContextProvider>
     </NavigationStackProvider>
   );
 }
