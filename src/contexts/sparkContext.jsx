@@ -238,26 +238,22 @@ const SparkWalletProvider = ({ children }) => {
       ],
     });
   };
-
   // Add event listeners to listen for bitcoin and lightning or spark transfers when receiving does not handle sending
   useEffect(() => {
     if (!sparkInformation.didConnect) return;
 
     const handleUpdate = async (updateType) => {
       try {
-        console.log(
-          "running update in spark context from db changes",
-          updateType
-        );
+        console.log("Running update from DB changes:", updateType);
         const balance = (await getSparkBalance()) || { balance: 0 };
         const txs = await getAllSparkTransactions();
         setSparkInformation((prev) => ({
           ...prev,
           balance: balance.balance,
-          transactions: txs ? txs : prev.transactions,
+          transactions: txs || prev.transactions,
         }));
       } catch (err) {
-        console.log("error in spark handle db update function", err);
+        console.error("Error in handleUpdate:", err);
       }
     };
 
@@ -269,7 +265,7 @@ const SparkWalletProvider = ({ children }) => {
     const addListeners = () => {
       if (sparkPaymentActionsRef.current) return;
       sparkPaymentActionsRef.current = true;
-      console.log("Adding spark listeners");
+      console.log("Adding Spark listeners");
 
       sparkTransactionsEventEmitter.on(
         SPARK_TX_UPDATE_ENVENT_NAME,
@@ -282,7 +278,7 @@ const SparkWalletProvider = ({ children }) => {
     const removeListeners = () => {
       if (!sparkPaymentActionsRef.current) return;
       sparkPaymentActionsRef.current = false;
-      console.log("Removing spark listeners");
+      console.log("Removing Spark listeners");
 
       sparkTransactionsEventEmitter.off(
         SPARK_TX_UPDATE_ENVENT_NAME,
@@ -292,22 +288,97 @@ const SparkWalletProvider = ({ children }) => {
       sparkWallet.off("deposit:confirmed", transferHandler);
     };
 
-    const handleAppStateChange = (nextAppState) => {
-      console.log(nextAppState);
-      if (nextAppState === "active") {
+    // Called when tab visibility changes
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
         addListeners();
-      } else if (nextAppState.match(/inactive|background/)) {
+      } else {
         removeListeners();
       }
     };
 
-    AppState.addEventListener("change", handleAppStateChange);
-
-    // Add on mount if app is already active
-    if (AppState.currentState === "active") {
+    // Initial listener add (e.g. when component mounts)
+    if (document.visibilityState === "visible") {
       addListeners();
     }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Clean up on unmount
+    return () => {
+      removeListeners();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [sparkInformation.didConnect]);
+
+  // useEffect(() => {
+  //   if (!sparkInformation.didConnect) return;
+
+  //   const handleUpdate = async (updateType) => {
+  //     try {
+  //       console.log(
+  //         "running update in spark context from db changes",
+  //         updateType
+  //       );
+  //       const balance = (await getSparkBalance()) || { balance: 0 };
+  //       const txs = await getAllSparkTransactions();
+  //       setSparkInformation((prev) => ({
+  //         ...prev,
+  //         balance: balance.balance,
+  //         transactions: txs ? txs : prev.transactions,
+  //       }));
+  //     } catch (err) {
+  //       console.log("error in spark handle db update function", err);
+  //     }
+  //   };
+
+  //   const transferHandler = (transferId, balance) => {
+  //     console.log(`Transfer ${transferId} claimed. New balance: ${balance}`);
+  //     handleIncomingPayment(transferId);
+  //   };
+
+  //   const addListeners = () => {
+  //     if (sparkPaymentActionsRef.current) return;
+  //     sparkPaymentActionsRef.current = true;
+  //     console.log("Adding spark listeners");
+
+  //     sparkTransactionsEventEmitter.on(
+  //       SPARK_TX_UPDATE_ENVENT_NAME,
+  //       handleUpdate
+  //     );
+  //     sparkWallet.on("transfer:claimed", transferHandler);
+  //     sparkWallet.on("deposit:confirmed", transferHandler);
+  //   };
+
+  //   const removeListeners = () => {
+  //     if (!sparkPaymentActionsRef.current) return;
+  //     sparkPaymentActionsRef.current = false;
+  //     console.log("Removing spark listeners");
+
+  //     sparkTransactionsEventEmitter.off(
+  //       SPARK_TX_UPDATE_ENVENT_NAME,
+  //       handleUpdate
+  //     );
+  //     sparkWallet.off("transfer:claimed", transferHandler);
+  //     sparkWallet.off("deposit:confirmed", transferHandler);
+  //   };
+
+  //   const handleAppStateChange = (nextAppState) => {
+  //     console.log(nextAppState);
+  //     if (nextAppState === "active") {
+  //       addListeners();
+  //     } else if (nextAppState.match(/inactive|background/)) {
+  //       removeListeners();
+  //     }
+  //   };
+
+  //   AppState.addEventListener("change", handleAppStateChange);
+
+  //   // Add on mount if app is already active
+  //   if (AppState.currentState === "active") {
+  //     addListeners();
+  //   }
+  // }, [sparkInformation.didConnect]);
 
   useEffect(() => {
     if (!sparkInformation.didConnect) return;

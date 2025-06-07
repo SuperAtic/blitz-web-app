@@ -3,11 +3,11 @@ import "./send.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import BackArrow from "../../components/backArrow/backArrow";
 import { processInputType } from "../../functions/sendPayment";
-import { sparkPaymenWrapper } from "../../functions/payments";
-import { useSpark } from "../../contexts/sparkContext";
 import walletIcon from "../../assets/adminHomeWallet_dark.png";
 import arrowIcon from "../../assets/arrow-left-blue.png";
 import deleteIcon from "../../assets/leftCheveronDark.png";
+import { sparkPaymenWrapper } from "../../functions/spark/payments";
+import { useSpark } from "../../contexts/sparkContext";
 
 export default function SendPage() {
   const location = useLocation();

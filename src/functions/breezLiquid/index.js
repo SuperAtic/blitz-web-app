@@ -1,17 +1,5 @@
-// import {
-//   lnurlPay,
-//   PayAmountVariant,
-//   AmountVariant,
-//   PaymentMethod,
-//   prepareLnurlPay,
-//   prepareReceivePayment,
-//   prepareSendPayment,
-//   receivePayment,
-//   sendPayment,
-
-// } from "@breeztech/breez-sdk-liquid";
-
 import { BLITZ_DEFAULT_PAYMENT_DESCRIPTION } from "../../constants";
+import { getLiquidSdk } from "../connectToLiquid.js";
 
 export async function breezLiquidReceivePaymentWrapper({
   sendAmount,
@@ -19,6 +7,7 @@ export async function breezLiquidReceivePaymentWrapper({
   description,
 }) {
   try {
+    const sdk = getLiquidSdk();
     console.log("Starting prepare receive payment process");
     // Set the amount you wish the payer to send via lightning, which should be within the above limits
 
@@ -27,18 +16,19 @@ export async function breezLiquidReceivePaymentWrapper({
       optionalAmount = undefined;
     } else {
       optionalAmount = {
-        type: AmountVariant.BITCOIN,
+        type: "bitcoin",
         payerAmountSat: sendAmount,
       };
     }
 
-    const prepareResponse = await prepareReceivePayment({
+    // lightning`, `bolt11Invoice`, `bolt12Offer`, `bitcoinAddress`, `liquidAddress`
+    const prepareResponse = await sdk.prepareReceivePayment({
       paymentMethod:
         paymentType === "lightning"
-          ? PaymentMethod.LIGHTNING
+          ? "lightning"
           : paymentType === "liquid"
-          ? PaymentMethod.LIQUID_ADDRESS
-          : PaymentMethod.BITCOIN_ADDRESS,
+          ? "liquidAddress"
+          : "bitcoinAddress",
       amount: optionalAmount,
     });
 
@@ -47,7 +37,7 @@ export async function breezLiquidReceivePaymentWrapper({
     console.log(`Fees: ${receiveFeesSat} sats`);
     console.log("Starting receive payment");
 
-    const res = await receivePayment({
+    const res = await sdk.receivePayment({
       prepareResponse,
       description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
     });
@@ -67,21 +57,22 @@ export async function breezLiquidPaymentWrapper({
   shouldDrain,
 }) {
   try {
+    const sdk = getLiquidSdk();
     let optionalAmount;
 
     if (paymentType === "bolt12") {
       optionalAmount = {
-        type: AmountVariant.BITCOIN,
+        type: "bitcoin",
         receiverAmountSat: sendAmount,
       };
     } else if (paymentType === "bip21Liquid" && shouldDrain) {
       optionalAmount = {
-        type: PayAmountVariant.DRAIN,
+        type: "drain",
       };
     } else optionalAmount = undefined;
 
     console.log("Starting prepare send payment process");
-    const prepareResponse = await prepareSendPayment({
+    const prepareResponse = await sdk.prepareSendPayment({
       destination: invoice,
       amount: optionalAmount ? optionalAmount : undefined,
     });
@@ -90,7 +81,7 @@ export async function breezLiquidPaymentWrapper({
     const sendFeesSat = prepareResponse.feesSat;
     console.log(`Fees: ${sendFeesSat} sats`);
     console.log("Sending payment");
-    const sendResponse = await sendPayment({
+    const sendResponse = await sdk.sendPayment({
       prepareResponse,
     });
 
@@ -110,6 +101,7 @@ export async function breezLiquidLNAddressPaymentWrapper({
   shouldDrain,
 }) {
   try {
+    const sdk = getLiquidSdk();
     const optionalComment = description;
     const optionalValidateSuccessActionUrl = true;
     console.log("Starting prepare LNURL pay payment process");
@@ -117,15 +109,15 @@ export async function breezLiquidLNAddressPaymentWrapper({
     let amount;
     if (shouldDrain) {
       amount = {
-        type: PayAmountVariant.DRAIN,
+        type: "drain",
       };
     } else
       amount = {
-        type: AmountVariant.BITCOIN,
+        type: "bitcoin",
         receiverAmountSat: sendAmountSat,
       };
 
-    const prepareResponse = await prepareLnurlPay({
+    const prepareResponse = await sdk.prepareLnurlPay({
       data: paymentInfo,
       amount,
       comment: optionalComment,
@@ -134,15 +126,13 @@ export async function breezLiquidLNAddressPaymentWrapper({
     const feesSat = prepareResponse.feesSat;
     console.log(`Fees: ${feesSat} sats`);
     console.log("Sending LNURL pay");
-    const result = await lnurlPay({
+    const result = await sdk.lnurlPay({
       prepareResponse,
     });
-    result.data.payment;
     const payment = result.data.payment;
     return { payment, fee: feesSat, didWork: true };
   } catch (err) {
     console.log(err, "BREEZ LIQUID TO LN ADDRESS PAYMENT WRAPPER");
-
     return { error: err, didWork: false };
   }
 }

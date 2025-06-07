@@ -1,21 +1,7 @@
 import { decode } from "light-bolt11-decoder";
-import { sparkPaymenWrapper } from "./payments";
 import * as bitcoin from "bitcoinjs-lib";
-export async function processInputType(address, paymentInfo) {
-  try {
-    if (address.toLowerCase().startsWith("lnbc")) {
-      return await decodeLNPayment(address);
-    } else if (address.toLowerCase().startsWith("sp1pg")) {
-      return await decodeSparkPayment(address, paymentInfo);
-    } else if (isValidBitcoinAddress(address))
-      return await decodeBitcoinPayment(address, paymentInfo);
-    else {
-      return null;
-    }
-  } catch (err) {
-    console.log("process input type error", err);
-  }
-}
+import { sparkPaymenWrapper } from "./spark/payments";
+
 async function decodeLNPayment(address) {
   try {
     const decoded = decode(address.toLowerCase());
@@ -122,5 +108,21 @@ function isValidBitcoinAddress(address) {
     return true;
   } catch (_) {
     return false;
+  }
+}
+
+export async function processInputType(address, paymentInfo) {
+  try {
+    if (address.toLowerCase().startsWith("lnbc")) {
+      return await decodeLNPayment(address);
+    } else if (address.toLowerCase().startsWith("sp1pg")) {
+      return await decodeSparkPayment(address, paymentInfo);
+    } else if (isValidBitcoinAddress(address))
+      return await decodeBitcoinPayment(address, paymentInfo);
+    else {
+      return null;
+    }
+  } catch (err) {
+    console.log("process input type error", err);
   }
 }

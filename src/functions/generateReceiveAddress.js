@@ -1,7 +1,6 @@
 import * as bip21 from "bip21";
-import { sparkReceivePaymentWrapper } from "./payments";
 import customUUID from "./customUUID";
-import { deleteSparkTransactionTable } from "./txStorage";
+import { sparkReceivePaymentWrapper } from "./spark/payments";
 
 let invoiceTracker = [];
 export async function initializeAddressProcess(wolletInfo) {
