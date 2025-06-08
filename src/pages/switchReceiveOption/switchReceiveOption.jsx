@@ -1,7 +1,7 @@
 // SlideUpPage.jsx
 import { motion } from "framer-motion";
 import BackArrow from "../../components/backArrow/backArrow";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import lightningIcon from "../../assets/lightningBoltDark.png";
 import bitcoinIcon from "../../assets/chainDark.png";
 import sparkIcon from "../../assets/SparkAsteriskBlack.png";
@@ -12,11 +12,21 @@ import { useEffect, useState } from "react";
 export default function SwitchReceiveOption() {
   const [selectedOption, setSelectedOption] = useState("");
   const naigate = useNavigate();
+  const location = useLocation();
+  const props = location.state;
+
+  const amount = props?.amount;
+  const description = props?.description;
 
   useEffect(() => {
     if (!selectedOption) return;
-    naigate("/receive", {
-      state: { selectedRecieveOption: selectedOption },
+    naigate(`/receive`, {
+      state: {
+        receiveOption: selectedOption,
+        amount: Number(amount),
+        description: description,
+        navigateHome: true,
+      },
       replace: true,
     });
   }, [selectedOption]);

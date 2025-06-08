@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import copyToClipboard from "../../functions/copyToClipboard";
 import BackArrow from "../../components/backArrow/backArrow";
 import QRCodeQrapper from "../../components/qrCode/qrCode";
@@ -10,14 +10,19 @@ import { initializeAddressProcess } from "../../functions/generateReceiveAddress
 export default function ReceiveQRPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const hasInitialized = useRef(false);
-  const [showReceiveOptions, setShowReceiveOptions] = useState(false);
+  const props = location.state;
 
-  const initialSendAmount = location.state?.receiveAmount;
-  const paymentDescription = location.state?.description;
-  const selectedRecieveOption = (
-    location.state?.selectedRecieveOption || "Lightning"
-  ).toLowerCase();
+  const receiveOption = props?.receiveOption;
+  const amount = props?.amount;
+  const description = props?.description;
+  const navigateHome = props?.navigateHome;
+  const hasInitialized = useRef(false);
+
+  const initialSendAmount = Number(amount);
+  const paymentDescription = description;
+  const selectedRecieveOption = (receiveOption || "Lightning").toLowerCase();
+
+  console.log(initialSendAmount, paymentDescription, selectedRecieveOption);
 
   const [addressState, setAddressState] = useState({
     selectedRecieveOption: selectedRecieveOption,
@@ -65,11 +70,18 @@ export default function ReceiveQRPage() {
 
   return (
     <div className="receiveQrPage">
-      <TopBar navigate={navigate} />
+      <TopBar
+        navigateHome={navigateHome}
+        receiveOption={selectedRecieveOption}
+        navigate={navigate}
+      />
       <div className="receiveQrPageContent">
         <p className="selectedReceiveOption">{selectedRecieveOption}</p>
         <QrCode addressState={addressState} navigate={navigate} />
         <ReceiveButtonsContainer
+          initialSendAmount={initialSendAmount}
+          description={description}
+          receiveOption={receiveOption}
           generatingInvoiceQRCode={addressState.isGeneratingInvoice}
           generatedAddress={addressState.generatedAddress}
         />
@@ -81,8 +93,12 @@ export default function ReceiveQRPage() {
             flexDirection: "column",
           }}
         >
-          <p className="feeText">Fee:</p>
-          <p className="feeText">0 sats</p>
+          <p style={{ margin: 0 }} className="feeText">
+            Fee:
+          </p>
+          <p style={{ margin: 0 }} className="feeText">
+            0 sats
+          </p>
         </div>
       </div>
     </div>
@@ -119,6 +135,15 @@ function QrCode({ addressState, navigate }) {
   );
 }
 
-function TopBar() {
-  return <BackArrow />;
+function TopBar({ navigateHome }) {
+  const navigate = useNavigate();
+  return (
+    <BackArrow
+      backFunction={() => {
+        navigate(navigateHome ? "/wallet" : -1, {
+          replace: true,
+        });
+      }}
+    />
+  );
 }

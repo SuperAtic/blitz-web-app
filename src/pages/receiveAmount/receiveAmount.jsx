@@ -1,32 +1,36 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-// import { useGlobalContext } from "../../../../contexts/GlobalContext";
-// import { useNodeContext } from "../../../../contexts/NodeContext";
-// import { useTranslation } from "react-i18next";
-// import { 100_000_000 } from "../../../../constants";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import "./style.css";
 import BackArrow from "../../components/backArrow/backArrow";
 import deleteIcon from "../../assets/leftCheveronDark.png";
 
-const EditReceivePaymentInformation = (props) => {
+const EditReceivePaymentInformation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const props = location.state;
+
+  const receiveOption = props?.receiceOption;
+  const fromPage = props?.fromPage;
+
   const [amountValue, setAmountValue] = useState("");
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
   const [paymentDescription, setPaymentDescription] = useState("");
 
-  const fromPage = props.from;
   const [inputDenomination, setInputDenomination] = useState("sats");
 
   const localSatAmount = Number(amountValue);
 
+  console.log(fromPage, "testing");
   const handleSubmit = () => {
     if (!Number(localSatAmount)) return;
     console.log("Running in edit payment information submit function");
 
-    navigate("/receive", {
+    navigate(`/receive`, {
       state: {
-        receiveAmount: Number(localSatAmount),
+        amount: Number(localSatAmount),
         description: paymentDescription,
+        receiveOption: receiveOption || "lightning",
+        navigateHome: fromPage !== "homepage",
       },
       replace: fromPage !== "homepage",
     });

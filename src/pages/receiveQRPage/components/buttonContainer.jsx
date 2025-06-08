@@ -7,6 +7,9 @@ import "./buttonContainer.css";
 export default function ReceiveButtonsContainer({
   generatingInvoiceQRCode,
   generatedAddress,
+  receiveOption,
+  initialSendAmount,
+  description,
 }) {
   const navigate = useNavigate();
 
@@ -14,8 +17,11 @@ export default function ReceiveButtonsContainer({
     <div className="receiveButtonContainer">
       <button
         onClick={() =>
-          navigate("/receiveAmount", {
-            state: { from: "receivePage" },
+          navigate(`/receiveAmount`, {
+            state: {
+              receiveOption,
+              from: "receivePage",
+            },
           })
         }
       >
@@ -33,7 +39,17 @@ export default function ReceiveButtonsContainer({
         Copy
       </button>
 
-      <button onClick={() => navigate("/receive-options")}>
+      <button
+        onClick={() =>
+          navigate(`/receive-options`, {
+            state: {
+              receiveOption,
+              amount: initialSendAmount,
+              description: description,
+            },
+          })
+        }
+      >
         Choose format
       </button>
     </div>
