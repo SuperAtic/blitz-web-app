@@ -21,6 +21,7 @@
   display: flex;
   align-items: center;
   border-radius: 8px;
+  cursor: pointer;
 }
 .transactionContainer .transaction img {
   width: 30px;

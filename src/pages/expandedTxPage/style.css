@@ -1,0 +1,120 @@
+.expandedTxContainer {
+  height: 100%;
+  width: 95%;
+  align-self: center;
+  overflow-y: scroll;
+}
+.expandedTxContainer .receiptContainer {
+  width: 100%;
+  height: auto;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+  padding: 15px;
+  padding-top: 40px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 80px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.expandedTxContainer .receiptContainer .paymentStatusOuterContainer {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: -70px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.expandedTxContainer
+  .receiptContainer
+  .paymentStatusOuterContainer
+  .paymentStatusFirstCircle {
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.expandedTxContainer
+  .receiptContainer
+  .paymentStatusOuterContainer
+  .paymentStatusSecondCircle {
+  width: 60px;
+  height: 60px;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.expandedTxContainer .receiptContainer .paymentStatusIcon {
+  width: 60%;
+  height: 60%;
+}
+
+.expandedTxContainer .paymentStatusTextContanier {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+.expandedTxContainer .paymentStatusPillContiner {
+  padding: 2px 15px;
+  border-radius: 20px;
+}
+.expandedTxContainer .paymentStatusPillContiner p {
+  margin: 0;
+}
+
+.expandedTxContainer .borderElementsContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.expandedTxContainer .borderElementScroll {
+  width: max-content;
+  display: flex;
+  justify-content: space-between;
+}
+.expandedTxContainer .dotElementsContainer {
+  position: absolute;
+  bottom: -10px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.expandedTxContainer .infoGridContainer {
+  width: 100%;
+  max-width: 250px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.expandedTxContainer .descriptionContainer {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+.expandedTxContainer .descriptionScrollviewContainer {
+  width: 100%;
+  max-width: 300px;
+  height: 100px;
+  padding: 10px;
+  border-radius: 8px;
+  overflow-y: scroll;
+}
+.expandedTxContainer .descriptionScrollviewContainer p {
+  margin: 0;
+}

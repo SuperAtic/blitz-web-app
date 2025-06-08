@@ -42,6 +42,9 @@ const Camera = lazy(() => import("./pages/camera/camera.jsx"));
 const SwitchReceiveOption = lazy(() =>
   import("./pages/switchReceiveOption/switchReceiveOption.jsx")
 );
+const ExpandedTxPage = lazy(() =>
+  import("./pages/expandedTxPage/expandedTxPage.jsx")
+);
 const SendPage = lazy(() => import("./pages/sendPage/sendPage.jsx"));
 import ConfirmPayment from "./pages/confirmPayment/confirmPaymentScreen.jsx";
 import { ThemeContextProvider } from "./contexts/themeContext.jsx";
@@ -189,6 +192,10 @@ function Root() {
                                   <Route
                                     path="/receive-options"
                                     element={<SwitchReceiveOption />}
+                                  />
+                                  <Route
+                                    path="/expanded-tx"
+                                    element={<ExpandedTxPage />}
                                   />
                                   <Route path="/camera" element={<Camera />} />
                                   <Route

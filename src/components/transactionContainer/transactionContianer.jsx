@@ -52,7 +52,6 @@ export default function TransactionContanier({ frompage }) {
 
   transfers.forEach((tx, index) => {
     const currnetTxTime = new Date(tx.created_at_time).getTime();
-
     const isDonation =
       tx.transfer_direction === "OUTGOING" &&
       tx.type === "TRANSFER" &&
@@ -82,6 +81,7 @@ export default function TransactionContanier({ frompage }) {
 
     groupedTransfers.push(
       <TxItem
+        navigate={navigate}
         key={index}
         isDonation={isDonation}
         tx={tx}
@@ -116,41 +116,43 @@ export default function TransactionContanier({ frompage }) {
   );
 }
 
-function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
-  const isLightningPayment = tx.type === "PREIMAGE_SWAP";
-  const isBitcoinPayment = tx.type == "COOPERATIVE_EXIT";
-  const isSparkPayment = tx.type === "TRANSFER";
+function TxItem({
+  tx,
+  index,
+  isDonation,
+  currentTime,
+  currnetTxTime,
+  navigate,
+}) {
+  const details = JSON.parse(tx.details);
 
-  const timeDifferenceMs = currentTime - tx.updated_at_time;
-
-  const minutes = timeDifferenceMs / (1000 * 60);
+  const timeDifference = currentTime - details.time;
+  const minutes = timeDifference / (1000 * 60);
   const hours = minutes / 60;
   const days = hours / 24;
   const years = days / 365;
-  const paymentType = useSparkPaymentType(tx);
-  const isPending = useIsSparkPaymentPending(tx, paymentType);
-  if (isPending) console.log(tx);
 
-  // BITCOIN PENDING = TRANSFER_STATUS_SENDER_KEY_TWEAK_PENDING
-  // BITCOIN CONFIRMED = TRANSFER_STATUS_COMPLETED
-  // BITCOIN FAILED = TRANSFER_STATUS_RETURNED
+  const paymentType = tx.paymentType;
+  const isPending = tx.paymentStatus === "pending";
 
-  // SPARK PENDING = TRANSFER_STATUS_SENDER_KEY_TWEAKED
-  // SPARK CONFIRMED = TRANSFER_STATUS_COMPLETED
-
-  // LIGHTING PENDING = LIGHTNING_PAYMENT_INITIATED
-  // LIGHTNING CONFIRMED = TRANSFER_STATUS_COMPLETED
-
-  const description = tx.description;
+  const description = details.description;
 
   return (
-    <div className="transaction" key={index}>
+    <div
+      onClick={() =>
+        navigate("/expanded-tx", {
+          state: { transaction: { ...tx, details: details } },
+        })
+      }
+      className="transaction"
+      key={index}
+    >
       <img
         style={{
           transform: `rotate(${
             isPending
               ? "0deg"
-              : tx.transfer_direction === "INCOMING"
+              : details.direction === "INCOMING"
               ? "310deg"
               : "130deg"
           })`,
@@ -162,7 +164,7 @@ function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
         <p>
           {description
             ? description
-            : tx.transfer_direction === "INCOMING"
+            : details.direction === "INCOMING"
             ? "Received"
             : "Sent"}
         </p>
@@ -193,8 +195,8 @@ function TxItem({ tx, index, isDonation, currentTime, currnetTxTime }) {
         </p>
       </div>
       <p className="amountText">
-        {tx.transfer_direction === TransferDirection.OUTGOING ? "-" : "+"}
-        {tx.total_sent + (tx.fee || 0)} sats
+        {details.direction === TransferDirection.OUTGOING ? "-" : "+"}
+        {details.amount + (details.fee || 0)} sats
       </p>
     </div>
   );

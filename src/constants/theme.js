@@ -26,6 +26,7 @@ export const Colors = {
     giftCardBlue: "#0375F6",
     giftCardBlue2: "#1986FF",
     giftCardBlue3: "#6AB1FF",
+    expandedTxReceitBackground: "white",
   },
   dark: {
     blue: "#0375F6",
@@ -38,6 +39,7 @@ export const Colors = {
     giftCardBlue: "#0375F6",
     giftCardBlue2: "#003B7B",
     giftCardBlue3: "#004B9D",
+    expandedTxReceitBackground: "#013167",
   },
   lightsout: {
     blue: "white",
@@ -47,5 +49,6 @@ export const Colors = {
     giftCardBlue: "#a7d1ff",
     giftCardBlue2: "#222222",
     giftCardBlue3: "#676767",
+    expandedTxReceitBackground: "#1B1B1B",
   },
 };

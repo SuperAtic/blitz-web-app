@@ -1,0 +1,12 @@
+#customButton {
+  min-width: 120px;
+  min-height: 45px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#customButton p {
+  margin: 0;
+}
