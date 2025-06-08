@@ -1,16 +1,20 @@
 import "./fonts.css";
 import "./index.css";
 import App from "./App.jsx";
-import { StrictMode, Suspense, lazy } from "react";
+import { StrictMode, Suspense, lazy, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   BrowserRouter,
+  Link,
   Route,
   Routes,
   useLocation,
   useNavigate,
 } from "react-router-dom";
-
+import { BottomNavigation, BottomNavigationAction } from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import PersonIcon from "@mui/icons-material/Person";
+import SettingsIcon from "@mui/icons-material/Store";
 import SafeAreaComponent from "./components/safeAreaContainer.jsx";
 import { AuthProvider } from "./contexts/authContext.jsx";
 import AuthGate from "./components/authGate.jsx";
@@ -50,6 +54,7 @@ import { GlobalContactsList } from "./contexts/globalContacts.jsx";
 import { AppStatusProvider } from "./contexts/appStatus.jsx";
 import { GLobalNodeContextProider } from "./contexts/nodeContext.jsx";
 import { LiquidEventProvider } from "./contexts/liquidEventContext.jsx";
+import { Colors } from "./constants/theme.js";
 // const ConfirmPayment = lazy(() =>
 //   import("./pages/confirmPayment/confirmPaymentScreen.jsx")
 // );
@@ -66,6 +71,11 @@ const ViewAllTxsPage = lazy(() =>
 function Root() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [value, setValue] = useState(1);
+
+  // Define paths where the bottom navigation should be visible
+  const showBottomTabsRoutes = ["/wallet", "/contacts", "/store"];
+  const shouldShowBottomTabs = showBottomTabsRoutes.includes(location.pathname);
 
   return (
     <NavigationStackProvider>
@@ -236,6 +246,40 @@ function Root() {
                                 </Routes>
                               </Suspense>
                             </AnimatePresence>
+                            {shouldShowBottomTabs && (
+                              <BottomNavigation
+                                value={value}
+                                onChange={(event, newValue) =>
+                                  setValue(newValue)
+                                }
+                                showLabels
+                                style={{
+                                  position: "fixed",
+                                  bottom: 0,
+                                  width: "100%",
+                                  zIndex: 100, // optional: to make sure it's above other content
+                                }}
+                              >
+                                <BottomNavigationAction
+                                  label="Contacts"
+                                  icon={<PersonIcon />}
+                                  component={Link}
+                                  to="/contacts"
+                                />
+                                <BottomNavigationAction
+                                  label="Home"
+                                  icon={<HomeIcon />}
+                                  component={Link}
+                                  to="/wallet"
+                                />
+                                <BottomNavigationAction
+                                  label="Store"
+                                  icon={<SettingsIcon />}
+                                  component={Link}
+                                  to="/store"
+                                />
+                              </BottomNavigation>
+                            )}
                           </AuthProvider>
                         </LiquidEventProvider>
                       </GlobalAppDataProvider>

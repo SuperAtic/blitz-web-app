@@ -492,29 +492,15 @@ const SparkWalletProvider = ({ children }) => {
   // This function connects to the spark node and sets the session up
   useEffect(() => {
     async function initProcess() {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(async () => {
-          const { didWork } = await initWallet({
-            setSparkInformation,
-            toggleGlobalContactsInformation,
-            globalContactsInformation,
-          });
-
-          console.log(didWork, "did connect to spark wallet in context");
-
-          if (didWork) return;
-          setNumberOfConnectionTries((prev) => (prev += 1));
-          await new Promise(
-            () =>
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  initProcess();
-                });
-              }),
-            2000
-          );
-        });
+      const { didWork } = await initWallet({
+        setSparkInformation,
+        toggleGlobalContactsInformation,
+        globalContactsInformation,
       });
+
+      if (didWork) return;
+      setNumberOfConnectionTries((prev) => (prev += 1));
+      await new Promise(() => initProcess(), 2000);
     }
     if (!startConnectingToSpark) return;
     initProcess();

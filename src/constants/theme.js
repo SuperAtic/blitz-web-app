@@ -6,7 +6,7 @@ export const Colors = {
   constants: {
     blue: "#0375F6",
     halfModalBackground: "rgba(0, 0, 0, 0.3)",
-    opacityGracy: "767676b8",
+    opacityGracy: "#767676b8",
     cameraOverlay: "#0000002e",
     cancelRed: "#e20000",
     darkModeTextInputPlaceholder: "#FFFFFF80",

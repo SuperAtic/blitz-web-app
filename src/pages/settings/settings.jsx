@@ -43,13 +43,13 @@ export default function SettingsHome() {
           <div className="technicalRow">
             <p className="techicalLabel">Public key</p>
             <span
-              onClick={() => copyToClipboard(sparkInformation.pubKey)}
+              onClick={() => copyToClipboard(sparkInformation.identityPubKey)}
               className="techicalData"
             >
               <p>
-                {sparkInformation.pubKey.slice(0, 5)}...
-                {sparkInformation.pubKey.slice(
-                  sparkInformation.pubKey.length - 5
+                {sparkInformation.identityPubKey.slice(0, 5)}...
+                {sparkInformation.identityPubKey.slice(
+                  sparkInformation.identityPubKey.length - 5
                 )}
               </p>
               <img
