@@ -13,18 +13,21 @@ import "./confirmPayment.css";
 export default function ConfirmPayment() {
   const navigate = useNavigate();
   const location = useLocation();
+  const props = location.state;
   const animationRef = useRef(null);
 
+  const transaction = props.transaction;
+
   const paymentType = location.state?.for;
-  const paymentInformation = location.state?.information;
   const formmatingType = location.state?.formattingType;
-  console.log(paymentInformation);
-  const didSucceed = !paymentInformation?.error;
-  const paymentFee = paymentInformation?.fee;
-  const paymentNetwork = paymentInformation.type || "";
-  const errorMessage = paymentInformation?.error || "Unknown error";
-  const amount = paymentInformation?.totalValue || 0;
-  const showPendingMessage = false; // Replace with real logic if needed
+  const didSucceed = transaction.paymentStatus === "completed";
+  const paymentFee = transaction.details.fee;
+  const paymentNetwork = transaction.paymentType;
+  const errorMessage = transaction.details.error || "Unknown Error";
+  const amount = transaction.details.amount;
+  const showPendingMessage = transaction.paymentStatus === "pending";
+
+  console.log(transaction, "etstasdas");
 
   const confirmAnimation = useMemo(() => {
     return updateConfirmAnimation(confirmTxAnimation, "light");
@@ -39,11 +42,11 @@ export default function ConfirmPayment() {
   }, []);
 
   const handleBack = useCallback(() => {
-    navigate("/wallet");
+    navigate("/wallet", { replace: true });
   }, [navigate]);
   return (
     <div className="receiveQrPage">
-      <BackArrow backFunction={() => navigate("/wallet")} />
+      <BackArrow backFunction={() => navigate("/wallet", { replace: true })} />
 
       <div className="contentContainer">
         <Lottie

@@ -42,7 +42,7 @@ import Storage from "../functions/localStorage";
 // Initiate context
 const SparkWalletManager = createContext(null);
 
-const SparkWalletProvider = ({ children }) => {
+const SparkWalletProvider = ({ children, navigate }) => {
   const { didGetToHomepage, minMaxLiquidSwapAmounts } = useAppStatus();
   const { liquidNodeInformation } = useNodeContext();
   const [sparkInformation, setSparkInformation] = useState({
@@ -206,6 +206,7 @@ const SparkWalletProvider = ({ children }) => {
     const selectedStoredPayment = storedTransaction.txs.find(
       (tx) => tx.sparkID === transferId
     );
+    console.log(selectedStoredPayment, "testing");
     // console.log(isLNURLPayment, 'isLNURL PAYMNET');
     // if (!!isLNURLPayment) {
     //   const dbLNURL = isLNURLPayment.db;
@@ -220,22 +221,15 @@ const SparkWalletProvider = ({ children }) => {
 
     // }
     const details = JSON.parse(selectedStoredPayment.details);
+
     if (details?.shouldNavigate) return;
     if (details.isRestore) return;
     // Handle confirm animation here
-    setPendingNavigation({
-      routes: [
-        {
-          name: "HomeAdmin",
-          params: { screen: "Home" },
-        },
-        {
-          name: "ConfirmTxPage",
-          params: {
-            transaction: storedTransaction.paymentObject,
-          },
-        },
-      ],
+    navigate("/confirm-page", {
+      state: {
+        for: "invoicePaid",
+        transaction: { ...selectedStoredPayment, details },
+      },
     });
   };
   // Add event listeners to listen for bitcoin and lightning or spark transfers when receiving does not handle sending
