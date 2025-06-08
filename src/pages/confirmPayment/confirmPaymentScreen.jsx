@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import BackArrow from "../../components/backArrow/backArrow";
 import { useNavigate, useLocation } from "react-router-dom";
 import React, { useEffect, useMemo, useRef, useCallback } from "react";
@@ -43,13 +42,7 @@ export default function ConfirmPayment() {
     navigate("/wallet");
   }, [navigate]);
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }} // optional fade-out
-      transition={{ duration: 0.3 }}
-      className="receiveQrPage"
-    >
+    <div className="receiveQrPage">
       <BackArrow backFunction={() => navigate("/wallet")} />
 
       <div className="contentContainer">
@@ -135,6 +128,6 @@ export default function ConfirmPayment() {
           Continue
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 }

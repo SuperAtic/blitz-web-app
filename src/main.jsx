@@ -38,6 +38,9 @@ const EditReceivePaymentInformation = lazy(() =>
 const ReceiveQRPage = lazy(() =>
   import("./pages/receiveQRPage/receiveQRPage.jsx")
 );
+const TechnicalDetailsPage = lazy(() =>
+  import("./pages/technicalDetails/technicalDetails.jsx")
+);
 const Camera = lazy(() => import("./pages/camera/camera.jsx"));
 const SwitchReceiveOption = lazy(() =>
   import("./pages/switchReceiveOption/switchReceiveOption.jsx")
@@ -58,6 +61,7 @@ import { AppStatusProvider } from "./contexts/appStatus.jsx";
 import { GLobalNodeContextProider } from "./contexts/nodeContext.jsx";
 import { LiquidEventProvider } from "./contexts/liquidEventContext.jsx";
 import { Colors } from "./constants/theme.js";
+import AnimatedRouteWrapper from "./components/animatedRouteWrapper.jsx";
 // const ConfirmPayment = lazy(() =>
 //   import("./pages/confirmPayment/confirmPaymentScreen.jsx")
 // );
@@ -79,6 +83,7 @@ function Root() {
   // Define paths where the bottom navigation should be visible
   const showBottomTabsRoutes = ["/wallet", "/contacts", "/store"];
   const shouldShowBottomTabs = showBottomTabsRoutes.includes(location.pathname);
+  const background = location.state && location.state.background;
 
   return (
     <NavigationStackProvider>
@@ -112,10 +117,7 @@ function Root() {
                                   </SafeAreaComponent>
                                 }
                               >
-                                <Routes
-                                  location={location}
-                                  key={location.pathname}
-                                >
+                                <Routes location={background || location}>
                                   {/* Public Routes */}
                                   <Route
                                     path="/"
@@ -191,19 +193,59 @@ function Root() {
                                   />
                                   <Route
                                     path="/receive-options"
-                                    element={<SwitchReceiveOption />}
+                                    element={
+                                      <AnimatedRouteWrapper
+                                        initialAnimation={{ y: "100%" }}
+                                        animate={{ y: 0 }}
+                                        exitAnimation={{ y: "100%" }}
+                                      >
+                                        <SafeAreaComponent>
+                                          <SwitchReceiveOption />
+                                        </SafeAreaComponent>
+                                      </AnimatedRouteWrapper>
+                                    }
                                   />
                                   <Route
                                     path="/expanded-tx"
-                                    element={<ExpandedTxPage />}
+                                    element={
+                                      <AnimatedRouteWrapper
+                                        initialAnimation={{ y: "100%" }}
+                                        animate={{ y: 0 }}
+                                        exitAnimation={{ y: "100%" }}
+                                      >
+                                        <SafeAreaComponent>
+                                          <ExpandedTxPage />
+                                        </SafeAreaComponent>
+                                      </AnimatedRouteWrapper>
+                                    }
+                                  />
+                                  <Route
+                                    path="/technical-details"
+                                    element={
+                                      <AnimatedRouteWrapper
+                                        initialAnimation={{ y: "100%" }}
+                                        animate={{ y: 0 }}
+                                        exitAnimation={{ y: "100%" }}
+                                      >
+                                        <SafeAreaComponent>
+                                          <TechnicalDetailsPage />
+                                        </SafeAreaComponent>
+                                      </AnimatedRouteWrapper>
+                                    }
                                   />
                                   <Route path="/camera" element={<Camera />} />
                                   <Route
                                     path="/confirm-page"
                                     element={
-                                      <SafeAreaComponent>
-                                        <ConfirmPayment />
-                                      </SafeAreaComponent>
+                                      <AnimatedRouteWrapper
+                                        initialAnimation={{ y: "100%" }}
+                                        animate={{ y: 0 }}
+                                        exitAnimation={{ y: "100%" }}
+                                      >
+                                        <SafeAreaComponent>
+                                          <ConfirmPayment />
+                                        </SafeAreaComponent>
+                                      </AnimatedRouteWrapper>
                                     }
                                   />
                                   <Route
@@ -246,11 +288,15 @@ function Root() {
                                       </SafeAreaComponent>
                                     }
                                   />
-                                  <Route
+                                  {/* <Route
                                     path="/error"
                                     element={<ErrorScreen />}
-                                  />
+                                  /> */}
                                 </Routes>
+
+                                {location.pathname === "/error" && (
+                                  <ErrorScreen />
+                                )}
                               </Suspense>
                             </AnimatePresence>
                             {shouldShowBottomTabs && (

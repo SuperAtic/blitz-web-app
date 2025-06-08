@@ -15,6 +15,7 @@ function Login() {
   const navigate = useNavigate();
   const { login, setMnemoinc, deleteWallet, logout } = useAuth();
   const { clearSparkSession } = useSpark();
+  const location = useLocation();
 
   const [password, setPassword] = useState("");
 
@@ -25,7 +26,9 @@ function Login() {
 
     const decryted = decrypt(storedKey, password);
     if (!decryted) {
-      navigate("/error", { state: { errorMessage: "Incorrect password" } });
+      navigate("/error", {
+        state: { errorMessage: "Incorrect password", background: location },
+      });
       return;
     }
     setMnemoinc(decryted);

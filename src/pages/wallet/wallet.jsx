@@ -6,11 +6,11 @@ import SendAndRequestBtns from "./components/sendAndRequestBTNS/sendAndRequstBtn
 
 export default function WalletHome() {
   return (
-    <div>
+    <>
       <WalletNavBar />
       <UserBalance />
       <SendAndRequestBtns />
       <TransactionContanier frompage={"home"} />
-    </div>
+    </>
   );
 }

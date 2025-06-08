@@ -35,166 +35,150 @@ export default function ExpandedTxPage() {
   }, []);
 
   return (
-    <motion.div
-      className="sliderContainer"
-      initial={{ y: "100%" }}
-      animate={{ y: 0 }}
-      exit={{ y: "100%" }}
-      transition={{ duration: 0.5 }}
-      style={{
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        top: 0,
-        left: 0,
-        zIndex: 1000,
-        flex: 1,
-      }}
-    >
-      <SafeAreaComponent>
-        <BackArrow backFunction={() => navigate(-1)} />
-        <div className="expandedTxContainer">
+    <>
+      <BackArrow backFunction={() => navigate(-1)} />
+      <div className="expandedTxContainer">
+        <div
+          style={{ backgroundColor: Colors.light.expandedTxReceitBackground }}
+          className="receiptContainer"
+        >
           <div
-            style={{ backgroundColor: Colors.light.expandedTxReceitBackground }}
-            className="receiptContainer"
+            style={{ backgroundColor: Colors.light.background }}
+            className="paymentStatusOuterContainer"
           >
             <div
-              style={{ backgroundColor: Colors.light.background }}
-              className="paymentStatusOuterContainer"
+              style={{
+                backgroundColor: isPending
+                  ? Colors.light.expandedTxPendingOuter
+                  : isFailed
+                  ? Colors.light.expandedTxFailed
+                  : Colors.light.expandedTxConfimred,
+              }}
+              className="paymentStatusFirstCircle"
             >
               <div
                 style={{
                   backgroundColor: isPending
-                    ? Colors.light.expandedTxPendingOuter
+                    ? Colors.light.expandedTxPendingInner
                     : isFailed
-                    ? Colors.light.expandedTxFailed
-                    : Colors.light.expandedTxConfimred,
+                    ? Colors.constants.cancelRed
+                    : Colors.light.blue,
                 }}
-                className="paymentStatusFirstCircle"
+                className="paymentStatusSecondCircle"
               >
-                <div
+                <img
                   style={{
-                    backgroundColor: isPending
-                      ? Colors.light.expandedTxPendingInner
-                      : isFailed
-                      ? Colors.constants.cancelRed
-                      : Colors.light.blue,
+                    filter: `invert(91%) sepia(3%) saturate(0%) hue-rotate(321deg) brightness(91%) contrast(93%)`,
                   }}
-                  className="paymentStatusSecondCircle"
-                >
-                  <img
-                    style={{
-                      filter: `invert(91%) sepia(3%) saturate(0%) hue-rotate(321deg) brightness(91%) contrast(93%)`,
-                    }}
-                    className="paymentStatusIcon"
-                    src={check}
-                  />
-                </div>
-              </div>
-            </div>
-            <ThemeText
-              textStyles={{
-                fontSize: "20px",
-                textAlign: "center",
-                marginTop: "20px",
-              }}
-              textContent={`${
-                transaction.details.direction === "OUTGOING"
-                  ? "Sent"
-                  : "Received"
-              } amount`}
-            />
-            <FormattedSatText
-              containerStyles={{ marginTop: "-5px" }}
-              neverHideBalance={true}
-              styles={{
-                fontSize: "40px",
-                margin: 0,
-              }}
-              balance={transaction.details.amount}
-            />
-            <div className="paymentStatusTextContanier">
-              <ThemeText textContent={"Payment status"} />
-              <div
-                className="paymentStatusPillContiner"
-                style={{
-                  backgroundColor: isPending
-                    ? Colors.light.expandedTxPendingOuter
-                    : isFailed
-                    ? Colors.light.expandedTxFailed
-                    : Colors.light.expandedTxConfimred,
-                }}
-              >
-                <ThemeText
-                  textStyles={{
-                    color: isPending
-                      ? Colors.light.expandedTxPendingInner
-                      : isFailed
-                      ? Colors.constants.cancelRed
-                      : Colors.light.blue,
-                  }}
-                  textContent={
-                    isPending ? "Pending" : isFailed ? "Failed" : "Successful"
-                  }
+                  className="paymentStatusIcon"
+                  src={check}
                 />
               </div>
             </div>
-            <Border windowWidth={windowWidth} />
-            <div className="infoGridContainer">
-              <ThemeText textContent={"Time"} />
-              <ThemeText
-                textStyles={{ textAlign: "right" }}
-                textContent={`${
-                  paymentDate.getHours() <= 9
-                    ? "0" + paymentDate.getHours()
-                    : paymentDate.getHours()
-                }:${
-                  paymentDate.getMinutes() <= 9
-                    ? "0" + paymentDate.getMinutes()
-                    : paymentDate.getMinutes()
-                }`}
-              />
-              <ThemeText textContent={"Fee"} />
-              <FormattedSatText
-                containerStyles={{ justifyContent: "end" }}
-                styles={{ testAlign: "right" }}
-                neverHideBalance={true}
-                balance={isFailed ? 0 : transaction.details.fee}
-              />
-              <ThemeText textContent={"Type"} />
+          </div>
+          <ThemeText
+            textStyles={{
+              fontSize: "20px",
+              textAlign: "center",
+              marginTop: "20px",
+            }}
+            textContent={`${
+              transaction.details.direction === "OUTGOING" ? "Sent" : "Received"
+            } amount`}
+          />
+          <FormattedSatText
+            containerStyles={{ marginTop: "-5px" }}
+            neverHideBalance={true}
+            styles={{
+              fontSize: "40px",
+              margin: 0,
+            }}
+            balance={transaction.details.amount}
+          />
+          <div className="paymentStatusTextContanier">
+            <ThemeText textContent={"Payment status"} />
+            <div
+              className="paymentStatusPillContiner"
+              style={{
+                backgroundColor: isPending
+                  ? Colors.light.expandedTxPendingOuter
+                  : isFailed
+                  ? Colors.light.expandedTxFailed
+                  : Colors.light.expandedTxConfimred,
+              }}
+            >
               <ThemeText
                 textStyles={{
-                  textAlign: "right",
-                  textTransform: "capitalize",
+                  color: isPending
+                    ? Colors.light.expandedTxPendingInner
+                    : isFailed
+                    ? Colors.constants.cancelRed
+                    : Colors.light.blue,
                 }}
-                textContent={paymentType}
+                textContent={
+                  isPending ? "Pending" : isFailed ? "Failed" : "Successful"
+                }
               />
             </div>
-            {description && (
-              <div className="descriptionContainer">
-                <ThemeText textContent={"Memo"} />
-                <div
-                  className="descriptionScrollviewContainer"
-                  style={{ backgroundColor: Colors.light.background }}
-                >
-                  <ThemeText textContent={description} />
-                </div>
-              </div>
-            )}
-            <CustomButton
-              buttonStyles={{
-                width: "auto",
-                backgroundColor: Colors.light.blue,
-                margin: "30px 0",
-              }}
-              textStyles={{ color: Colors.light.background }}
-              textContent={"Technical details"}
-            />
-            <ReceiptDots windowWidth={windowWidth} />
           </div>
+          <Border windowWidth={windowWidth} />
+          <div className="infoGridContainer">
+            <ThemeText textContent={"Time"} />
+            <ThemeText
+              textStyles={{ textAlign: "right" }}
+              textContent={`${
+                paymentDate.getHours() <= 9
+                  ? "0" + paymentDate.getHours()
+                  : paymentDate.getHours()
+              }:${
+                paymentDate.getMinutes() <= 9
+                  ? "0" + paymentDate.getMinutes()
+                  : paymentDate.getMinutes()
+              }`}
+            />
+            <ThemeText textContent={"Fee"} />
+            <FormattedSatText
+              containerStyles={{ justifyContent: "end" }}
+              styles={{ testAlign: "right" }}
+              neverHideBalance={true}
+              balance={isFailed ? 0 : transaction.details.fee}
+            />
+            <ThemeText textContent={"Type"} />
+            <ThemeText
+              textStyles={{
+                textAlign: "right",
+                textTransform: "capitalize",
+              }}
+              textContent={paymentType}
+            />
+          </div>
+          {description && (
+            <div className="descriptionContainer">
+              <ThemeText textContent={"Memo"} />
+              <div
+                className="descriptionScrollviewContainer"
+                style={{ backgroundColor: Colors.light.background }}
+              >
+                <ThemeText textContent={description} />
+              </div>
+            </div>
+          )}
+          <CustomButton
+            actionFunction={() =>
+              navigate("/technical-details", { state: { transaction } })
+            }
+            buttonStyles={{
+              width: "auto",
+              backgroundColor: Colors.light.blue,
+              margin: "30px 0",
+            }}
+            textStyles={{ color: Colors.light.background }}
+            textContent={"Technical details"}
+          />
+          <ReceiptDots windowWidth={windowWidth} />
         </div>
-      </SafeAreaComponent>
-    </motion.div>
+      </div>
+    </>
   );
 }
 

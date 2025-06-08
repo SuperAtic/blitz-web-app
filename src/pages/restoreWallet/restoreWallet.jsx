@@ -65,7 +65,9 @@ export default function RestoreWallet() {
       setInputedKey(newKeys);
     } catch (err) {
       console.error(err);
-      navigate("/error", { state: { errorMessage: err.message } });
+      navigate("/error", {
+        state: { errorMessage: err.message, background: location },
+      });
     }
   };
 
@@ -85,7 +87,9 @@ export default function RestoreWallet() {
       });
     } catch (err) {
       console.error(err);
-      navigate("/error", { state: { errorMessage: err.message } });
+      navigate("/error", {
+        state: { errorMessage: err.message, background: location },
+      });
     } finally {
       setIsValidating(false);
     }

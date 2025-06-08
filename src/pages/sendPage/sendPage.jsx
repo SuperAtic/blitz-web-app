@@ -30,6 +30,7 @@ export default function SendPage() {
           state: {
             errorMessage: "Error decoding payment.",
             navigateBack: "wallet",
+            background: location,
           },
         });
       }
@@ -88,6 +89,7 @@ export default function SendPage() {
         state: {
           errorMessage: "Error decoding payment.",
           navigateBack: "wallet",
+          background: location,
         },
       });
     }

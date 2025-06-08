@@ -3,6 +3,7 @@ import {
   getSparkAddress,
   getSparkBalance,
   getSparkIdentityPubKey,
+  getSparkTransactions,
   initializeSparkWallet,
 } from "./spark";
 import { cleanStalePendingSparkLightningTransactions } from "./spark/transactions";
