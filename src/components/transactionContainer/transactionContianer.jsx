@@ -1,10 +1,5 @@
 import { useRef, useState } from "react";
 import { useSpark } from "../../contexts/sparkContext";
-import {
-  TransferFilter,
-  TransferStatus,
-  TransferType,
-} from "@buildonspark/spark-sdk/proto/spark";
 import { TransferDirection } from "@buildonspark/spark-sdk/types";
 import "./style.css";
 import arrow from "../../assets/arrow-left-blue.png";
@@ -14,6 +9,7 @@ import {
   useIsSparkPaymentPending,
   useSparkPaymentType,
 } from "../../functions/spark";
+import SkeletonLoadingTx from "./skeletonLoadingTx";
 
 export default function TransactionContanier({ frompage }) {
   const { sparkInformation } = useSpark();
@@ -21,19 +17,36 @@ export default function TransactionContanier({ frompage }) {
   const currentTime = new Date();
   const navigate = useNavigate();
 
-  if (frompage === "home" && !sparkInformation.isConnected) {
+  if (frompage === "home" && sparkInformation.didConnect === null) {
     return (
       <div className="transactionContainer">
-        <p className="noTxText">
-          {sparkInformation.isConnected === null
-            ? "Connecting..."
-            : "Error connecting to spark."}
-        </p>
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+        <SkeletonLoadingTx />
+      </div>
+    );
+  }
+  if (frompage === "home" && !sparkInformation.didConnect) {
+    return (
+      <div className="transactionContainer">
+        <p className="noTxText">Error connecting to spark.</p>
       </div>
     );
   }
 
-  const transfers = sparkInformation?.trasactions;
+  const transfers = sparkInformation?.transactions;
   const groupedTransfers = [];
   let lastBanner = null;
 

@@ -1,0 +1,23 @@
+.skeletonContianer {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+.skeletonContianer .circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 30px;
+  overflow: hidden;
+  margin-right: 10px;
+}
+.skeletonContianer .textContainer {
+  width: calc(100% - 50px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.skeletonContianer p {
+  height: 20%;
+  margin: 0;
+}
