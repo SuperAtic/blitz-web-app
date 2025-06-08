@@ -23,7 +23,9 @@ export default function FullLoadingScreen({
           size={size}
         />
       )}
-      {showText && <ThemeText styles={{ ...textStyles }} textContent={text} />}
+      {showText && (
+        <ThemeText textStyles={{ ...textStyles }} textContent={text} />
+      )}
     </div>
   );
 }
