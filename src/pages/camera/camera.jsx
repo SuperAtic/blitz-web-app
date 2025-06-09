@@ -1,11 +1,11 @@
 import { useRef, useEffect, useState } from "react";
 import jsQR from "jsqr";
 import BackArrow from "../../components/backArrow/backArrow";
+import { Scanner } from "@yudiel/react-qr-scanner";
 
 import "./style.css";
 import getDataFromClipboard from "../../functions/getDataFromClipboard";
 import { useNavigate } from "react-router-dom";
-import SafeAreaComponent from "../../components/safeAreaContainer";
 
 export default function Camera() {
   const navigate = useNavigate();
@@ -14,124 +14,122 @@ export default function Camera() {
   const streamRef = useRef(null);
   const didScan = useRef(false);
   const animationFrameId = useRef(null);
-  const [isCameraReady, setIsCameraReady] = useState(false);
+  const [pauseCamera, setPauseCamera] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(true);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    let isMounted = true;
+  // useEffect(() => {
+  //   const video = videoRef.current;
+  //   const canvas = canvasRef.current;
+  //   const ctx = canvas.getContext("2d");
+  //   let isMounted = true;
 
-    const scan = () => {
-      if (!isMounted || !video || video.readyState !== video.HAVE_ENOUGH_DATA) {
-        animationFrameId.current = requestAnimationFrame(scan);
-        return;
-      }
+  //   const scan = () => {
+  //     if (!isMounted || !video || video.readyState !== video.HAVE_ENOUGH_DATA) {
+  //       animationFrameId.current = requestAnimationFrame(scan);
+  //       return;
+  //     }
 
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
+  //     canvas.width = video.videoWidth;
+  //     canvas.height = video.videoHeight;
+  //     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  //     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  //     const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-      if (code && !didScan.current) {
-        didScan.current = true;
-        // Stop camera resources before navigating
-        if (animationFrameId.current) {
-          cancelAnimationFrame(animationFrameId.current);
-          animationFrameId.current = null;
-        }
+  //     if (code && !didScan.current) {
+  //       didScan.current = true;
+  //       // Stop camera resources before navigating
+  //       if (animationFrameId.current) {
+  //         cancelAnimationFrame(animationFrameId.current);
+  //         animationFrameId.current = null;
+  //       }
 
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach((track) => track.stop());
-          streamRef.current = null;
-        }
+  //       if (streamRef.current) {
+  //         streamRef.current.getTracks().forEach((track) => track.stop());
+  //         streamRef.current = null;
+  //       }
 
-        navigate("/send", { state: { btcAddress: code.data } });
-        return; // Exit scan loop after successful scan
-      }
+  //       navigate("/send", { state: { btcAddress: code.data } });
+  //       return; // Exit scan loop after successful scan
+  //     }
 
-      if (isMounted) {
-        animationFrameId.current = requestAnimationFrame(scan);
-      }
-    };
+  //     if (isMounted) {
+  //       animationFrameId.current = requestAnimationFrame(scan);
+  //     }
+  //   };
 
-    const setupCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
-        });
+  //   const setupCamera = async () => {
+  //     try {
+  //       const stream = await navigator.mediaDevices.getUserMedia({
+  //         video: { facingMode: "environment" },
+  //       });
 
-        if (!isMounted) {
-          stream.getTracks().forEach((track) => track.stop());
-          return;
-        }
+  //       if (!isMounted) {
+  //         stream.getTracks().forEach((track) => track.stop());
+  //         return;
+  //       }
 
-        streamRef.current = stream;
-        video.srcObject = stream;
-        video.setAttribute("playsinline", true);
+  //       streamRef.current = stream;
+  //       video.srcObject = stream;
+  //       video.setAttribute("playsinline", true);
 
-        // Wait for video to be ready to play
-        await video.play();
+  //       // Wait for video to be ready to play
+  //       await video.play();
 
-        if (!isMounted) {
-          stream.getTracks().forEach((track) => track.stop());
-          return;
-        }
+  //       if (!isMounted) {
+  //         stream.getTracks().forEach((track) => track.stop());
+  //         return;
+  //       }
 
-        setIsCameraReady(true);
-        animationFrameId.current = requestAnimationFrame(scan);
-      } catch (err) {
-        console.error("Camera error:", err);
-      }
-    };
+  //       setIsCameraReady(true);
+  //       animationFrameId.current = requestAnimationFrame(scan);
+  //     } catch (err) {
+  //       console.error("Camera error:", err);
+  //     }
+  //   };
 
-    setupCamera();
+  //   setupCamera();
 
-    // Cleanup function
-    return () => {
-      console.log("Camera component unmounting, cleaning up resources");
-      isMounted = false;
-      setIsCameraReady(false);
+  //   // Cleanup function
+  //   return () => {
+  //     console.log("Camera component unmounting, cleaning up resources");
+  //     isMounted = false;
+  //     setIsCameraReady(false);
 
-      // Cancel animation frame first
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-        animationFrameId.current = null;
-      }
+  //     // Cancel animation frame first
+  //     if (animationFrameId.current) {
+  //       cancelAnimationFrame(animationFrameId.current);
+  //       animationFrameId.current = null;
+  //     }
 
-      // Then stop all tracks
-      if (streamRef.current) {
-        const tracks = streamRef.current.getTracks();
-        tracks.forEach((track) => {
-          track.stop();
-          console.log("Track stopped:", track.kind);
-        });
-        streamRef.current = null;
-      }
+  //     // Then stop all tracks
+  //     if (streamRef.current) {
+  //       const tracks = streamRef.current.getTracks();
+  //       tracks.forEach((track) => {
+  //         track.stop();
+  //         console.log("Track stopped:", track.kind);
+  //       });
+  //       streamRef.current = null;
+  //     }
 
-      // Clear video source
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-        videoRef.current.load(); // Force video to clear its source
-      }
-    };
-  }, [navigate]);
+  //     // Clear video source
+  //     if (videoRef.current) {
+  //       videoRef.current.srcObject = null;
+  //       videoRef.current.load(); // Force video to clear its source
+  //     }
+  //   };
+  // }, [navigate]);
+
+  const handleScan = (rawValue) => {
+    setPauseCamera(true);
+    navigate("/send", { state: { btcAddress: rawValue } });
+  };
 
   const handlePaste = async () => {
     if (didScan.current) return;
     didScan.current = true;
 
     // Stop camera resources before navigating
-    if (animationFrameId.current) {
-      cancelAnimationFrame(animationFrameId.current);
-      animationFrameId.current = null;
-    }
-
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
+    setPauseCamera(true);
 
     const data = await getDataFromClipboard();
     navigate("/send", { state: { btcAddress: data } });
@@ -139,8 +137,21 @@ export default function Camera() {
 
   return (
     <div className="camera-page">
-      <video ref={videoRef} className="camera-video" playsInline muted />
-      <canvas ref={canvasRef} style={{ display: "none" }} />
+      <Scanner
+        paused={pauseCamera}
+        classNames={"cameraComponenet"}
+        formats={["qr_code"]}
+        onError={() => setIsCameraReady(false)}
+        onScan={(result) => {
+          const [data] = result;
+
+          handleScan(data.rawValue);
+
+          console.log(result, data);
+        }}
+      />
+      {/* <video ref={videoRef} className="camera-video" playsInline muted /> */}
+      {/* <canvas ref={canvasRef} style={{ display: "none" }} /> */}
       <div className="camera-overlay">
         <div className="overlay">
           <div className="backContainer">

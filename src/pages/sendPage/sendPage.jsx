@@ -8,40 +8,133 @@ import arrowIcon from "../../assets/arrow-left-blue.png";
 import deleteIcon from "../../assets/leftCheveronDark.png";
 import { sparkPaymenWrapper } from "../../functions/spark/payments";
 import { useSpark } from "../../contexts/sparkContext";
+import FullLoadingScreen from "../../components/fullLoadingScreen/fullLoadingScreen";
+import { Colors } from "../../constants/theme";
+import hasAlredyPaidInvoice from "../../functions/sendBitcoin/hasPaid";
+import { useGlobalContextProvider } from "../../contexts/masterInfoObject";
+import { useNodeContext } from "../../contexts/nodeContext";
+import { useAppStatus } from "../../contexts/appStatus";
+import ErrorWithPayment from "./components/errorScreen";
+import decodeSendAddress from "../../functions/sendBitcoin/decodeSendAdress";
+import { SATSPERBITCOIN } from "../../constants";
 
 export default function SendPage() {
   const location = useLocation();
   const params = location.state || {};
+
+  const {
+    btcAddress: btcAdress,
+    fromPage,
+    publishMessageFunc,
+    comingFromAccept,
+    enteredPaymentInfo,
+    errorMessage: globalError,
+  } = params;
   const [paymentInfo, setPaymentInfo] = useState({});
-  const [isSending, setIsSending] = useState(false);
+  const { masterInfoObject, toggleMasterInfoObject } =
+    useGlobalContextProvider();
+  const { liquidNodeInformation, fiatStats } = useNodeContext();
+  const { minMaxLiquidSwapAmounts } = useAppStatus();
+  const [isSendingPayment, setIsSendingPayment] = useState(false);
+  const [paymentDescription, setPaymentDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(globalError);
+  const [loadingMessage, setLoadingMessage] = useState(
+    "Getting invoice information"
+  );
   const navigate = useNavigate();
   const { sparkInformation } = useSpark();
 
-  useEffect(() => {
-    async function decodeSendAddress() {
-      try {
-        const decodedInvoice = await processInputType(params.btcAddress, {});
-        if (!decodedInvoice) throw new Error("Invalid address");
-        setPaymentInfo(decodedInvoice);
-      } catch (err) {
-        console.error("Error decoding payment", err);
-        navigate("/error", {
-          state: {
-            errorMessage: "Error decoding payment.",
-            navigateBack: "wallet",
-            background: location,
-          },
-        });
-      }
-    }
+  const sendingAmount = paymentInfo?.sendAmount || 0;
+  const isBTCdenominated =
+    masterInfoObject.userBalanceDenomination === "hidden" ||
+    masterInfoObject.userBalanceDenomination === "sats";
+  const canEditPaymentAmount = paymentInfo?.canEditPayment;
+  const convertedSendAmount = isBTCdenominated
+    ? Math.round(Number(sendingAmount))
+    : Math.round((SATSPERBITCOIN / fiatStats?.value) * Number(sendingAmount));
 
-    decodeSendAddress();
-  }, [params, navigate]);
+  const isLightningPayment = paymentInfo?.paymentNetwork === "lightning";
+  const isLiquidPayment = paymentInfo?.paymentNetwork === "liquid";
+  const isBitcoinPayment = paymentInfo?.paymentNetwork === "Bitcoin";
+  const isSparkPayment = paymentInfo?.paymentNetwork === "spark";
+
+  const paymentFee =
+    (paymentInfo?.paymentFee || 0) + (paymentInfo?.supportFee || 0);
+  const canSendPayment =
+    Number(sparkInformation.balance) >= Number(sendingAmount) + paymentFee &&
+    sendingAmount != 0; //ecash is built into ln
+  console.log(
+    canSendPayment,
+    "can send payment",
+    sparkInformation.balance,
+    sendingAmount,
+    paymentFee,
+    sendingAmount,
+    paymentInfo
+  ); //ecash is built into ln);
+  const isUsingSwapWithZeroInvoice =
+    paymentInfo?.paymentNetwork === "lightning" &&
+    paymentInfo.type === "bolt11" &&
+    !paymentInfo?.data?.invoice.amountMsat;
+
+  useEffect(() => {
+    async function decodePayment() {
+      // const didPay = hasAlredyPaidInvoice({
+      //   scannedAddress: btcAdress,
+      //   sparkInformation,
+      // });
+
+      // if (didPay) {
+      //   errorMessageNavigation("You have already paid this invoice");
+      //   return;
+      // }
+
+      console.log({
+        fiatStats,
+        btcAdress,
+        goBackFunction: errorMessageNavigation,
+        setPaymentInfo,
+        liquidNodeInformation,
+        masterInfoObject,
+        // setWebViewArgs,
+        navigate,
+        maxZeroConf:
+          minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
+        comingFromAccept,
+        enteredPaymentInfo,
+        setLoadingMessage,
+        paymentInfo,
+        fromPage,
+        publishMessageFunc,
+      });
+
+      await decodeSendAddress({
+        fiatStats,
+        btcAdress,
+        goBackFunction: errorMessageNavigation,
+        setPaymentInfo,
+        liquidNodeInformation,
+        masterInfoObject,
+        // setWebViewArgs,
+        // webViewRef,
+        navigate,
+        maxZeroConf:
+          minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
+        comingFromAccept,
+        enteredPaymentInfo,
+        setLoadingMessage,
+        paymentInfo,
+        fromPage,
+        publishMessageFunc,
+      });
+    }
+    setTimeout(decodePayment, 1000);
+  }, []);
 
   const handleSend = async () => {
-    if (isSending || !paymentInfo.paymentType) return;
-    setIsSending(true);
+    if (isSendingPayment || !paymentInfo.paymentType) return;
+    setIsSendingPayment(true);
 
     try {
       const response = await sparkPaymenWrapper({
@@ -95,15 +188,17 @@ export default function SendPage() {
     }
   };
 
-  if (!Object.keys(paymentInfo).length) {
+  if (!Object.keys(paymentInfo).length && !errorMessage)
     return (
-      <div className="sendContainer">
-        <BackArrow />
-        <p className="decodeInvoiceLoadingText">
-          Getting invoice information...
-        </p>
-      </div>
+      <FullLoadingScreen
+        loadingColor={Colors.light.blue}
+        text={loadingMessage}
+      />
     );
+
+  if (errorMessage) {
+    console.log("RUNNING ERROR COMPONENT");
+    return <ErrorWithPayment reason={errorMessage} />;
   }
 
   const totalFee = (paymentInfo.fee || 0) + (paymentInfo.supportFee || 0);
@@ -152,19 +247,26 @@ export default function SendPage() {
         <button
           style={{ marginTop: paymentInfo.canEdit ? 0 : "auto" }}
           onClick={paymentInfo.canEdit ? handleSave : handleSend}
-          disabled={isSending}
+          disabled={isSendingPayment}
         >
           {paymentInfo.canEdit
             ? isLoading
               ? "Loading..."
               : "Save"
-            : isSending
+            : isSendingPayment
             ? "Sending..."
             : "Send Payment"}
         </button>
       </div>
     </div>
   );
+  function goBackFunction() {
+    navigate(-1);
+  }
+  function errorMessageNavigation(reason) {
+    setErrorMessage(reason);
+    setPaymentInfo({});
+  }
 }
 
 function NabBar({ sparkInformation }) {

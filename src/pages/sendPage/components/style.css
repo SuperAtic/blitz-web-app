@@ -1,0 +1,21 @@
+.errorWithPaymentComponent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.errorWithPaymentComponent .errorAnimation {
+  width: 95%;
+  max-width: 300px;
+  height: auto;
+}
+.errorWithPaymentComponent .errorText {
+  margin-top: auto;
+}
+.errorWithPaymentComponent .sendErrorContentContainer {
+  flex: 1;
+  max-width: 400px;
+  overflow-y: scroll;
+}

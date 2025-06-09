@@ -61,6 +61,26 @@ const BLITZ_GOAL_USER_COUNT = 1_000_000;
 
 const IS_DONTATION_PAYMENT_BUFFER = 10_000;
 
+const LIQUID_TYPES = {
+  BitcoinAddress: "BitcoinAddress",
+  LiquidAddress: "LiquidAddress",
+  Bolt11: "Bolt11",
+  Bolt12Offer: "Bolt12Offer",
+  NodeId: "NodeId",
+  Url: "Url",
+  LnUrlPay: "LnUrlPay",
+  LnUrlWithdraw: "LnUrlWithdraw",
+  LnUrlAuth: "LnUrlAuth",
+  LnUrlError: "LnUrlError",
+};
+const LIQUID_PAYMENT_METHOD = {
+  Lightning: "Lightning",
+  Bolt11Invoice: "Bolt11Invoice",
+  Bolt12Offer: "Bolt12Offer",
+  BitcoinAddress: "BitcoinAddress",
+  LiquidAddress: "LiquidAddress",
+};
+
 export {
   //   COLORS,
   //   FONT,
@@ -103,4 +123,6 @@ export {
   BLITZ_SUPPORT_DEFAULT_PAYMENT_DESCRIPTION,
   IS_DONTATION_PAYMENT_BUFFER,
   THEME_LOCAL_STORAGE_KEY,
+  LIQUID_TYPES,
+  LIQUID_PAYMENT_METHOD,
 };

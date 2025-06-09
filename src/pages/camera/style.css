@@ -4,6 +4,11 @@
   height: 100vh;
   overflow: hidden;
 }
+/* This is very janky but it works */
+.camera-page div div div div div * {
+  border: none !important;
+  outline: none !important;
+}
 
 .camera-page .backContainer {
   width: 95%;

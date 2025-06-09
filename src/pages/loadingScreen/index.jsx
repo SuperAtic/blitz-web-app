@@ -20,7 +20,10 @@ import {
   getLiquidSdk,
 } from "../../functions/connectToLiquid.js";
 import { useSpark } from "../../contexts/sparkContext";
-import { getDateXDaysAgo } from "../../functions/rotateAddressDateChecker";
+import {
+  getDateXDaysAgo,
+  isMoreThan7DaysPast,
+} from "../../functions/rotateAddressDateChecker";
 import { breezLiquidReceivePaymentWrapper } from "../../functions/breezLiquid";
 import { useNavigate } from "react-router-dom";
 import { JsEventListener } from "../../functions/breezLiquid/JsEventListener.js";

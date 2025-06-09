@@ -8,6 +8,7 @@ export async function breezLiquidReceivePaymentWrapper({
 }) {
   try {
     const sdk = getLiquidSdk();
+
     console.log("Starting prepare receive payment process");
     // Set the amount you wish the payer to send via lightning, which should be within the above limits
 

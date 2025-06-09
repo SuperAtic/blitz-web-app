@@ -1,10 +1,8 @@
 #activityIndicator {
   width: 40px;
   height: 40px;
-  border: 4px solid #ccc;
-  border-top: 4px solid #333;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 1.2s linear infinite;
   margin: 20px auto; /* center it */
 }
 
