@@ -12,6 +12,5 @@ export function privateKeyFromSeedWords(mnemonic, passphrase) {
 
 export function getPublicKey(privateKey) {
   const pubkeyBytes = secp.getPublicKey(privateKey, true); // compressed
-  console.log(secp.etc.bytesToHex(pubkeyBytes));
   return secp.etc.bytesToHex(pubkeyBytes).slice(2);
 }
