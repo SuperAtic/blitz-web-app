@@ -1,11 +1,11 @@
-import { openDB } from "idb";
+import { deleteDB, openDB } from "idb";
 import Storage from "../localStorage";
 import { getTwoWeeksAgoDate } from "../rotateAddressDateChecker";
 import EventEmitter from "events";
 
 export const CACHED_MESSAGES_KEY = "CASHED_CONTACTS_MESSAGES";
 export const DB_NAME = `${CACHED_MESSAGES_KEY}`;
-export const STORE_NAME = "messagesTable";
+export const STORE_NAME_CONTACT_MESSAGES = "messagesTable";
 export const LOCALSTORAGE_LAST_RECEIVED_TIME_KEY =
   "LAST_RECEIVED_CONTACT_MESSAGE";
 export const CONTACTS_TRANSACTION_UPDATE_NAME = "RECEIVED_CONTACTS EVENT";
@@ -19,8 +19,8 @@ const getDB = async () => {
   if (!dbPromise) {
     dbPromise = await openDB(DB_NAME, 1, {
       upgrade(db) {
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          const store = db.createObjectStore(STORE_NAME, {
+        if (!db.objectStoreNames.contains(STORE_NAME_CONTACT_MESSAGES)) {
+          const store = db.createObjectStore(STORE_NAME_CONTACT_MESSAGES, {
             keyPath: "messageUUID",
           });
           store.createIndex("contactPubKey", "contactPubKey");
@@ -41,8 +41,8 @@ export const initializeDatabase = async () => {
 export const getCachedMessages = async () => {
   try {
     const db = await getDB();
-    const tx = db.transaction(STORE_NAME);
-    const store = tx.objectStore(STORE_NAME);
+    const tx = db.transaction(STORE_NAME_CONTACT_MESSAGES);
+    const store = tx.objectStore(STORE_NAME_CONTACT_MESSAGES);
     const messages = await store.getAll();
 
     const returnObj = {};
@@ -113,8 +113,8 @@ const processQueue = async () => {
 
 const setCashedMessages = async ({ newMessagesList, myPubKey }) => {
   const db = await getDB();
-  const tx = db.transaction(STORE_NAME, "readwrite");
-  const store = tx.objectStore(STORE_NAME);
+  const tx = db.transaction(STORE_NAME_CONTACT_MESSAGES, "readwrite");
+  const store = tx.objectStore(STORE_NAME_CONTACT_MESSAGES);
 
   try {
     for (const newMessage of newMessagesList) {
@@ -188,8 +188,8 @@ const setCashedMessages = async ({ newMessagesList, myPubKey }) => {
 export const deleteCachedMessages = async (contactPubKey) => {
   try {
     const db = await getDB();
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
+    const tx = db.transaction(STORE_NAME_CONTACT_MESSAGES, "readwrite");
+    const store = tx.objectStore(STORE_NAME_CONTACT_MESSAGES);
     const index = store.index("contactPubKey");
     const messages = await index.getAllKeys(contactPubKey);
 
@@ -214,8 +214,8 @@ export const deleteCachedMessages = async (contactPubKey) => {
 export const deleteTable = async () => {
   try {
     const db = await getDB();
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
+    const tx = db.transaction(STORE_NAME_CONTACT_MESSAGES, "readwrite");
+    const store = tx.objectStore(STORE_NAME_CONTACT_MESSAGES);
     const allKeys = await store.getAllKeys();
 
     for (const key of allKeys) {
@@ -223,8 +223,18 @@ export const deleteTable = async () => {
     }
 
     await tx.done;
-    console.log(`Store ${STORE_NAME} cleared successfully`);
+    console.log(`Store ${STORE_NAME_CONTACT_MESSAGES} cleared successfully`);
   } catch (err) {
     console.error("Error clearing store:", err);
+  }
+};
+export const wipeEntireContactDatabase = async () => {
+  try {
+    await deleteDB(DB_NAME);
+    console.log("Spark DB deleted successfully");
+    return true;
+  } catch (err) {
+    console.error("Failed to delete DB:", err);
+    return false;
   }
 };

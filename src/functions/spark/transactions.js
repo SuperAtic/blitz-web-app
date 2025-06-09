@@ -1,4 +1,4 @@
-import { openDB } from "idb";
+import { openDB, deleteDB } from "idb";
 import EventEmitter from "events";
 
 export const SPARK_TRANSACTIONS_DATABASE_NAME = "spark-info-db";
@@ -205,6 +205,18 @@ export const deleteSparkTransactionTable = async () => {
 export const deleteUnpaidSparkLightningTransactionTable = async () => {
   const db = await dbPromise;
   db.deleteObjectStore(LIGHTNING_REQUEST_IDS_TABLE_NAME);
+};
+
+export const wipeEntireSparkDatabase = async () => {
+  try {
+    await deleteDB(SPARK_TRANSACTIONS_DATABASE_NAME);
+    await deleteDB(LIGHTNING_REQUEST_IDS_TABLE_NAME);
+    console.log("Spark DB deleted successfully");
+    return true;
+  } catch (err) {
+    console.error("Failed to delete DB:", err);
+    return false;
+  }
 };
 
 export const cleanStalePendingSparkLightningTransactions = async () => {

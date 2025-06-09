@@ -62,6 +62,7 @@ import { GLobalNodeContextProider } from "./contexts/nodeContext.jsx";
 import { LiquidEventProvider } from "./contexts/liquidEventContext.jsx";
 import { Colors } from "./constants/theme.js";
 import AnimatedRouteWrapper from "./components/animatedRouteWrapper.jsx";
+import ConfirmActionPage from "./components/confirmActionPage/confirmActionPage.jsx";
 // const ConfirmPayment = lazy(() =>
 //   import("./pages/confirmPayment/confirmPaymentScreen.jsx")
 // );
@@ -294,6 +295,9 @@ function Root() {
                                   /> */}
                                 </Routes>
 
+                                {location.pathname === "/confirm-action" && (
+                                  <ConfirmActionPage />
+                                )}
                                 {location.pathname === "/error" && (
                                   <ErrorScreen />
                                 )}

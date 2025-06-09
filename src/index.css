@@ -20,6 +20,7 @@
 }
 * {
   box-sizing: border-box;
+  font: var(--font-family);
 }
 input {
   font-size: 16px;

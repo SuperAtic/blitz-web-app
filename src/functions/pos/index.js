@@ -1,4 +1,4 @@
-import { openDB } from "idb";
+import { deleteDB, openDB } from "idb";
 import Storage from "../localStorage";
 import EventEmitter from "events";
 import { decryptMessage } from "../encodingAndDecoding";
@@ -180,4 +180,15 @@ export const deletePOSTransactionsTable = async () => {
   const db = await dbPromise;
   await db.deleteObjectStore(POS_TRANSACTION_TABLE_NAME);
   console.log(`Table ${POS_TRANSACTION_TABLE_NAME} deleted`);
+};
+
+export const wipeEntirePOSDatabase = async () => {
+  try {
+    await deleteDB(POS_TRANSACTION_TABLE_NAME);
+    console.log("Spark DB deleted successfully");
+    return true;
+  } catch (err) {
+    console.error("Failed to delete DB:", err);
+    return false;
+  }
 };

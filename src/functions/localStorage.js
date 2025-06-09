@@ -24,6 +24,18 @@ const Storage = {
       console.error("Error removing from localStorage", err);
     }
   },
+
+  removeAllItems: () => {
+    try {
+      const numberOfItems = localStorage.length;
+      for (let index = 0; index < numberOfItems; index++) {
+        const keyName = localStorage.key(index);
+        Storage.removeItem(keyName);
+      }
+    } catch (err) {
+      console.error("Error removing from localStorage", err);
+    }
+  },
 };
 
 export default Storage;

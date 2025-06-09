@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import Storage from "../functions/localStorage";
-import { deleteSparkTransactionTable } from "../functions/spark/transactions";
+import { wipeEntireSparkDatabase } from "../functions/spark/transactions";
+import { wipeEntireContactDatabase } from "../functions/messaging/cachedMessages";
+import { wipeEntirePOSDatabase } from "../functions/pos";
 
 const AuthContext = createContext();
 
@@ -17,7 +19,6 @@ export const AuthProvider = ({ children, navigate }) => {
 
   const login = (walletKey) => {
     Storage.setItem("walletKey", walletKey);
-
     Storage.setItem("lastSession", Date.now().toString());
 
     setAuthState({
@@ -28,10 +29,12 @@ export const AuthProvider = ({ children, navigate }) => {
     navigate("/connecting");
   };
 
-  const deleteWallet = () => {
-    Storage.removeItem("walletKey");
-    Storage.removeItem("lastSession");
-    deleteSparkTransactionTable();
+  const deleteWallet = async () => {
+    Storage.removeAllItems();
+    await wipeEntireSparkDatabase();
+    await wipeEntireContactDatabase();
+    await wipeEntirePOSDatabase();
+
     setAuthState({
       isAuthenticated: false,
       walletKey: null,

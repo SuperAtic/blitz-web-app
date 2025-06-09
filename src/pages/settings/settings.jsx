@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import PageNavBar from "../../components/navBar/navBar";
 export default function SettingsHome() {
   const navigate = useNavigate();
-  const { sparkInformation, clearSparkSession } = useSpark();
+  const { sparkInformation } = useSpark();
   const { logout, deleteWallet } = useAuth();
   console.log(sparkInformation);
 
@@ -67,7 +67,6 @@ export default function SettingsHome() {
         <button
           onClick={() => {
             logout();
-            clearSparkSession();
           }}
         >
           <img
@@ -81,7 +80,6 @@ export default function SettingsHome() {
         <button
           onClick={() => {
             deleteWallet();
-            clearSparkSession();
           }}
         >
           <img src={trashIcon} alt="" srcset="" /> Delete wallet
