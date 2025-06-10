@@ -89,18 +89,18 @@ function Root() {
 
   return (
     <NavigationStackProvider>
-      <GlobalRescanLiquidSwaps>
-        <KeysContextProvider>
-          <GlobalContactsList>
-            <AppStatusProvider>
-              <ThemeContextProvider>
-                <GLobalNodeContextProider>
-                  <SparkWalletProvider navigate={navigate}>
-                    <GlobalContextProvider>
-                      <BitcoinPriceProvider>
-                        <GlobalAppDataProvider>
-                          <LiquidEventProvider>
-                            <AuthProvider navigate={navigate}>
+      <AuthProvider navigate={navigate}>
+        <GlobalRescanLiquidSwaps>
+          <KeysContextProvider>
+            <GlobalContactsList>
+              <AppStatusProvider>
+                <ThemeContextProvider>
+                  <GLobalNodeContextProider>
+                    <SparkWalletProvider navigate={navigate}>
+                      <GlobalContextProvider>
+                        <BitcoinPriceProvider>
+                          <GlobalAppDataProvider>
+                            <LiquidEventProvider>
                               <AuthGate />
                               <AnimatePresence mode="wait">
                                 <Suspense
@@ -342,18 +342,18 @@ function Root() {
                                   />
                                 </BottomNavigation>
                               )}
-                            </AuthProvider>
-                          </LiquidEventProvider>
-                        </GlobalAppDataProvider>
-                      </BitcoinPriceProvider>
-                    </GlobalContextProvider>
-                  </SparkWalletProvider>
-                </GLobalNodeContextProider>
-              </ThemeContextProvider>
-            </AppStatusProvider>
-          </GlobalContactsList>
-        </KeysContextProvider>
-      </GlobalRescanLiquidSwaps>
+                            </LiquidEventProvider>
+                          </GlobalAppDataProvider>
+                        </BitcoinPriceProvider>
+                      </GlobalContextProvider>
+                    </SparkWalletProvider>
+                  </GLobalNodeContextProider>
+                </ThemeContextProvider>
+              </AppStatusProvider>
+            </GlobalContactsList>
+          </KeysContextProvider>
+        </GlobalRescanLiquidSwaps>
+      </AuthProvider>
     </NavigationStackProvider>
   );
 }

@@ -38,6 +38,7 @@ import { useAppStatus } from "./appStatus";
 import { useNodeContext } from "./nodeContext";
 import { calculateBoltzFeeNew } from "../functions/boltz/boltzFeeNew";
 import Storage from "../functions/localStorage";
+import { useAuth } from "./authContext";
 
 // Initiate context
 const SparkWalletManager = createContext(null);
@@ -45,6 +46,7 @@ const SparkWalletManager = createContext(null);
 const SparkWalletProvider = ({ children, navigate }) => {
   const { didGetToHomepage, minMaxLiquidSwapAmounts } = useAppStatus();
   const { liquidNodeInformation } = useNodeContext();
+  const { mnemoinc } = useAuth();
   const [sparkInformation, setSparkInformation] = useState({
     balance: 0,
     transactions: [],
@@ -490,6 +492,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
         setSparkInformation,
         toggleGlobalContactsInformation,
         globalContactsInformation,
+        mnemoinc,
       });
 
       if (didWork) return;

@@ -12,11 +12,12 @@ export async function initWallet({
   setSparkInformation,
   toggleGlobalContactsInformation,
   globalContactsInformation,
+  mnemoinc,
 }) {
   console.log("HOME RENDER BREEZ EVENT FIRST LOAD");
 
   try {
-    const didConnectToSpark = await initializeSparkWallet();
+    const didConnectToSpark = await initializeSparkWallet(mnemoinc);
 
     if (didConnectToSpark.isConnected) {
       const didSetSpark = await initializeSparkSession({
