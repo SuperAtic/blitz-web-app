@@ -21,17 +21,17 @@ export const GlobalRescanLiquidSwaps = ({ children }) => {
     console.log(isWindowFocused, "isWindowFocused");
     console.log(isTabFocused, "isTabFocused");
 
-    const claims = getRetriableClaims(process.env.REACT_APP_ENVIRONMENT);
+    const claims = getRetriableClaims(import.meta.env.VITE_BOLTZ_ENVIRONMENT);
     console.log("rescanning swaps....");
 
     let didClaim = false;
+    console.log(claims);
 
     for (let index = 0; index < claims.length; index++) {
       const element = claims[index];
       try {
         const response = await claimUnclaimedSwaps(element);
         if (!response) continue;
-        await fetchFunction("/addTxActivity", element?.dbClaim, "post");
         didClaim = true;
       } catch (err) {
         console.log("claim error", err);

@@ -6,7 +6,7 @@ export default function bip39LiquidAddressDecode(
   liquidNodeInformation
 ) {
   const isBip21 = btcAddress.startsWith(
-    process.env.BOLTZ_ENVIRONMENT === "testnet"
+    import.meta.env.VITE_BOLTZ_ENVIRONMENT === "testnet"
       ? "liquidtestnet:"
       : "liquidnetwork:"
   );

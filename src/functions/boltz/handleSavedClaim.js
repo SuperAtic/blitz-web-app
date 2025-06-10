@@ -1,5 +1,6 @@
 import zkpInit from "@vulpemventures/secp256k1-zkp";
 // import axios from "axios";
+import { Buffer } from "buffer";
 import { Transaction, address } from "liquidjs-lib";
 import {
   Musig,
@@ -20,6 +21,7 @@ import { getNetwork } from "./network";
 import { getBoltzApiUrl } from "./boltzEndpoitns";
 import getBoltzFeeRates from "./getBoltzFeerate,";
 import fetchFunction from "./fetchFunction";
+import createCompatibleBuffer from "./compatibleBuffer";
 
 /**
  * Reverse swap flow:
@@ -38,13 +40,14 @@ export async function claimUnclaimedSwaps(claimInfo) {
     const swapStatus = await getSwapStatus(createdResponse.id);
     console.log(swapStatus);
     if (!swapStatus.transaction?.hex) throw Error("LOCK_TRANSACTION_MISSING");
-    const boltzPublicKey = Buffer.from(createdResponse.refundPublicKey, "hex");
-    // const boltzPublicKey = Buffer.from('4444', 'hex')
+    const boltzPublicKey = createCompatibleBuffer(
+      createdResponse.refundPublicKey
+    );
 
     // Create a musig signing session and tweak it with the Taptree of the swap scripts
     const musig = new Musig(await zkpInit(), keys, randomBytes(32), [
       boltzPublicKey,
-      keys.publicKey,
+      createCompatibleBuffer(keys.publicKey),
     ]);
     const tweakedKey = TaprootUtils.tweakMusig(
       musig,
@@ -76,7 +79,9 @@ export async function claimUnclaimedSwaps(claimInfo) {
             cooperative: true,
             type: OutputType.Taproot,
             txHash: lockupTx.getHash(),
-            blindingPrivateKey: Buffer.from(createdResponse.blindingKey, "hex"),
+            blindingPrivateKey: createCompatibleBuffer(
+              createdResponse.blindingKey
+            ),
           },
         ],
         address.toOutputScript(destinationAddress, network),
@@ -89,21 +94,23 @@ export async function claimUnclaimedSwaps(claimInfo) {
 
     console.log("Getting partial signature from Boltz");
     const boltzSig = await fetchFunction(
-      `${getBoltzApiUrl(process.env.REACT_APP_ENVIRONMENT)}/v2/swap/reverse/${
-        createdResponse.id
-      }/claim`,
+      `${getBoltzApiUrl(
+        import.meta.env.VITE_BOLTZ_ENVIRONMENT
+      )}/v2/swap/reverse/${createdResponse.id}/claim`,
       {
         index: 0,
         transaction: claimTx.toHex(),
-        preimage: preimage.toString("hex"),
+        preimage: Buffer.from(preimage).toString("hex"),
         pubNonce: Buffer.from(musig.getPublicNonce()).toString("hex"),
       },
       "post"
     );
 
+    console.log("✅ Boltz partial signature received:", boltzSig);
+
     // Aggregate the nonces
     musig.aggregateNonces([
-      [boltzPublicKey, Buffer.from(boltzSig.pubNonce, "hex")],
+      [boltzPublicKey, createCompatibleBuffer(boltzSig.pubNonce)],
     ]);
 
     // Initialize the session to sign the claim transaction
@@ -118,13 +125,11 @@ export async function claimUnclaimedSwaps(claimInfo) {
     );
 
     // Add the partial signature from Boltz
-
     musig.addPartial(
       boltzPublicKey,
-      Buffer.from(boltzSig.partialSignature, "hex")
+      createCompatibleBuffer(boltzSig.partialSignature)
     );
 
-    // Create our partial signature
     musig.signPartial();
 
     // Witness of the input to the aggregated signature
@@ -132,13 +137,12 @@ export async function claimUnclaimedSwaps(claimInfo) {
 
     // save claimtx hex on claimInfo
     claimInfo.claimTx = claimTx.toHex();
-    saveClaim(claimInfo, process.env.REACT_APP_ENVIRONMENT);
+    saveClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
 
     console.log("Broadcasting claim transaction");
-
     const didBroadcast = fetchFunction(
       `${getBoltzApiUrl(
-        process.env.REACT_APP_ENVIRONMENT
+        import.meta.env.VITE_BOLTZ_ENVIRONMENT
       )}/v2/chain/L-BTC/transaction`,
       {
         hex: claimTx.toHex(),
@@ -149,7 +153,7 @@ export async function claimUnclaimedSwaps(claimInfo) {
     if (!didBroadcast) throw Error("did not broadcast");
 
     claimInfo.claimed = true;
-    removeClaim(claimInfo, process.env.REACT_APP_ENVIRONMENT);
+    removeClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
     return true;
   } catch (err) {
     console.log(`Error when constructing claim tx: ${err}`);

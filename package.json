@@ -48,6 +48,7 @@
     "react-lottie-player": "^2.1.0",
     "react-qr-code": "^2.0.15",
     "react-router-dom": "^7.5.3",
+    "tiny-secp256k1": "^2.2.3",
     "unique-names-generator": "^4.7.1"
   },
   "devDependencies": {

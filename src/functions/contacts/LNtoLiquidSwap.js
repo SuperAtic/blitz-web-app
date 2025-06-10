@@ -18,7 +18,9 @@ export async function contactsLNtoLiquidSwapInfo(
     ).toString("hex");
 
     const response = await fetch(
-      `${getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT)}/v2/swap/reverse`,
+      `${getBoltzApiUrl(
+        import.meta.env.VITE_BOLTZ_ENVIRONMENT
+      )}/v2/swap/reverse`,
       {
         method: "POST",
         headers: {

@@ -1,5 +1,5 @@
 import zkpInit from "@vulpemventures/secp256k1-zkp";
-// import axios from "axios";
+import { Buffer } from "buffer";
 import { Transaction, address, crypto } from "liquidjs-lib";
 import {
   Musig,
@@ -17,38 +17,32 @@ import { randomBytes } from "crypto";
 import { ECPairFactory } from "ecpair";
 import * as ecc from "@bitcoinerlab/secp256k1";
 import { getNetwork } from "./network";
-import { getBoltzApiUrl, getBoltzWsUrl } from "./boltz";
-
-import getBoltzFeeRates from "./boltzFeeRate";
 import fetchFunction from "./fetchFunction";
-import { PAYMENT_DESCRIPTION } from "../constants";
 import { removeClaim, saveClaim } from "./claims";
+import { getBoltzApiUrl, getBoltzWsUrl } from "./boltzEndpoitns";
+import getBoltzFeeRates from "./getBoltzFeerate,";
+import createCompatibleBuffer from "./compatibleBuffer";
 
-/**
- * Reverse swap flow:
- * 1. user generates preimage and sends hash to boltz
- * 2. user generates public key and sends to boltz
- * 3. user receives lightning invoice
- * 4. user validates lightining invoice
- */
+// Debug helper functions
+function debugLog(message, data = null) {
+  console.log(`🔍 [DEBUG] ${message}`, data || "");
+}
 
-export const waitAndClaim = async (
-  claimInfo,
-  onFinish,
-  setBoltzLoadingAnimation,
-  claimObject,
-  clearIntervalRef
-) => {
+export const waitAndClaim = async (claimInfo) => {
   init(await zkpInit());
   let claimTx;
-  const network = getNetwork(process.env.REACT_APP_ENVIRONMENT);
+  const network = getNetwork(import.meta.env.VITE_BOLTZ_ENVIRONMENT);
   const { createdResponse, destinationAddress, keys, preimage } = claimInfo;
 
-  // Create a WebSocket and subscribe to updates for the created swap
+  debugLog("Starting waitAndClaim with claim info:", claimInfo);
+
+  // Create WebSocket connection
   const webSocket = new WebSocket(
-    getBoltzWsUrl(process.env.REACT_APP_ENVIRONMENT)
+    getBoltzWsUrl(import.meta.env.VITE_BOLTZ_ENVIRONMENT)
   );
+
   webSocket.onopen = () => {
+    debugLog("WebSocket connected, subscribing to swap updates");
     webSocket.send(
       JSON.stringify({
         op: "subscribe",
@@ -60,74 +54,64 @@ export const waitAndClaim = async (
 
   webSocket.onmessage = async (rawMsg) => {
     const msg = JSON.parse(rawMsg.data);
-    console.log("msg", msg);
+    debugLog("WebSocket message received:", msg);
 
     if (msg.event !== "update") return;
-
     if (msg.args[0].id !== createdResponse.id) return;
 
     if (msg.args[0].error) {
+      console.error("Swap error:", msg.args[0].error);
       webSocket.close();
-      onFinish(false, claimObject);
       return;
     }
 
     switch (msg.args[0].status) {
-      // "swap.created" means Boltz is waiting for the invoice to be paid
       case "swap.created": {
-        console.log("Waiting for invoice to be paid");
-
-        saveClaim(
-          { ...claimInfo, dbClaim: { ...claimObject } },
-          process.env.REACT_APP_ENVIRONMENT
-        );
+        debugLog("Swap created, waiting for invoice payment");
+        saveClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
         break;
       }
 
-      // Boltz's lockup transaction is found in the mempool (or already confirmed)
-      // which will only happen after the user paid the Lightning hold invoice
       case "transaction.mempool":
       case "transaction.confirmed": {
-        clearIntervalRef();
-        setBoltzLoadingAnimation("Processing payment");
         try {
-          // save claim to be able to retry if something fails
+          debugLog(`Transaction ${msg.args[0].status}, starting claim process`);
+
+          // Save current status
           claimInfo.lastStatus = msg.args[0].status;
-          saveClaim(
-            { ...claimInfo, dbClaim: { ...claimObject } },
-            process.env.REACT_APP_ENVIRONMENT
-          );
+          saveClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
 
-          const boltzPublicKey = Buffer.from(
-            createdResponse.refundPublicKey,
-            "hex"
+          // Get Boltz public key
+          const boltzPublicKey = createCompatibleBuffer(
+            createdResponse.refundPublicKey
           );
-          // const boltzPublicKey = Buffer.from('4444', 'hex')
+          debugLog("Boltz public key extracted");
 
-          // Create a musig signing session and tweak it with the Taptree of the swap scripts
           const musig = new Musig(await zkpInit(), keys, randomBytes(32), [
             boltzPublicKey,
-            keys.publicKey,
+            createCompatibleBuffer(keys.publicKey),
           ]);
+
+          debugLog("Tweaking key");
           const tweakedKey = TaprootUtils.tweakMusig(
             musig,
             SwapTreeSerializer.deserializeSwapTree(createdResponse.swapTree)
               .tree
           );
 
-          // Parse the lockup transaction and find the output relevant for the swap
+          // Parse lockup transaction
           const lockupTx = Transaction.fromHex(msg.args[0].transaction.hex);
-          console.log(`Got lockup transaction: ${lockupTx.getId()}`);
+          debugLog(`Lockup transaction parsed: ${lockupTx.getId()}`);
 
+          // Find swap output
           const swapOutput = detectSwap(tweakedKey, lockupTx);
           if (swapOutput === undefined) {
-            console.error("No swap output found in lockup transaction");
-            return;
+            throw new Error("No swap output found in lockup transaction");
           }
+          debugLog("Swap output detected:", swapOutput);
 
-          console.log("Creating claim transaction");
-
-          // Create a claim transaction to be signed cooperatively via a key path spend
+          // Create claim transaction
+          debugLog("Creating claim transaction...");
           const feeRate = await getBoltzFeeRates();
 
           claimTx = targetFee(feeRate, (fee) =>
@@ -140,9 +124,8 @@ export const waitAndClaim = async (
                   cooperative: true,
                   type: OutputType.Taproot,
                   txHash: lockupTx.getHash(),
-                  blindingPrivateKey: Buffer.from(
-                    createdResponse.blindingKey,
-                    "hex"
+                  blindingPrivateKey: createCompatibleBuffer(
+                    createdResponse.blindingKey
                   ),
                 },
               ],
@@ -154,23 +137,28 @@ export const waitAndClaim = async (
             )
           );
 
-          console.log("Getting partial signature from Boltz");
+          if (!claimTx.toHex()) {
+            throw new Error("Failed to create claim transaction");
+          }
+
+          // Get partial signature from Boltz
+          debugLog("Requesting partial signature from Boltz...");
           const boltzSig = await fetchFunction(
             `${getBoltzApiUrl(
-              process.env.REACT_APP_ENVIRONMENT
+              import.meta.env.VITE_BOLTZ_ENVIRONMENT
             )}/v2/swap/reverse/${createdResponse.id}/claim`,
             {
               index: 0,
               transaction: claimTx.toHex(),
-              preimage: preimage.toString("hex"),
+              preimage: Buffer.from(preimage).toString("hex"),
               pubNonce: Buffer.from(musig.getPublicNonce()).toString("hex"),
             },
             "post"
           );
+          debugLog("✅ Boltz partial signature received:", boltzSig);
 
-          // Aggregate the nonces
           musig.aggregateNonces([
-            [boltzPublicKey, Buffer.from(boltzSig.pubNonce, "hex")],
+            [boltzPublicKey, createCompatibleBuffer(boltzSig.pubNonce)],
           ]);
 
           // Initialize the session to sign the claim transaction
@@ -178,34 +166,33 @@ export const waitAndClaim = async (
             claimTx.hashForWitnessV1(
               0,
               [swapOutput.script],
-              [{ asset: swapOutput.asset, value: swapOutput.value }],
+              [{ value: swapOutput.value, asset: swapOutput.asset }],
               Transaction.SIGHASH_DEFAULT,
               network.genesisBlockHash
             )
           );
-
           // Add the partial signature from Boltz
-
           musig.addPartial(
             boltzPublicKey,
-            Buffer.from(boltzSig.partialSignature, "hex")
+            createCompatibleBuffer(boltzSig.partialSignature)
           );
 
           // Create our partial signature
           musig.signPartial();
 
-          // Witness of the input to the aggregated signature
+          // Set the witness
           claimTx.ins[0].witness = [musig.aggregatePartials()];
+          debugLog("✅ Witness set on claim transaction");
 
-          // save claimtx hex on claimInfo
+          // Save claim transaction
           claimInfo.claimTx = claimTx.toHex();
-          saveClaim(claimInfo, process.env.REACT_APP_ENVIRONMENT);
+          saveClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
 
-          console.log("Broadcasting claim transaction");
-
-          const didBroadcast = fetchFunction(
+          // Broadcast transaction
+          debugLog("Broadcasting claim transaction...");
+          const broadcastResult = await fetchFunction(
             `${getBoltzApiUrl(
-              process.env.REACT_APP_ENVIRONMENT
+              import.meta.env.VITE_BOLTZ_ENVIRONMENT
             )}/v2/chain/L-BTC/transaction`,
             {
               hex: claimTx.toHex(),
@@ -213,21 +200,28 @@ export const waitAndClaim = async (
             "post"
           );
 
-          if (!didBroadcast) throw Error("did not broadcast");
+          if (!broadcastResult) {
+            throw new Error("Failed to broadcast claim transaction");
+          }
 
+          debugLog("✅ Claim transaction broadcast successfully");
           claimInfo.claimed = true;
-          removeClaim(claimInfo, process.env.REACT_APP_ENVIRONMENT);
-          onFinish(true, claimObject);
-          break;
+          removeClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
+          webSocket.close();
         } catch (err) {
-          console.log(`Error when constructing claim tx: ${err}`);
+          console.error(`❌ Error in claim process: ${err.message}`);
+          console.error("Full error:", err);
+          // Don't close WebSocket on error, allow retry
         }
+        break;
       }
 
       case "invoice.settled": {
-        console.log("Invoice was settled");
+        debugLog("Invoice settled");
         claimInfo.lastStatus = msg.args[0].status;
-        // if (!claimInfo.claimed) saveClaim(claimInfo, process.env.REACT_APP_ENVIRONMENT);
+        if (!claimInfo.claimed) {
+          saveClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
+        }
         webSocket.close();
         break;
       }
@@ -236,53 +230,47 @@ export const waitAndClaim = async (
       case "swap.expired":
       case "transaction.failed":
       case "transaction.refunded": {
-        console.log(
-          `Removing claim, swap status = ${msg.args[0].status}`,
-          claimInfo
-        );
-        // removeClaim(claimInfo, process.env.REACT_APP_ENVIRONMENT);
+        debugLog(`Swap failed with status: ${msg.args[0].status}`);
+        removeClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
         webSocket.close();
         break;
       }
     }
   };
+
+  webSocket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+  };
+
+  webSocket.onclose = (event) => {
+    debugLog("WebSocket closed:", event);
+  };
 };
 
-export const reverseSwap = async (
-  recvInfo,
-  destinationAddress,
-  onFinish,
-  claimObject,
-  setBoltzLoadingAnimation,
-  clearIntervalRef
-) => {
-  // Create a random preimage for the swap; has to have a length of 32 bytes
+export const reverseSwap = async (recvInfo, destinationAddress) => {
+  debugLog("Starting reverse swap", { recvInfo, destinationAddress });
   const preimage = randomBytes(32);
   const keys = ECPairFactory(ecc).makeRandom();
   const signature = keys.signSchnorr(
     crypto.sha256(Buffer.from(destinationAddress, "utf-8"))
   );
   const invoiceAmount = Math.round(Number(recvInfo.amount));
-  const description = PAYMENT_DESCRIPTION;
+  debugLog("Creating reverse swap with amount:", invoiceAmount);
+
   const createdResponse = await fetchFunction(
-    `${getBoltzApiUrl(process.env.REACT_APP_ENVIRONMENT)}/v2/swap/reverse`,
+    `${getBoltzApiUrl(import.meta.env.VITE_BOLTZ_ENVIRONMENT)}/v2/swap/reverse`,
     {
       address: destinationAddress,
-      addressSignature: signature.toString("hex"),
-      claimPublicKey: keys.publicKey.toString("hex"),
-      description: description,
+      addressSignature: Buffer.from(signature).toString("hex"),
+      claimPublicKey: Buffer.from(keys.publicKey).toString("hex"),
+      description: recvInfo.description || "",
       from: "BTC",
       onchainAmount: invoiceAmount,
       preimageHash: crypto.sha256(preimage).toString("hex"),
-      referralId: "blitzWallet",
       to: "L-BTC",
     },
     "post"
   );
-
-  // Show invoice on wallet UI
-  setBoltzLoadingAnimation("");
-  // onInvoice(createdResponse.invoice);
 
   const claimInfo = {
     claimed: false,
@@ -294,38 +282,37 @@ export const reverseSwap = async (
     keys,
   };
 
-  // Wait for Boltz to lock funds onchain and than claim them
-  waitAndClaim(
-    claimInfo,
-    onFinish,
-    setBoltzLoadingAnimation,
-    claimObject,
-    clearIntervalRef
-  );
+  waitAndClaim(claimInfo);
+
   return claimInfo;
 };
 
 export const getLiquidAddress = async (invoice, magicHint) => {
+  debugLog("Getting liquid address for invoice:", invoice);
+
   const bip21Data = await (
     await fetch(
       `${getBoltzApiUrl(
-        process.env.REACT_APP_ENVIRONMENT
+        import.meta.env.VITE_BOLTZ_ENVIRONMENT
       )}/v2/swap/reverse/${invoice}/bip21`
     )
   ).json();
+
   const bip21Split = bip21Data.bip21.split(":");
   const bip21Address = bip21Split[1].split("?")[0];
 
-  if (
-    !ECPairFactory(ecc)
-      .fromPublicKey(Buffer.from(magicHint.pubkey, "hex"))
-      .verifySchnorr(
-        crypto.sha256(Buffer.from(bip21Address, "utf-8")),
-        Buffer.from(bip21Data.signature, "hex")
-      )
-  ) {
-    throw "BOLTZ IS TRYING TO CHEAT";
+  // Verify signature
+  const isValidSignature = ECPairFactory(ecc)
+    .fromPublicKey(Buffer.from(magicHint.pubkey, "hex"))
+    .verifySchnorr(
+      crypto.sha256(Buffer.from(bip21Address, "utf-8")),
+      Buffer.from(bip21Data.signature, "hex")
+    );
+
+  if (!isValidSignature) {
+    throw new Error("Invalid Boltz signature - potential security issue");
   }
 
+  debugLog("✅ Liquid address verified:", bip21Address);
   return bip21Address;
 };

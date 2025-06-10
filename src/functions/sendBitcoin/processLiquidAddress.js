@@ -1,7 +1,5 @@
 import { SATSPERBITCOIN } from "../../constants";
-import { getBoltzWsUrl } from "../boltz/boltzEndpoitns";
-import handleReverseClaimWSS from "../boltz/handle-reverse-claim-wss";
-import { contactsLNtoLiquidSwapInfo } from "../contacts/LNtoLiquidSwap";
+import { reverseSwap } from "../boltz/handleClaim";
 import { sparkPaymenWrapper } from "../spark/payments";
 
 export default async function processLiquidAddress(input, context) {
@@ -15,7 +13,6 @@ export default async function processLiquidAddress(input, context) {
     publishMessageFunc,
   } = context;
   let webSocket;
-  console.log(webViewRef, "WEB VIEW REF");
   try {
     let addressInfo = JSON.parse(JSON.stringify(input?.address));
     let paymentFee = 0;
@@ -23,39 +20,49 @@ export default async function processLiquidAddress(input, context) {
     let boltzData;
 
     if (comingFromAccept) {
-      addressInfo.amount = enteredPaymentInfo.amount;
+      addressInfo.amount = enteredPaymentInfo.amount || "";
       addressInfo.label =
         enteredPaymentInfo.description || input?.address?.label || "";
       addressInfo.message =
         enteredPaymentInfo.description || input?.address?.message || "";
       addressInfo.isBip21 = true;
-      const { data, publicKey, privateKey, keys, preimage, liquidAddress } =
-        await contactsLNtoLiquidSwapInfo(
-          input?.address.address,
-          Number(enteredPaymentInfo.amount),
-          enteredPaymentInfo.description || input?.address?.label || ""
-        );
 
-      if (!data?.invoice) throw new Error("No Swap invoice genereated");
-      boltzData = data;
-      webSocket = new WebSocket(
-        `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`
+      const claimInfo = await reverseSwap(
+        {
+          amount: Number(enteredPaymentInfo.amount),
+          description: addressInfo.message,
+        },
+        addressInfo.address
       );
-      const didHandle = await handleReverseClaimWSS({
-        ref: webViewRef,
-        webSocket: webSocket,
-        liquidAddress: liquidAddress,
-        swapInfo: data,
-        preimage: preimage,
-        privateKey: privateKey,
-        fromPage: fromPage,
-        contactsFunction: publishMessageFunc,
-      });
-      if (!didHandle) throw new Error("Unable to open websocket");
+      boltzData = claimInfo.createdResponse;
+
+      // const { data, publicKey, privateKey, keys, preimage, liquidAddress } =
+      //   await contactsLNtoLiquidSwapInfo(
+      //     input?.address.address,
+      //     Number(enteredPaymentInfo.amount),
+      //     enteredPaymentInfo.description || input?.address?.label || ""
+      //   );
+
+      // if (!data?.invoice) throw new Error("No Swap invoice genereated");
+      // boltzData = data;
+      // webSocket = new WebSocket(
+      //   `${getBoltzWsUrl(import.meta.env.VITE_BOLTZ_ENVIRONMENT)}`
+      // );
+      // const didHandle = await handleReverseClaimWSS({
+      //   ref: webViewRef,
+      //   webSocket: webSocket,
+      //   liquidAddress: liquidAddress,
+      //   swapInfo: data,
+      //   preimage: preimage,
+      //   privateKey: privateKey,
+      //   fromPage: fromPage,
+      //   contactsFunction: publishMessageFunc,
+      // });
+      // if (!didHandle) throw new Error("Unable to open websocket");
 
       const fee = await sparkPaymenWrapper({
         getFee: true,
-        address: data.invoice,
+        address: claimInfo.createdResponse.invoice,
         amountSats: Math.round(enteredPaymentInfo.amount),
         paymentType: "lightning",
         masterInfoObject,
@@ -65,12 +72,12 @@ export default async function processLiquidAddress(input, context) {
 
       paymentFee = fee.fee;
       supportFee = fee.supportFee;
-      addressInfo.invoice = data.invoice;
+      addressInfo.invoice = claimInfo.createdResponse.invoice;
     } else {
       addressInfo.amount = addressInfo.amountSat;
     }
 
-    const amountSat = addressInfo.amount;
+    const amountSat = addressInfo.amount || "";
     const fiatValue =
       Number(amountSat) / (SATSPERBITCOIN / (fiatStats?.value || 65000));
 
