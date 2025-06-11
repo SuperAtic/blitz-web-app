@@ -228,10 +228,10 @@ export async function fullRestoreSparkState({ sparkAddress }) {
 
     if (newPaymentObjects.length) {
       // Update DB state of payments but dont hold up thread
-      bulkUpdateSparkTransactions(newPaymentObjects);
+      await bulkUpdateSparkTransactions(newPaymentObjects);
     }
 
-    return newPaymentObjects.length;
+    return { num: newPaymentObjects.length, txs: newPaymentObjects };
   } catch (err) {
     console.log("full restore spark state error", err);
     return false;

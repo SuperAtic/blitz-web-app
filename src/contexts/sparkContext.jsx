@@ -30,6 +30,7 @@ import {
 } from "../functions/spark/transactions";
 import {
   fullRestoreSparkState,
+  restoreSparkTxState,
   updateSparkTxStatus,
 } from "../functions/spark/restore";
 import { useGlobalContacts } from "./globalContacts";
@@ -236,8 +237,6 @@ const SparkWalletProvider = ({ children, navigate }) => {
   };
   // Add event listeners to listen for bitcoin and lightning or spark transfers when receiving does not handle sending
   useEffect(() => {
-    if (!sparkInformation.didConnect) return;
-
     const handleUpdate = async (updateType) => {
       try {
         console.log("Running update from DB changes:", updateType);
@@ -258,32 +257,53 @@ const SparkWalletProvider = ({ children, navigate }) => {
       handleIncomingPayment(transferId);
     };
 
-    const addListeners = () => {
-      if (sparkPaymentActionsRef.current) return;
-      sparkPaymentActionsRef.current = true;
-      console.log("Adding Spark listeners");
-
+    const addListeners = async () => {
+      console.log("Adding Spark listeners...");
       sparkTransactionsEventEmitter.on(
         SPARK_TX_UPDATE_ENVENT_NAME,
         handleUpdate
       );
       sparkWallet.on("transfer:claimed", transferHandler);
       sparkWallet.on("deposit:confirmed", transferHandler);
+      if (!sparkPaymentActionsRef.current) {
+        console.log("blocking first listeners run");
+        sparkPaymentActionsRef.current = true;
+        return;
+      }
+      await new Promise((res) => setTimeout(res, 1000));
+      const restored = await fullRestoreSparkState({
+        sparkAddress: sparkInformation.sparkAddress,
+      });
+      console.log(restored, "restore resposne");
+      if (!restored.txs.length) return;
+      navigate("/confirm-page", {
+        state: {
+          for: "invoicePaid",
+          transaction: restored.txs[0],
+        },
+      });
     };
 
-    // const removeListeners = () => {
-    //   if (!sparkPaymentActionsRef.current) return;
-    //   sparkPaymentActionsRef.current = false;
-    //   console.log("Removing Spark listeners");
+    const removeListeners = () => {
+      console.log("Removing Spark listeners");
+      sparkTransactionsEventEmitter.off(
+        SPARK_TX_UPDATE_ENVENT_NAME,
+        handleUpdate
+      );
+      sparkWallet.off("transfer:claimed", transferHandler);
+      sparkWallet.off("deposit:confirmed", transferHandler);
+    };
+    const handleTabBlur = () => removeListeners();
+    const handleTabFocus = () => addListeners();
+    const handleBeforeUnload = () => removeListeners();
 
-    //   sparkTransactionsEventEmitter.off(
-    //     SPARK_TX_UPDATE_ENVENT_NAME,
-    //     handleUpdate
-    //   );
-    //   sparkWallet.off("transfer:claimed", transferHandler);
-    //   sparkWallet.off("deposit:confirmed", transferHandler);
-    // };
+    if (!sparkInformation.didConnect) return;
 
+    addListeners();
+    window.addEventListener("blur", handleTabBlur);
+    window.addEventListener("focus", handleTabFocus);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    sparkTransactionsEventEmitter.on(SPARK_TX_UPDATE_ENVENT_NAME, handleUpdate);
     // // Called when tab visibility changes
     // const handleVisibilityChange = () => {
     //   if (document.visibilityState === "visible") {
@@ -300,7 +320,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
 
     // document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    addListeners();
+    // addListeners();
     // // Clean up on unmount
     // return () => {
     //   removeListeners();
