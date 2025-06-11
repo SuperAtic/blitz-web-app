@@ -148,84 +148,78 @@ export const GlobalContactsList = ({ children }) => {
   }, [updatedCachedMessagesStateFunction]);
 
   useEffect(() => {
-    return;
-    if (!Object.keys(globalContactsInformation).length) return;
-    const now = new Date().getTime();
-
-    // Unsubscribe from previous listeners before setting new ones
-    if (unsubscribeMessagesRef.current) {
-      unsubscribeMessagesRef.current();
-    }
-    if (unsubscribeSentMessagesRef.current) {
-      unsubscribeSentMessagesRef.current();
-    }
-    const inboundMessageQuery = query(
-      collection(db, "contactMessages"),
-      where("toPubKey", "==", globalContactsInformation.myProfile.uuid),
-      orderBy("timestamp"),
-      startAfter(now)
-    );
-    const outbounddMessageQuery = query(
-      collection(db, "contactMessages"),
-      where("fromPubKey", "==", globalContactsInformation.myProfile.uuid),
-      orderBy("timestamp"),
-      startAfter(now)
-    );
-
-    // Set up the realtime listener
-    unsubscribeMessagesRef.current = onSnapshot(
-      inboundMessageQuery,
-      (snapshot) => {
-        if (!snapshot?.docChanges()?.length) return;
-
-        snapshot.docChanges().forEach((change) => {
-          console.log("received a new message", change.type);
-          if (change.type === "added") {
-            const newMessage = change.doc.data();
-            queueSetCashedMessages({
-              newMessagesList: [newMessage],
-              myPubKey: globalContactsInformation.myProfile.uuid,
-            });
-          }
-        });
-      }
-    );
-
-    unsubscribeSentMessagesRef.current = onSnapshot(
-      outbounddMessageQuery,
-      (snapshot) => {
-        if (!snapshot?.docChanges()?.length) return;
-        snapshot.docChanges().forEach((change) => {
-          console.log("sent a new message", change.type);
-          if (change.type === "added") {
-            const newMessage = change.doc.data();
-            queueSetCashedMessages({
-              newMessagesList: [newMessage],
-              myPubKey: globalContactsInformation.myProfile.uuid,
-            });
-          }
-        });
-      }
-    );
-
-    return () => {
-      if (unsubscribeMessagesRef.current) {
-        unsubscribeMessagesRef.current();
-      }
-      if (unsubscribeSentMessagesRef.current) {
-        unsubscribeSentMessagesRef.current();
-      }
-    };
+    // if (!Object.keys(globalContactsInformation).length) return;
+    // const now = new Date().getTime();
+    // // Unsubscribe from previous listeners before setting new ones
+    // if (unsubscribeMessagesRef.current) {
+    //   unsubscribeMessagesRef.current();
+    // }
+    // if (unsubscribeSentMessagesRef.current) {
+    //   unsubscribeSentMessagesRef.current();
+    // }
+    // const inboundMessageQuery = query(
+    //   collection(db, "contactMessages"),
+    //   where("toPubKey", "==", globalContactsInformation.myProfile.uuid),
+    //   orderBy("timestamp"),
+    //   startAfter(now)
+    // );
+    // const outbounddMessageQuery = query(
+    //   collection(db, "contactMessages"),
+    //   where("fromPubKey", "==", globalContactsInformation.myProfile.uuid),
+    //   orderBy("timestamp"),
+    //   startAfter(now)
+    // );
+    // // Set up the realtime listener
+    // unsubscribeMessagesRef.current = onSnapshot(
+    //   inboundMessageQuery,
+    //   (snapshot) => {
+    //     if (!snapshot?.docChanges()?.length) return;
+    //     snapshot.docChanges().forEach((change) => {
+    //       console.log("received a new message", change.type);
+    //       if (change.type === "added") {
+    //         const newMessage = change.doc.data();
+    //         queueSetCashedMessages({
+    //           newMessagesList: [newMessage],
+    //           myPubKey: globalContactsInformation.myProfile.uuid,
+    //         });
+    //       }
+    //     });
+    //   }
+    // );
+    // unsubscribeSentMessagesRef.current = onSnapshot(
+    //   outbounddMessageQuery,
+    //   (snapshot) => {
+    //     if (!snapshot?.docChanges()?.length) return;
+    //     snapshot.docChanges().forEach((change) => {
+    //       console.log("sent a new message", change.type);
+    //       if (change.type === "added") {
+    //         const newMessage = change.doc.data();
+    //         queueSetCashedMessages({
+    //           newMessagesList: [newMessage],
+    //           myPubKey: globalContactsInformation.myProfile.uuid,
+    //         });
+    //       }
+    //     });
+    //   }
+    // );
+    // return () => {
+    //   if (unsubscribeMessagesRef.current) {
+    //     unsubscribeMessagesRef.current();
+    //   }
+    //   if (unsubscribeSentMessagesRef.current) {
+    //     unsubscribeSentMessagesRef.current();
+    //   }
+    // };
   }, [globalContactsInformation?.myProfile?.uuid]);
 
   useEffect(() => {
     if (!Object.keys(globalContactsInformation).length) return;
     if (lookForNewMessages.current) return;
     lookForNewMessages.current = true;
-    syncDatabasePayment(
-      globalContactsInformation.myProfile.uuid,
-      updatedCachedMessagesStateFunction
-    );
+    // syncDatabasePayment(
+    //   globalContactsInformation.myProfile.uuid,
+    //   updatedCachedMessagesStateFunction
+    // );
   }, [globalContactsInformation, updatedCachedMessagesStateFunction]);
 
   // No longer need to handle this manualy as it happens automaticly from peoples activity

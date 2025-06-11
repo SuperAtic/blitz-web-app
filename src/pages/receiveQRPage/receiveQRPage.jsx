@@ -5,7 +5,7 @@ import BackArrow from "../../components/backArrow/backArrow";
 import QRCodeQrapper from "../../components/qrCode/qrCode";
 import "./style.css";
 import ReceiveButtonsContainer from "./components/buttonContainer";
-import { initializeAddressProcess } from "../../functions/generateReceiveAddress";
+import { initializeAddressProcess } from "../../functions/receiveBitcoin/addressGeneration";
 
 export default function ReceiveQRPage() {
   const navigate = useNavigate();

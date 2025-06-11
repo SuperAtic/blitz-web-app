@@ -67,6 +67,9 @@
   font-size: 20px;
   margin: 0;
 }
+.sendContainer .customTextInputContinaerStyles {
+  margin-top: auto;
+}
 
 .number-keyboard {
   display: grid;

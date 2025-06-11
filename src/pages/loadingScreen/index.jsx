@@ -120,8 +120,8 @@ export default function LoadingScreen() {
 
     try {
       setStartConnectingToSpark(true);
-      navigate("/wallet", { replace: true });
-      return;
+      // navigate("/wallet", { replace: true });
+      // return;
       const listener = new JsEventListener(onLiquidBreezEvent);
       const [didConnectToLiquidNode, txs] = await Promise.all([
         connectToLiquidNode(mnemoinc, listener),
@@ -189,37 +189,37 @@ export default function LoadingScreen() {
       // const balanceSat = info.balanceSat;
 
       if (addressResponse) {
-        const { destination, receiveFeesSat } = addressResponse;
-        console.log("LIQUID DESTINATION ADDRESS", destination);
-        console.log(destination);
-        if (!globalContactsInformation.myProfile.receiveAddress) {
-          // For legacy users and legacy functions
-          toggleGlobalContactsInformation(
-            {
-              myProfile: {
-                ...globalContactsInformation.myProfile,
-                receiveAddress: destination,
-                lastRotated: getDateXDaysAgo(0),
-              },
-            },
-            true
-          );
-        }
-        // Didn't sperate since it only cost one write so there is no reasy not to update
-        toggleMasterInfoObject({
-          posSettings: {
-            ...masterInfoObject.posSettings,
-            receiveAddress: destination,
-            lastRotated: getDateXDaysAgo(0),
-          },
-          offlineReceiveAddresses: {
-            addresses: [
-              destination,
-              ...masterInfoObject.offlineReceiveAddresses.addresses.slice(0, 6),
-            ],
-            lastRotated: new Date().getTime(),
-          },
-        });
+        // const { destination, receiveFeesSat } = addressResponse;
+        // console.log("LIQUID DESTINATION ADDRESS", destination);
+        // console.log(destination);
+        // if (!globalContactsInformation.myProfile.receiveAddress) {
+        //   // For legacy users and legacy functions
+        //   toggleGlobalContactsInformation(
+        //     {
+        //       myProfile: {
+        //         ...globalContactsInformation.myProfile,
+        //         receiveAddress: destination,
+        //         lastRotated: getDateXDaysAgo(0),
+        //       },
+        //     },
+        //     true
+        //   );
+        // }
+        // // Didn't sperate since it only cost one write so there is no reasy not to update
+        // toggleMasterInfoObject({
+        //   posSettings: {
+        //     ...masterInfoObject.posSettings,
+        //     receiveAddress: destination,
+        //     lastRotated: getDateXDaysAgo(0),
+        //   },
+        //   offlineReceiveAddresses: {
+        //     addresses: [
+        //       destination,
+        //       ...masterInfoObject.offlineReceiveAddresses.addresses.slice(0, 6),
+        //     ],
+        //     lastRotated: new Date().getTime(),
+        //   },
+        // });
       }
 
       toggleFiatStats({ ...fiat_rate });

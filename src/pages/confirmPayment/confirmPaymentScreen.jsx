@@ -16,16 +16,16 @@ export default function ConfirmPayment() {
   const props = location.state;
   const animationRef = useRef(null);
 
-  const transaction = props.transaction;
+  const transaction = props?.transaction;
 
   const paymentType = location.state?.for;
   const formmatingType = location.state?.formattingType;
-  const didSucceed = transaction.paymentStatus === "completed";
-  const paymentFee = transaction.details.fee;
-  const paymentNetwork = transaction.paymentType;
-  const errorMessage = transaction.details.error || "Unknown Error";
-  const amount = transaction.details.amount;
-  const showPendingMessage = transaction.paymentStatus === "pending";
+  const didSucceed = transaction?.paymentStatus === "completed";
+  const paymentFee = transaction?.details.fee;
+  const paymentNetwork = transaction?.paymentType;
+  const errorMessage = transaction?.details.error || "Unknown Error";
+  const amount = transaction?.details.amount;
+  const showPendingMessage = transaction?.paymentStatus === "pending";
 
   console.log(transaction, "etstasdas");
 

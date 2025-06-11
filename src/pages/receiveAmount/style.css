@@ -71,10 +71,6 @@
   border: none;
 }
 
-.submit-button {
-  border: none;
-}
-
 .submit-button.disabled {
   opacity: 0.5;
   cursor: not-allowed;

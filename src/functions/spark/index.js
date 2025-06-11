@@ -198,7 +198,7 @@ export const getSparkLightningPaymentFeeEstimate = async (invoice) => {
   try {
     if (!sparkWallet) throw new Error("sparkWallet not initialized");
     return await sparkWallet.getLightningSendFeeEstimate({
-      encodedInvoice: invoice,
+      encodedInvoice: invoice.toLowerCase(),
     });
   } catch (err) {
     console.log("Get lightning payment fee error", err);
@@ -274,7 +274,10 @@ export const getSparkLightningPaymentStatus = async ({
 export const sendSparkLightningPayment = async ({ invoice, maxFeeSats }) => {
   try {
     if (!sparkWallet) throw new Error("sparkWallet not initialized");
-    return await sparkWallet.payLightningInvoice({ invoice });
+    return await sparkWallet.payLightningInvoice({
+      invoice,
+      preferSpark: true,
+    });
   } catch (err) {
     console.log("Send lightning payment error", err);
   }
@@ -377,8 +380,9 @@ export const isSparkDonationPayment = (currentTx, currentTxDetails) => {
     return (
       currentTxDetails.direction === "OUTGOING" &&
       currentTx === "spark" &&
-      currentTxDetails.address === process.env.BLITZ_SPARK_SUPPORT_ADDRESSS &&
-      currentTxDetails.receiverPubKey === process.env.BLITZ_SPARK_PUBLICKEY
+      currentTxDetails.address === import.meta.env.VITE_BLITZ_SPARK_ADDRESS &&
+      currentTxDetails.receiverPubKey ===
+        import.meta.env.VITE_BLITZ_SPARK_PUBKEY
     );
   } catch (err) {
     console.log("Error finding is payment method is pending", err);

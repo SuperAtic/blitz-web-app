@@ -49,7 +49,8 @@ export const restoreSparkTxState = async (BATCH_SIZE) => {
         !savedIds.includes(tx.id) &&
         !(
           tx.transferDirection === "OUTGOING" &&
-          tx.receiverIdentityPublicKey === process.env.BLITZ_SPARK_PUBLICKEY
+          tx.receiverIdentityPublicKey ===
+            import.meta.env.VITE_BLITZ_SPARK_PUBKEY
         )
     );
 
@@ -126,7 +127,7 @@ export const updateSparkTxStatus = async () =>
             accountId: txStateUpdate.accountId,
             details: {
               ...details,
-              preImage: sparkResponse ? sparkResponse.paymentPreimage : "",
+              preimage: sparkResponse ? sparkResponse.paymentPreimage : "",
             },
           };
           updatedTxs.push(tx);

@@ -17,7 +17,7 @@ export default function ExpandedTxPage() {
   const navigate = useNavigate();
   const [windowWidth, setWindowWidth] = useState(0);
 
-  const transaction = props.transaction;
+  const transaction = props?.transaction;
   const paymentType = transaction.paymentType;
 
   const isFailed = transaction.paymentStatus === "failed";

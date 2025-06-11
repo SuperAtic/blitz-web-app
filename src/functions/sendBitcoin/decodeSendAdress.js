@@ -32,7 +32,7 @@ export default async function decodeSendAddress(props) {
   } = props;
 
   try {
-    // const sdk = getLiquidSdk();
+    const sdk = getLiquidSdk();
     // Handle cryptoqr.net special case
     if (btcAdress.includes("cryptoqr.net")) {
       try {
@@ -104,50 +104,17 @@ export default async function decodeSendAddress(props) {
       }
     }
 
-    // const chosenPath = parsedInvoice
-    //   ? Promise.resolve(parsedInvoice)
-    //   : sdk.parse(btcAdress);
+    const chosenPath = parsedInvoice
+      ? Promise.resolve(parsedInvoice)
+      : sdk.parse(btcAdress);
 
-    let input = {
-      type: "bolt11",
-      invoice: {
-        bolt11:
-          "LNBC1P5YWH3JPP5JAAFXV03V34ZDAAXLRQN40VUXY0DXZSD6PKE6S6KULQGVCLSHRCSCQZYSSP5YFES0Y5EVYE43XZPSYYU3NLK3GE887Q9RRNZKDVDXEPJHCJ7YY8S9Q7SQQQQQQQQQQQQQQQQQQQSQQQQQYSGQDQQMQZ9GXQYJW5QRZJQWRYAUP9LH50KKRANZGCDNN2FGVX390WGJ5JD07RWR3VXEJE0GLCLLCM6EDLG4FELQQQQQLGQQQQQEQQJQHH7U43EQX8Q8P6CXGSX07SMF3EHENEW9LZNAXUGCNUUQYDADND4SCF2VQ85WU4U6QP405FUYU6MXV8J7UCE58V7MA4UA7LX9MSCPVZQPS3Q3E2",
-        network: "bitcoin",
-        payeePubkey:
-          "029379fcb7a0e39a9f7b196ae5a4a533309bed0b0fb0ae271e5e1bd65bf45539f8",
-        paymentHash:
-          "977a9331f1646a26f7a6f8c13abd9c311ed30a0dd06d9d4356e7c08663f0b8f1",
-        description: "",
-        timestamp: 1749507634,
-        expiry: 604800,
-        routingHints: [
-          {
-            hops: [
-              {
-                srcNodeId:
-                  "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f",
-                shortChannelId: "16718806x6026325x14840",
-                feesBaseMsat: 1000,
-                feesProportionalMillionths: 100,
-                cltvExpiryDelta: 144,
-              },
-            ],
-          },
-        ],
-        paymentSecret: [
-          34, 115, 7, 146, 153, 97, 51, 88, 152, 65, 129, 9, 200, 207, 246, 138,
-          50, 115, 248, 5, 24, 230, 43, 53, 141, 54, 67, 43, 226, 94, 33, 15,
-        ],
-        minFinalCltvExpiryDelta: 144,
-      },
-    };
-    // try {
-    //   input = await chosenPath;
-    // } catch (err) {
-    //   console.log(err, "parsing address error");
-    //   return goBackFunction("Unable to parse address");
-    // }
+    let input;
+    try {
+      input = await chosenPath;
+    } catch (err) {
+      console.log(err, "parsing address error");
+      return goBackFunction("Unable to parse address");
+    }
     console.log(input, "parsed input");
 
     if (input.type.toLowerCase() === LIQUID_TYPES.Bolt11.toLowerCase()) {
@@ -204,28 +171,30 @@ async function processInputType(input, context) {
   setLoadingMessage("Getting invoice details");
 
   switch (input.type.toLowerCase()) {
-    case LIQUID_TYPES.BitcoinAddress.toLowerCase():
-      return await processBitcoinAddress(input, context);
+    // case LIQUID_TYPES.BitcoinAddress.toLowerCase():
+    //   return await processBitcoinAddress(input, context);
 
-    case LIQUID_TYPES.Bolt11.toLowerCase():
+    case LIQUID_TYPES.Bolt11.toLowerCase(): //works
       return processBolt11Invoice(input, context);
 
-    case LIQUID_TYPES.LnUrlAuth.toLowerCase():
-      return await processLNUrlAuth(input, context);
+    // case LIQUID_TYPES.LnUrlAuth.toLowerCase():
+    //   return await processLNUrlAuth(input, context);
 
-    case LIQUID_TYPES.LnUrlPay.toLowerCase():
+    case LIQUID_TYPES.LnUrlPay.toLowerCase(): //works
       return processLNUrlPay(input, context);
 
-    case LIQUID_TYPES.LnUrlWithdraw.toLowerCase():
-      return await processLNUrlWithdraw(input, context);
+    // case LIQUID_TYPES.LnUrlWithdraw.toLowerCase():
+    //   return await processLNUrlWithdraw(input, context);
 
-    case LIQUID_TYPES.LiquidAddress.toLowerCase():
-      return processLiquidAddress(input, context);
+    // case LIQUID_TYPES.LiquidAddress.toLowerCase(): //doesnt work
+    //   return processLiquidAddress(input, context);
 
     // case "bolt12offer":
     //   return processBolt12Offer(input, context);
     default:
-      goBackFunction("Not a valid address type");
+      goBackFunction(
+        `Blitz wallet currently does not support sending to addresses of type: ${input.type.toLowerCase()}`
+      );
       return null;
   }
 }
