@@ -16,6 +16,7 @@ import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Store";
+import testing from "../src/assets/adminHomeWallet_dark.png";
 import SafeAreaComponent from "./components/safeAreaContainer.jsx";
 import { AuthProvider } from "./contexts/authContext.jsx";
 import AuthGate from "./components/authGate.jsx";
@@ -67,6 +68,7 @@ import ConfirmActionPage from "./components/confirmActionPage/confirmActionPage.
 import { GlobalRescanLiquidSwaps } from "./contexts/rescanLiquidSwaps.jsx";
 import Contacts from "./pages/contacts/contacts.jsx";
 import Store from "./pages/store/store.jsx";
+import TabsIcon from "./components/tabsIcon/tabsIcon.jsx";
 // const ConfirmPayment = lazy(() =>
 //   import("./pages/confirmPayment/confirmPaymentScreen.jsx")
 // );
@@ -342,20 +344,65 @@ function Root() {
                                   }}
                                 >
                                   <BottomNavigationAction
+                                    disableRipple
+                                    sx={{
+                                      "& .MuiBottomNavigationAction-label": {
+                                        transition: "none",
+                                        fontSize: "15px",
+                                        font: "var(--font-family)",
+                                      },
+                                      "&.Mui-selected .MuiBottomNavigationAction-label":
+                                        {
+                                          fontSize: "15px",
+                                          color: Colors.light.blue,
+                                        },
+                                    }}
                                     label="Contacts"
-                                    icon={<PersonIcon />}
+                                    icon={
+                                      <TabsIcon value={value} icon="contacts" />
+                                    }
                                     component={Link}
                                     to="/contacts"
                                   />
                                   <BottomNavigationAction
+                                    disableRipple
+                                    sx={{
+                                      "& .MuiBottomNavigationAction-label": {
+                                        transition: "none",
+                                        fontSize: "15px",
+                                        font: "var(--font-family)",
+                                      },
+                                      "&.Mui-selected .MuiBottomNavigationAction-label":
+                                        {
+                                          fontSize: "15px",
+                                          color: Colors.light.blue,
+                                        },
+                                    }}
                                     label="Home"
-                                    icon={<HomeIcon />}
+                                    icon={
+                                      <TabsIcon value={value} icon="wallet" />
+                                    }
                                     component={Link}
                                     to="/wallet"
                                   />
                                   <BottomNavigationAction
+                                    disableRipple
+                                    sx={{
+                                      "& .MuiBottomNavigationAction-label": {
+                                        transition: "none",
+                                        fontSize: "15px",
+                                        font: "var(--font-family)",
+                                      },
+                                      "&.Mui-selected .MuiBottomNavigationAction-label":
+                                        {
+                                          fontSize: "15px",
+                                          color: Colors.light.blue,
+                                        },
+                                    }}
                                     label="Store"
-                                    icon={<SettingsIcon />}
+                                    icon={
+                                      <TabsIcon value={value} icon="store" />
+                                    }
                                     component={Link}
                                     to="/store"
                                   />
