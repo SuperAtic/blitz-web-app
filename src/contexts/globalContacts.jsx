@@ -148,6 +148,7 @@ export const GlobalContactsList = ({ children }) => {
   }, [updatedCachedMessagesStateFunction]);
 
   useEffect(() => {
+    return;
     if (!Object.keys(globalContactsInformation).length) return;
     const now = new Date().getTime();
 

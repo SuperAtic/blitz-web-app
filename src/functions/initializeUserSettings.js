@@ -29,12 +29,12 @@ export default async function initializeUserSettings(
 
     if (!privateKey || !publicKey) throw Error("Failed to retrieve keys");
 
-    await initializeFirebase(publicKey, privateKey);
+    // await initializeFirebase(publicKey, privateKey);
 
     // Wrap both of thses in promise.all to fetch together.
     let [blitzStoredData, localStoredData, lastUpdatedExploreData] =
       await Promise.all([
-        getDataFromCollection("blitzWalletUsers", publicKey),
+        Promise.resolve({}), //getDataFromCollection("blitzWalletUsers", publicKey),
         fetchLocalStorageItems(),
         Promise.resolve(Storage.getItem("savedExploreData")),
       ]);
@@ -211,19 +211,19 @@ export default async function initializeUserSettings(
       !lastUpdatedExploreData?.lastUpdated ||
       isNewDaySince(lastUpdatedExploreData?.lastUpdated)
     ) {
-      const response = await fetchBackend(
-        "getTotalUserCount",
-        { data: publicKey },
-        privateKey,
-        publicKey
-      );
-      if (response) {
-        tempObject["exploreData"] = response;
-        Storage.setItem("savedExploreData", {
-          lastUpdated: new Date().getTime(),
-          data: response,
-        });
-      } else tempObject["exploreData"] = null;
+      // const response = await fetchBackend(
+      //   "getTotalUserCount",
+      //   { data: publicKey },
+      //   privateKey,
+      //   publicKey
+      // );
+      // if (response) {
+      //   tempObject["exploreData"] = response;
+      //   Storage.setItem("savedExploreData", {
+      //     lastUpdated: new Date().getTime(),
+      //     data: response,
+      //   });
+      // } else tempObject["exploreData"] = null;
     } else {
       tempObject["exploreData"] = lastUpdatedExploreData.data;
     }
@@ -260,7 +260,7 @@ export default async function initializeUserSettings(
     tempObject["enabledDeveloperSupport"] = enabledDeveloperSupport;
 
     if (needsToUpdate || Object.keys(blitzStoredData).length === 0) {
-      await sendDataToDB(tempObject, publicKey);
+      // await sendDataToDB(tempObject, publicKey);
     }
 
     delete tempObject["contacts"];

@@ -337,6 +337,7 @@ function Root() {
                                   }
                                   showLabels
                                   style={{
+                                    height: "70px",
                                     position: "fixed",
                                     bottom: 0,
                                     width: "100%",
