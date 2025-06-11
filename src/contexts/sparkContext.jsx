@@ -271,40 +271,41 @@ const SparkWalletProvider = ({ children, navigate }) => {
       sparkWallet.on("deposit:confirmed", transferHandler);
     };
 
-    const removeListeners = () => {
-      if (!sparkPaymentActionsRef.current) return;
-      sparkPaymentActionsRef.current = false;
-      console.log("Removing Spark listeners");
+    // const removeListeners = () => {
+    //   if (!sparkPaymentActionsRef.current) return;
+    //   sparkPaymentActionsRef.current = false;
+    //   console.log("Removing Spark listeners");
 
-      sparkTransactionsEventEmitter.off(
-        SPARK_TX_UPDATE_ENVENT_NAME,
-        handleUpdate
-      );
-      sparkWallet.off("transfer:claimed", transferHandler);
-      sparkWallet.off("deposit:confirmed", transferHandler);
-    };
+    //   sparkTransactionsEventEmitter.off(
+    //     SPARK_TX_UPDATE_ENVENT_NAME,
+    //     handleUpdate
+    //   );
+    //   sparkWallet.off("transfer:claimed", transferHandler);
+    //   sparkWallet.off("deposit:confirmed", transferHandler);
+    // };
 
-    // Called when tab visibility changes
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        addListeners();
-      } else {
-        removeListeners();
-      }
-    };
+    // // Called when tab visibility changes
+    // const handleVisibilityChange = () => {
+    //   if (document.visibilityState === "visible") {
+    //     addListeners();
+    //   } else {
+    //     removeListeners();
+    //   }
+    // };
 
-    // Initial listener add (e.g. when component mounts)
-    if (document.visibilityState === "visible") {
-      addListeners();
-    }
+    // // Initial listener add (e.g. when component mounts)
+    // if (document.visibilityState === "visible") {
+    //   addListeners();
+    // }
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    // document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // Clean up on unmount
-    return () => {
-      removeListeners();
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
+    addListeners();
+    // // Clean up on unmount
+    // return () => {
+    //   removeListeners();
+    //   document.removeEventListener("visibilitychange", handleVisibilityChange);
+    // };
   }, [sparkInformation.didConnect]);
 
   // useEffect(() => {

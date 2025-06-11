@@ -10,6 +10,7 @@ import { getLiquidSdk } from "../connectToLiquid";
 import displayCorrectDenomination from "../displayCorrectDenomination";
 import getLiquidAddressFromSwap from "../boltz/magicRoutingHints";
 import { LIQUID_TYPES } from "../../constants";
+import processSparkAddress from "./processSparkAddress";
 
 export default async function decodeSendAddress(props) {
   let {
@@ -32,7 +33,7 @@ export default async function decodeSendAddress(props) {
   } = props;
 
   try {
-    const sdk = getLiquidSdk();
+    // const sdk = getLiquidSdk();
     // Handle cryptoqr.net special case
     if (btcAdress.includes("cryptoqr.net")) {
       try {
@@ -77,8 +78,11 @@ export default async function decodeSendAddress(props) {
         return;
       }
     }
-    if (btcAdress.startsWith("spark:") || btcAdress.startsWith("sp1p")) {
-      if (btcAdress.startsWith("spark:")) {
+    if (
+      btcAdress.toLowerCase().startsWith("spark:") ||
+      btcAdress.toLowerCase().startsWith("sp1p")
+    ) {
+      if (btcAdress.toLowerCase().startsWith("spark:")) {
         const processedAddress = decodeBip21SparkAddress(btcAdress);
         parsedInvoice = {
           type: "Spark",
@@ -151,9 +155,11 @@ export default async function decodeSendAddress(props) {
         publishMessageFunc,
       });
     } catch (err) {
+      console.error(err);
       return goBackFunction(err.message || "Error processing payment info");
     }
 
+    console.log(processedPaymentInfo, "proceessed info");
     if (processedPaymentInfo) {
       setPaymentInfo({ ...processedPaymentInfo, decodedInput: input });
     } else {
@@ -177,8 +183,8 @@ async function processInputType(input, context) {
     case LIQUID_TYPES.Bolt11.toLowerCase(): //works
       return processBolt11Invoice(input, context);
 
-    // case LIQUID_TYPES.LnUrlAuth.toLowerCase():
-    //   return await processLNUrlAuth(input, context);
+    case LIQUID_TYPES.LnUrlAuth.toLowerCase():
+      return await processLNUrlAuth(input, context);
 
     case LIQUID_TYPES.LnUrlPay.toLowerCase(): //works
       return processLNUrlPay(input, context);
@@ -191,6 +197,9 @@ async function processInputType(input, context) {
 
     // case "bolt12offer":
     //   return processBolt12Offer(input, context);
+
+    case "spark":
+      return await processSparkAddress(input, context);
     default:
       goBackFunction(
         `Blitz wallet currently does not support sending to addresses of type: ${input.type.toLowerCase()}`
