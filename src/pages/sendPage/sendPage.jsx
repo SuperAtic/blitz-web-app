@@ -16,7 +16,15 @@ import { useNodeContext } from "../../contexts/nodeContext";
 import { useAppStatus } from "../../contexts/appStatus";
 import ErrorWithPayment from "./components/errorScreen";
 import decodeSendAddress from "../../functions/sendBitcoin/decodeSendAdress";
-import { SATSPERBITCOIN } from "../../constants";
+import { LIQUID_TYPES, SATSPERBITCOIN } from "../../constants";
+import CustomInput from "../../components/customInput/customInput";
+import CustomNumberKeyboard from "../../components/customNumberKeyboard/customNumberKeyboard";
+import NumberInputSendPage from "./components/numberInput";
+import CustomButton from "../../components/customButton/customButton";
+import { getBoltzApiUrl } from "../../functions/boltz/boltzEndpoitns";
+import formatBalanceAmount from "../../functions/formatNumber";
+import numberConverter from "../../functions/numberConverter";
+import displayCorrectDenomination from "../../functions/displayCorrectDenomination";
 
 export default function SendPage() {
   const location = useLocation();
@@ -45,6 +53,7 @@ export default function SendPage() {
   const navigate = useNavigate();
   const { sparkInformation } = useSpark();
 
+  const userBalance = sparkInformation.balance;
   const sendingAmount = paymentInfo?.sendAmount || 0;
   const isBTCdenominated =
     masterInfoObject.userBalanceDenomination === "hidden" ||
@@ -62,12 +71,12 @@ export default function SendPage() {
   const paymentFee =
     (paymentInfo?.paymentFee || 0) + (paymentInfo?.supportFee || 0);
   const canSendPayment =
-    Number(sparkInformation.balance) >= Number(sendingAmount) + paymentFee &&
+    Number(userBalance) >= Number(sendingAmount) + paymentFee &&
     sendingAmount != 0; //ecash is built into ln
   console.log(
     canSendPayment,
     "can send payment",
-    sparkInformation.balance,
+    userBalance,
     sendingAmount,
     paymentFee,
     sendingAmount,
@@ -80,15 +89,15 @@ export default function SendPage() {
 
   useEffect(() => {
     async function decodePayment() {
-      // const didPay = hasAlredyPaidInvoice({
-      //   scannedAddress: btcAdress,
-      //   sparkInformation,
-      // });
+      const didPay = hasAlredyPaidInvoice({
+        scannedAddress: btcAdress,
+        sparkInformation,
+      });
 
-      // if (didPay) {
-      //   errorMessageNavigation("You have already paid this invoice");
-      //   return;
-      // }
+      if (didPay) {
+        errorMessageNavigation("You have already paid this invoice");
+        return;
+      }
 
       console.log({
         fiatStats,
@@ -133,32 +142,111 @@ export default function SendPage() {
   }, []);
 
   const handleSend = async () => {
-    if (isSendingPayment || !paymentInfo.paymentType) return;
+    if (!canSendPayment) return;
+    if (isSendingPayment) return;
     setIsSendingPayment(true);
 
     try {
-      const response = await sparkPaymenWrapper({
-        address: paymentInfo.invoice,
-        paymentType: paymentInfo.paymentType,
-        amountSats: Number(paymentInfo.amount),
-        fee: (paymentInfo.fee || 0) + (paymentInfo.supportFee || 0),
-        memo: paymentInfo.description,
-        passedSupportFee: paymentInfo.supportFee,
-        userBalance: sparkInformation.balance,
-      });
+      let formmateedSparkPaymentInfo = {
+        address: "",
+        paymentType: "",
+      };
+      // manipulate paymetn details here
+      if (
+        paymentInfo.type.toLowerCase() === LIQUID_TYPES.Bolt11.toLowerCase()
+      ) {
+        formmateedSparkPaymentInfo.address =
+          paymentInfo?.decodedInput?.invoice?.bolt11?.toLowerCase();
+        formmateedSparkPaymentInfo.paymentType = "lightning";
+      } else if (paymentInfo.type.toLowerCase() === "spark") {
+        formmateedSparkPaymentInfo.address =
+          paymentInfo?.data?.address.toLowerCase();
+        formmateedSparkPaymentInfo.paymentType = "spark";
+      } else if (
+        paymentInfo.type.toLowerCase() === LIQUID_TYPES.LnUrlPay.toLowerCase()
+      ) {
+        formmateedSparkPaymentInfo.address =
+          paymentInfo?.data?.invoice.toLowerCase();
+        formmateedSparkPaymentInfo.paymentType = "lightning";
+      } else if (paymentInfo.type.toLowerCase() === "liquid") {
+        formmateedSparkPaymentInfo.address =
+          paymentInfo?.data?.invoice.toLowerCase();
+        formmateedSparkPaymentInfo.paymentType = "lightning";
+        console.log(paymentInfo?.boltzData);
+      } else if (paymentInfo?.type.toLowerCase() === "bitcoin") {
+        formmateedSparkPaymentInfo.address = paymentInfo?.address.toLowerCase();
+        formmateedSparkPaymentInfo.paymentType = "bitcoin";
+      }
+      console.log(formmateedSparkPaymentInfo, "manual spark information");
+      const paymentObject = {
+        getFee: false,
+        ...formmateedSparkPaymentInfo,
+        amountSats:
+          paymentInfo?.type === "Bitcoin"
+            ? convertedSendAmount + paymentFee
+            : convertedSendAmount,
+        masterInfoObject,
+        fee: paymentFee,
+        memo: paymentDescription || paymentInfo?.data.message || "",
+        userBalance: userBalance,
+        sparkInformation,
+      };
+      // Shouuld be same for all paymetns
+      const paymentResponse = await sparkPaymenWrapper(paymentObject);
+
+      if (paymentInfo.type === "liquid" && paymentResponse.didWork) {
+        async function pollBoltzSwapStatus() {
+          let didSettleInvoice = false;
+          let runCount = 0;
+
+          while (!didSettleInvoice && runCount < 10) {
+            runCount += 1;
+            const resposne = await fetch(
+              getBoltzApiUrl(import.meta.env.VITE_BOLTZ_ENVIRONMENT) +
+                `/v2/swap/${paymentInfo.boltzData.id}`
+            );
+            const boltzData = await resposne.json();
+
+            if (boltzData.status === "invoice.settled") {
+              didSettleInvoice = true;
+
+              navigate("/confirm-page", {
+                state: {
+                  for: "paymentsucceed",
+                  transaction: paymentResponse.response,
+                },
+                replace: true,
+              });
+            } else {
+              console.log("Waiting for confirmation....");
+              await new Promise((resolve) => setTimeout(resolve, 5000));
+            }
+          }
+          if (didSettleInvoice) return;
+          navigate("/confirm-page", {
+            state: {
+              for: "paymentFailed",
+              transaction: {
+                ...paymentResponse.response,
+                details: {
+                  ...paymentResponse.response.details,
+                  error: "Unable to settle swap",
+                },
+              },
+            },
+            replace: true,
+          });
+        }
+        pollBoltzSwapStatus();
+        return;
+      }
 
       navigate("/confirm-page", {
         state: {
-          for: response.didWork ? "paymentsucceed" : "paymentFailed",
-          information: {
-            error: response.error || "",
-            fee: response.didWork
-              ? (paymentInfo.fee || 0) + (paymentInfo.supportFee || 0)
-              : 0,
-            type: paymentInfo.paymentType,
-            totalValue: paymentInfo.amount,
-          },
+          for: "paymentsucceed",
+          transaction: paymentResponse.response,
         },
+        replace: true,
       });
     } catch (err) {
       console.error("Payment send error", err);
@@ -167,17 +255,61 @@ export default function SendPage() {
 
   const handleSave = async () => {
     try {
+      if (Number(userBalance) <= paymentInfo.sendAmount) {
+        navigate("/error", {
+          state: {
+            errorMessage: "Sending amount is greater than wallet balance.",
+            background: location,
+          },
+        });
+        return;
+      }
+      if (
+        isLiquidPayment &&
+        paymentInfo.sendAmount < minMaxLiquidSwapAmounts.min
+      ) {
+        navigate("/error", {
+          state: {
+            errorMessage: `Liquid payment must be greater than ${displayCorrectDenomination(
+              {
+                amount: minMaxLiquidSwapAmounts.min,
+                masterInfoObject,
+                fiatStats,
+              }
+            )}`,
+            background: location,
+          },
+        });
+        return;
+      }
+      if (!canSendPayment) return;
       setIsLoading(true);
-      const decodedInvoice = await processInputType(
-        params.btcAddress,
-        paymentInfo
-      );
-      if (!decodedInvoice) throw new Error("Invalid address");
-      setPaymentInfo(decodedInvoice);
-      setIsLoading(false);
+      await decodeSendAddress({
+        fiatStats,
+        btcAdress,
+        goBackFunction: errorMessageNavigation,
+        setPaymentInfo,
+        liquidNodeInformation,
+        masterInfoObject,
+        // setWebViewArgs,
+        // webViewRef,
+        navigate,
+        maxZeroConf:
+          minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
+        comingFromAccept: true,
+        enteredPaymentInfo: {
+          amount: convertedSendAmount,
+          description: paymentDescription,
+        },
+        setLoadingMessage,
+        paymentInfo,
+        parsedInvoice: paymentInfo.decodedInput,
+        fromPage,
+        publishMessageFunc,
+      });
     } catch (err) {
       console.error("Error saving payment info", err);
-      setIsLoading(false);
+
       navigate("/error", {
         state: {
           errorMessage: "Error decoding payment.",
@@ -185,6 +317,8 @@ export default function SendPage() {
           background: location,
         },
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -203,60 +337,53 @@ export default function SendPage() {
 
   const totalFee = (paymentInfo.fee || 0) + (paymentInfo.supportFee || 0);
 
-  const handleKeypad = (key) => {
-    setPaymentInfo((prev) => {
-      if (key === "delete") {
-        return { ...prev, amount: String(prev.amount).slice(0, -1) };
-      } else if (key === "C" && inputDenomination === "sats") {
-        return { ...prev, amount: "" };
-      } else {
-        return { ...prev, amount: String(prev.amount) + key };
-      }
-    });
-  };
-  console.log(paymentInfo);
   return (
     <div className="sendContainer">
       <NabBar sparkInformation={sparkInformation} />
       <div className="paymentInfoContainer">
-        <h1 className="paymentAmount">{paymentInfo.amount || 0} sats</h1>
-        {!paymentInfo.canEdit && (
+        <h1 className="paymentAmount">{convertedSendAmount || 0} sats</h1>
+        {!canEditPaymentAmount && (
           <>
             <p className="paymentFeeDesc">Fee & speed</p>
             <p className="paymentFeeVal">{totalFee} sats and Instant</p>
           </>
         )}
 
-        {paymentInfo.canEdit && (
-          <div
-            style={{ marginBottom: 0, marginTop: "auto" }}
-            className="number-keyboard"
-          >
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "delete"].map((num) => (
-              <button
-                key={num}
-                className="keyboard-key"
-                onClick={() => handleKeypad(num)}
-              >
-                {num === "delete" ? <img src={deleteIcon} /> : num}
-              </button>
-            ))}
-          </div>
+        {canEditPaymentAmount && (
+          <>
+            <CustomInput
+              onchange={setPaymentDescription}
+              placeholder={"Description..."}
+              value={paymentDescription}
+              containerClassName="customTextInputContinaerStyles"
+            />
+            <NumberInputSendPage
+              setPaymentInfo={setPaymentInfo}
+              paymentInfo={paymentInfo}
+              fiatStats={fiatStats}
+            />
+          </>
         )}
 
-        <button
-          style={{ marginTop: paymentInfo.canEdit ? 0 : "auto" }}
-          onClick={paymentInfo.canEdit ? handleSave : handleSend}
-          disabled={isSendingPayment}
-        >
-          {paymentInfo.canEdit
-            ? isLoading
-              ? "Loading..."
-              : "Save"
-            : isSendingPayment
-            ? "Sending..."
-            : "Send Payment"}
-        </button>
+        <CustomButton
+          buttonStyles={{
+            marginTop: canEditPaymentAmount ? 0 : "auto",
+            opacity: isSendingPayment ? 1 : canSendPayment ? 1 : 0.5,
+          }}
+          actionFunction={() => {
+            canEditPaymentAmount ? handleSave() : handleSend();
+          }}
+          textContent={
+            paymentInfo.canEdit
+              ? isLoading
+                ? "Loading..."
+                : "Save"
+              : isSendingPayment
+              ? "Sending..."
+              : "Send Payment"
+          }
+          useLoading={isSendingPayment || isLoading}
+        />
       </div>
     </div>
   );
@@ -276,7 +403,7 @@ function NabBar({ sparkInformation }) {
       <img onClick={() => navigate(-1)} src={arrowIcon} alt="" />
       <div className="label">
         <img src={walletIcon} alt="" />
-        <p>{sparkInformation.balance} stats</p>
+        <p>{Number(sparkInformation.balance)} stats</p>
       </div>
     </div>
   );
