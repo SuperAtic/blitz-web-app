@@ -50,7 +50,8 @@ export default function RestoreWallet() {
 
       if (!response) throw new Error("Not able to get clipboard data");
 
-      const data = response.data;
+      console.log(response);
+      const data = response;
       const splitSeed = data.split(" ");
       if (
         !splitSeed.every((word) => word.trim().length > 0) ||
