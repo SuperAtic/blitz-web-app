@@ -1,29 +1,49 @@
 export default function createCompatibleBuffer(input, encoding = "hex") {
-  let buffer;
-
-  if (typeof input === "string") {
-    buffer = Buffer.from(input, encoding);
-  } else if (input instanceof Uint8Array || Array.isArray(input)) {
-    buffer = Buffer.from(input);
-  } else {
-    buffer = Buffer.from(input);
+  // First ensure the global Buffer is properly polyfilled
+  if (typeof window !== "undefined" && !window.Buffer) {
+    window.Buffer = Buffer;
   }
 
-  // Force the buffer to have proper prototype methods
-  if (buffer.constructor.name === "Buffer2") {
-    console.warn("Buffer2 detected, attempting compatibility fixes...");
+  let buffer;
 
-    // Ensure .equals method exists and works properly
-    if (typeof buffer.equals !== "function") {
-      buffer.equals = function (other) {
-        if (!Buffer.isBuffer(other)) return false;
-        if (this.length !== other.length) return false;
-        for (let i = 0; i < this.length; i++) {
-          if (this[i] !== other[i]) return false;
-        }
-        return true;
-      };
+  try {
+    if (input instanceof Buffer) {
+      return input; // Already a Buffer
+    } else if (typeof input === "string") {
+      buffer = Buffer.from(
+        input,
+        /^[0-9a-f]+$/i.test(input) ? "hex" : encoding
+      );
+    } else if (input instanceof Uint8Array || Array.isArray(input)) {
+      buffer = Buffer.from(input);
+    } else if (input?.buffer instanceof ArrayBuffer) {
+      buffer = Buffer.from(input.buffer);
+    } else {
+      buffer = Buffer.from(input);
     }
+  } catch (e) {
+    console.error("Buffer creation failed:", {
+      input,
+      type: typeof input,
+      constructor: input?.constructor?.name,
+    });
+    throw new Error(`Invalid buffer input: ${e.message}`);
+  }
+
+  // Force Buffer prototype consistency
+  if (buffer.constructor.name !== "Buffer") {
+    const newBuffer = Buffer.alloc(buffer.length);
+    buffer.copy(newBuffer);
+    buffer = newBuffer;
+  }
+
+  // Ensure critical methods exist
+  if (typeof buffer.equals !== "function") {
+    buffer.equals = function (other) {
+      if (!Buffer.isBuffer(other)) return false;
+      if (this.length !== other.length) return false;
+      return this.compare(other) === 0;
+    };
   }
 
   return buffer;

@@ -1,6 +1,7 @@
+import "./aggressiveBufferFix";
+import { forceBufferCompatibility, Buffer } from "./aggressiveBufferFix";
 import zkpInit from "@vulpemventures/secp256k1-zkp";
 // import axios from "axios";
-import { Buffer } from "buffer";
 import { Transaction, address } from "liquidjs-lib";
 import {
   Musig,
@@ -22,6 +23,10 @@ import { getBoltzApiUrl } from "./boltzEndpoitns";
 import getBoltzFeeRates from "./getBoltzFeerate,";
 import fetchFunction from "./fetchFunction";
 import createCompatibleBuffer from "./compatibleBuffer";
+import { patchMusigClass } from "./musigPatch";
+import debugLog from "./debugLog";
+
+patchMusigClass(Musig);
 
 /**
  * Reverse swap flow:
@@ -32,23 +37,31 @@ import createCompatibleBuffer from "./compatibleBuffer";
  */
 export async function claimUnclaimedSwaps(claimInfo) {
   init(await zkpInit());
+
   let claimTx;
   const network = getNetwork(import.meta.env.VITE_BOLTZ_ENVIRONMENT);
   const { createdResponse, destinationAddress, keys, preimage } = claimInfo;
-
+  debugLog("Starting waitAndClaim with claim info:", claimInfo);
   try {
     const swapStatus = await getSwapStatus(createdResponse.id);
-    console.log(swapStatus);
+
+    debugLog(`Transaction ${swapStatus}, starting claim process`);
     if (!swapStatus.transaction?.hex) throw Error("LOCK_TRANSACTION_MISSING");
-    const boltzPublicKey = createCompatibleBuffer(
-      createdResponse.refundPublicKey
+
+    const boltzPublicKey = forceBufferCompatibility(
+      createCompatibleBuffer(createdResponse.refundPublicKey)
     );
 
-    // Create a musig signing session and tweak it with the Taptree of the swap scripts
+    const userPublicKey = forceBufferCompatibility(
+      createCompatibleBuffer(keys.publicKey)
+    );
+
     const musig = new Musig(await zkpInit(), keys, randomBytes(32), [
       boltzPublicKey,
-      createCompatibleBuffer(keys.publicKey),
+      userPublicKey,
     ]);
+
+    debugLog("Tweaking key");
     const tweakedKey = TaprootUtils.tweakMusig(
       musig,
       SwapTreeSerializer.deserializeSwapTree(createdResponse.swapTree).tree
@@ -56,7 +69,8 @@ export async function claimUnclaimedSwaps(claimInfo) {
 
     // Parse the lockup transaction and find the output relevant for the swap
     const lockupTx = Transaction.fromHex(swapStatus.transaction?.hex);
-    console.log(`Got lockup transaction: ${lockupTx.getId()}`);
+
+    debugLog(`Lockup transaction parsed: ${lockupTx.getId()}`);
 
     const swapOutput = detectSwap(tweakedKey, lockupTx);
     if (swapOutput === undefined) {
@@ -64,11 +78,11 @@ export async function claimUnclaimedSwaps(claimInfo) {
       return;
     }
 
-    console.log("Creating claim transaction");
+    debugLog("Swap output detected:", swapOutput);
 
-    // Create a claim transaction to be signed cooperatively via a key path spend
     const feeRate = await getBoltzFeeRates();
 
+    debugLog("Creating claim transaction...");
     claimTx = targetFee(feeRate, (fee) =>
       constructClaimTransaction(
         [
@@ -79,8 +93,8 @@ export async function claimUnclaimedSwaps(claimInfo) {
             cooperative: true,
             type: OutputType.Taproot,
             txHash: lockupTx.getHash(),
-            blindingPrivateKey: createCompatibleBuffer(
-              createdResponse.blindingKey
+            blindingPrivateKey: forceBufferCompatibility(
+              createCompatibleBuffer(createdResponse.blindingKey)
             ),
           },
         ],
@@ -92,7 +106,11 @@ export async function claimUnclaimedSwaps(claimInfo) {
       )
     );
 
-    console.log("Getting partial signature from Boltz");
+    debugLog("Requesting partial signature from Boltz...");
+
+    // Get public nonce and force compatibility
+    const publicNonce = musig.getPublicNonce();
+
     const boltzSig = await fetchFunction(
       `${getBoltzApiUrl(
         import.meta.env.VITE_BOLTZ_ENVIRONMENT
@@ -100,19 +118,23 @@ export async function claimUnclaimedSwaps(claimInfo) {
       {
         index: 0,
         transaction: claimTx.toHex(),
-        preimage: Buffer.from(preimage).toString("hex"),
-        pubNonce: Buffer.from(musig.getPublicNonce()).toString("hex"),
+        preimage: forceBufferCompatibility(preimage).toString("hex"),
+        pubNonce: forceBufferCompatibility(publicNonce).toString("hex"),
       },
       "post"
     );
 
-    console.log("✅ Boltz partial signature received:", boltzSig);
+    console.log("✅ Boltz partial signature received");
 
+    const receivedPubNonce = forceBufferCompatibility(
+      createCompatibleBuffer(boltzSig.pubNonce)
+    );
+
+    debugLog("About to call aggregateNonces");
     // Aggregate the nonces
-    musig.aggregateNonces([
-      [boltzPublicKey, createCompatibleBuffer(boltzSig.pubNonce)],
-    ]);
+    musig.aggregateNonces([[boltzPublicKey, receivedPubNonce]]);
 
+    debugLog("✅ aggregateNonces completed successfully");
     // Initialize the session to sign the claim transaction
     musig.initializeSession(
       claimTx.hashForWitnessV1(
@@ -125,21 +147,23 @@ export async function claimUnclaimedSwaps(claimInfo) {
     );
 
     // Add the partial signature from Boltz
-    musig.addPartial(
-      boltzPublicKey,
+    const partialSignature = forceBufferCompatibility(
       createCompatibleBuffer(boltzSig.partialSignature)
     );
+
+    musig.addPartial(boltzPublicKey, partialSignature);
 
     musig.signPartial();
 
     // Witness of the input to the aggregated signature
     claimTx.ins[0].witness = [musig.aggregatePartials()];
 
+    debugLog("✅ Witness set on claim transaction");
     // save claimtx hex on claimInfo
     claimInfo.claimTx = claimTx.toHex();
     saveClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
 
-    console.log("Broadcasting claim transaction");
+    debugLog("Broadcasting claim transaction...");
     const didBroadcast = fetchFunction(
       `${getBoltzApiUrl(
         import.meta.env.VITE_BOLTZ_ENVIRONMENT
@@ -152,11 +176,15 @@ export async function claimUnclaimedSwaps(claimInfo) {
 
     if (!didBroadcast) throw Error("did not broadcast");
 
+    debugLog("✅ Claim transaction broadcast successfully");
     claimInfo.claimed = true;
     removeClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
+
     return true;
   } catch (err) {
-    console.log(`Error when constructing claim tx: ${err}`);
+    console.error(`❌ Error in claim process: ${err.message}`);
+    console.error("Full error:", err);
+    console.error("Stack trace:", err.stack);
     return false;
   }
 }

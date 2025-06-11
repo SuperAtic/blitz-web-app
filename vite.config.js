@@ -11,7 +11,18 @@ export default defineConfig({
     react(),
     wasm(),
     topLevelAwait(),
-    nodePolyfills(),
+    nodePolyfills({
+      // Whether to polyfill specific globals.
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
+      },
+      // Whether to polyfill Node.js built-in modules.
+      protocolImports: true,
+      // Include specific polyfills
+      include: ["buffer", "stream", "crypto"],
+    }),
     // Custom plugin to fix WASM MIME type in dev
     VitePWA({
       workbox: {

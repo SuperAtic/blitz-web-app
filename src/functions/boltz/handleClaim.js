@@ -1,5 +1,8 @@
+import "./aggressiveBufferFix";
+import { Buffer, forceBufferCompatibility } from "./aggressiveBufferFix";
+import { patchMusigClass } from "./musigPatch";
+
 import zkpInit from "@vulpemventures/secp256k1-zkp";
-import { Buffer } from "buffer";
 import { Transaction, address, crypto } from "liquidjs-lib";
 import {
   Musig,
@@ -22,18 +25,17 @@ import { removeClaim, saveClaim } from "./claims";
 import { getBoltzApiUrl, getBoltzWsUrl } from "./boltzEndpoitns";
 import getBoltzFeeRates from "./getBoltzFeerate,";
 import createCompatibleBuffer from "./compatibleBuffer";
+import debugLog from "./debugLog";
 
-// Debug helper functions
-function debugLog(message, data = null) {
-  console.log(`🔍 [DEBUG] ${message}`, data || "");
-}
+// Patch the Musig class immediately after import
+patchMusigClass(Musig);
 
 export const waitAndClaim = async (claimInfo) => {
   init(await zkpInit());
+
   let claimTx;
   const network = getNetwork(import.meta.env.VITE_BOLTZ_ENVIRONMENT);
   const { createdResponse, destinationAddress, keys, preimage } = claimInfo;
-
   debugLog("Starting waitAndClaim with claim info:", claimInfo);
 
   // Create WebSocket connection
@@ -81,15 +83,17 @@ export const waitAndClaim = async (claimInfo) => {
           claimInfo.lastStatus = msg.args[0].status;
           saveClaim(claimInfo, import.meta.env.VITE_BOLTZ_ENVIRONMENT);
 
-          // Get Boltz public key
-          const boltzPublicKey = createCompatibleBuffer(
-            createdResponse.refundPublicKey
+          const boltzPublicKey = forceBufferCompatibility(
+            createCompatibleBuffer(createdResponse.refundPublicKey)
           );
-          debugLog("Boltz public key extracted");
+
+          const userPublicKey = forceBufferCompatibility(
+            createCompatibleBuffer(keys.publicKey)
+          );
 
           const musig = new Musig(await zkpInit(), keys, randomBytes(32), [
             boltzPublicKey,
-            createCompatibleBuffer(keys.publicKey),
+            userPublicKey,
           ]);
 
           debugLog("Tweaking key");
@@ -113,7 +117,6 @@ export const waitAndClaim = async (claimInfo) => {
           // Create claim transaction
           debugLog("Creating claim transaction...");
           const feeRate = await getBoltzFeeRates();
-
           claimTx = targetFee(feeRate, (fee) =>
             constructClaimTransaction(
               [
@@ -124,8 +127,8 @@ export const waitAndClaim = async (claimInfo) => {
                   cooperative: true,
                   type: OutputType.Taproot,
                   txHash: lockupTx.getHash(),
-                  blindingPrivateKey: createCompatibleBuffer(
-                    createdResponse.blindingKey
+                  blindingPrivateKey: forceBufferCompatibility(
+                    createCompatibleBuffer(createdResponse.blindingKey)
                   ),
                 },
               ],
@@ -143,6 +146,10 @@ export const waitAndClaim = async (claimInfo) => {
 
           // Get partial signature from Boltz
           debugLog("Requesting partial signature from Boltz...");
+
+          // Get public nonce and force compatibility
+          const publicNonce = musig.getPublicNonce();
+
           const boltzSig = await fetchFunction(
             `${getBoltzApiUrl(
               import.meta.env.VITE_BOLTZ_ENVIRONMENT
@@ -150,16 +157,25 @@ export const waitAndClaim = async (claimInfo) => {
             {
               index: 0,
               transaction: claimTx.toHex(),
-              preimage: Buffer.from(preimage).toString("hex"),
-              pubNonce: Buffer.from(musig.getPublicNonce()).toString("hex"),
+              preimage: forceBufferCompatibility(preimage).toString("hex"),
+              pubNonce: forceBufferCompatibility(publicNonce).toString("hex"),
             },
             "post"
           );
-          debugLog("✅ Boltz partial signature received:", boltzSig);
 
-          musig.aggregateNonces([
-            [boltzPublicKey, createCompatibleBuffer(boltzSig.pubNonce)],
-          ]);
+          debugLog("✅ Boltz partial signature received");
+
+          // Force buffer compatibility on received signature data
+          const receivedPubNonce = forceBufferCompatibility(
+            createCompatibleBuffer(boltzSig.pubNonce)
+          );
+
+          debugLog("About to call aggregateNonces");
+
+          // This is the critical call that was failing
+          musig.aggregateNonces([[boltzPublicKey, receivedPubNonce]]);
+
+          debugLog("✅ aggregateNonces completed successfully");
 
           // Initialize the session to sign the claim transaction
           musig.initializeSession(
@@ -171,11 +187,13 @@ export const waitAndClaim = async (claimInfo) => {
               network.genesisBlockHash
             )
           );
+
           // Add the partial signature from Boltz
-          musig.addPartial(
-            boltzPublicKey,
+          const partialSignature = forceBufferCompatibility(
             createCompatibleBuffer(boltzSig.partialSignature)
           );
+
+          musig.addPartial(boltzPublicKey, partialSignature);
 
           // Create our partial signature
           musig.signPartial();
@@ -211,6 +229,7 @@ export const waitAndClaim = async (claimInfo) => {
         } catch (err) {
           console.error(`❌ Error in claim process: ${err.message}`);
           console.error("Full error:", err);
+          console.error("Stack trace:", err.stack);
           // Don't close WebSocket on error, allow retry
         }
         break;
@@ -249,11 +268,15 @@ export const waitAndClaim = async (claimInfo) => {
 
 export const reverseSwap = async (recvInfo, destinationAddress) => {
   debugLog("Starting reverse swap", { recvInfo, destinationAddress });
+
   const preimage = randomBytes(32);
   const keys = ECPairFactory(ecc).makeRandom();
   const signature = keys.signSchnorr(
-    crypto.sha256(Buffer.from(destinationAddress, "utf-8"))
+    crypto.sha256(
+      forceBufferCompatibility(Buffer.from(destinationAddress, "utf-8"))
+    )
   );
+
   const invoiceAmount = Math.round(Number(recvInfo.amount));
   debugLog("Creating reverse swap with amount:", invoiceAmount);
 
@@ -261,8 +284,8 @@ export const reverseSwap = async (recvInfo, destinationAddress) => {
     `${getBoltzApiUrl(import.meta.env.VITE_BOLTZ_ENVIRONMENT)}/v2/swap/reverse`,
     {
       address: destinationAddress,
-      addressSignature: Buffer.from(signature).toString("hex"),
-      claimPublicKey: Buffer.from(keys.publicKey).toString("hex"),
+      addressSignature: forceBufferCompatibility(signature).toString("hex"),
+      claimPublicKey: forceBufferCompatibility(keys.publicKey).toString("hex"),
       description: recvInfo.description || "",
       from: "BTC",
       onchainAmount: invoiceAmount,
@@ -283,7 +306,6 @@ export const reverseSwap = async (recvInfo, destinationAddress) => {
   };
 
   waitAndClaim(claimInfo);
-
   return claimInfo;
 };
 
@@ -303,10 +325,14 @@ export const getLiquidAddress = async (invoice, magicHint) => {
 
   // Verify signature
   const isValidSignature = ECPairFactory(ecc)
-    .fromPublicKey(Buffer.from(magicHint.pubkey, "hex"))
+    .fromPublicKey(
+      forceBufferCompatibility(Buffer.from(magicHint.pubkey, "hex"))
+    )
     .verifySchnorr(
-      crypto.sha256(Buffer.from(bip21Address, "utf-8")),
-      Buffer.from(bip21Data.signature, "hex")
+      crypto.sha256(
+        forceBufferCompatibility(Buffer.from(bip21Address, "utf-8"))
+      ),
+      forceBufferCompatibility(Buffer.from(bip21Data.signature, "hex"))
     );
 
   if (!isValidSignature) {
