@@ -1,6 +1,7 @@
 import "./fonts.css";
 import "./index.css";
 import App from "./App.jsx";
+import "../pollyfills.js";
 import { StrictMode, Suspense, lazy, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -64,6 +65,8 @@ import { Colors } from "./constants/theme.js";
 import AnimatedRouteWrapper from "./components/animatedRouteWrapper.jsx";
 import ConfirmActionPage from "./components/confirmActionPage/confirmActionPage.jsx";
 import { GlobalRescanLiquidSwaps } from "./contexts/rescanLiquidSwaps.jsx";
+import Contacts from "./pages/contacts/contacts.jsx";
+import Store from "./pages/store/store.jsx";
 // const ConfirmPayment = lazy(() =>
 //   import("./pages/confirmPayment/confirmPaymentScreen.jsx")
 // );
@@ -171,6 +174,22 @@ function Root() {
                                       }
                                     />
                                     <Route
+                                      path="/contacts"
+                                      element={
+                                        <SafeAreaComponent>
+                                          <Contacts />
+                                        </SafeAreaComponent>
+                                      }
+                                    />
+                                    <Route
+                                      path="/store"
+                                      element={
+                                        <SafeAreaComponent>
+                                          <Store />
+                                        </SafeAreaComponent>
+                                      }
+                                    />
+                                    <Route
                                       path="/receiveAmount"
                                       element={
                                         <SafeAreaComponent>
@@ -244,9 +263,9 @@ function Root() {
                                       path="/confirm-page"
                                       element={
                                         <AnimatedRouteWrapper
-                                          initialAnimation={{ y: "100%" }}
-                                          animate={{ y: 0 }}
-                                          exitAnimation={{ y: "100%" }}
+                                          initialAnimation={{ opacity: 0 }}
+                                          animate={{ opacity: 1 }}
+                                          exitAnimation={{ opacity: 0 }}
                                         >
                                           <SafeAreaComponent>
                                             <ConfirmPayment />
