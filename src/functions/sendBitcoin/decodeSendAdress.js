@@ -33,7 +33,7 @@ export default async function decodeSendAddress(props) {
   } = props;
 
   try {
-    // const sdk = getLiquidSdk();
+    const sdk = getLiquidSdk();
     // Handle cryptoqr.net special case
     if (btcAdress.includes("cryptoqr.net")) {
       try {
