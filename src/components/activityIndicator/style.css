@@ -3,7 +3,6 @@
   height: 40px;
   border-radius: 50%;
   animation: spin 1.2s linear infinite;
-  margin: 20px auto; /* center it */
 }
 
 @keyframes spin {

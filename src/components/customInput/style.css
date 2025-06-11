@@ -1,0 +1,12 @@
+.custom-description-input-container {
+  max-width: 300px;
+  width: 100%;
+  display: flex;
+  margin: 0 auto 0;
+}
+.custom-description-input-container .description-input {
+  width: 100%;
+  padding: 15px;
+  border: unset;
+  border-radius: 8px;
+}
