@@ -1,3 +1,5 @@
+import { LIQUID_TYPES } from "../../constants";
+
 export async function getLNAddressForLiquidPayment(
   paymentInfo,
   sendingValue,
@@ -5,7 +7,9 @@ export async function getLNAddressForLiquidPayment(
 ) {
   let invoiceAddress;
   try {
-    if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
+    if (
+      paymentInfo.type?.toLowerCase() === LIQUID_TYPES.LnUrlPay.toLowerCase()
+    ) {
       const url = `${paymentInfo.data.callback}?amount=${sendingValue * 1000}${
         !!paymentInfo?.data.commentAllowed
           ? `&comment=${encodeURIComponent(
