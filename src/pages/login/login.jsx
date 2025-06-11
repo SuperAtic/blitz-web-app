@@ -44,6 +44,7 @@ function Login() {
     async function deleateAllWalletData() {
       try {
         deleteWallet();
+        navigate("/");
       } catch (err) {
         console.log("Error deleting account", err);
         navigate("/error", {

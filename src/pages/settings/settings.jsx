@@ -80,6 +80,7 @@ export default function SettingsHome() {
         <button
           onClick={() => {
             deleteWallet();
+            navigate("/");
           }}
         >
           <img src={trashIcon} alt="" srcset="" /> Delete wallet

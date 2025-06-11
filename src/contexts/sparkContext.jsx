@@ -445,7 +445,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
 
   useEffect(() => {
     // This function runs once per load and check to see if a user received any payments while offline. It also starts a timeout to update payment status of paymetns every 30 seconds.
-    if (!sparkInformation.didConnect || !didGetToHomepage) return;
+    if (!sparkInformation.didConnect) return;
     if (restoreOffllineStateRef.current) return;
     restoreOffllineStateRef.current = true;
 
@@ -471,40 +471,19 @@ const SparkWalletProvider = ({ children, navigate }) => {
       }, 100000); //one minute intervals
     };
 
-    const clearIntervalIfNeeded = () => {
-      if (intervalId) {
-        console.log("Clearing spark update interval");
-        clearInterval(intervalId);
-        intervalId = null;
-      }
-    };
-
-    const handleAppStateChange = (nextAppState) => {
-      if (nextAppState === "active") {
-        startInterval();
-      } else if (nextAppState.match(/inactive|background/)) {
-        clearIntervalIfNeeded();
-      }
-    };
-
     // Run restore logic once
     const restoreTxState = async () => {
-      const isFirstWalletLoad = Storage.getItem("isFirstWalletLoad");
-      if (isFirstWalletLoad === "true") return;
-      Storage.setItem(isFirstWalletLoad, "true");
+      console.log("RUNNING RESTORE");
+      // const isFirstWalletLoad = Storage.getItem("isFirstWalletLoad");
+      // if (isFirstWalletLoad === "true") return;
+      // Storage.setItem(isFirstWalletLoad, "true");
       await fullRestoreSparkState({
         sparkAddress: sparkInformation.sparkAddress,
       });
     };
     restoreTxState();
-
-    // Start interval immediately if app is active
-    if (AppState.currentState === "active") {
-      startInterval();
-    }
-
-    AppState.addEventListener("change", handleAppStateChange);
-  }, [didGetToHomepage, sparkInformation.didConnect]);
+    startInterval();
+  }, [sparkInformation.didConnect]);
 
   // This function connects to the spark node and sets the session up
   useEffect(() => {
@@ -568,17 +547,15 @@ const SparkWalletProvider = ({ children, navigate }) => {
       }
     }
     console.log(
-      didGetToHomepage,
       liquidNodeInformation,
       minMaxLiquidSwapAmounts,
       sparkInformation.didConnect,
       "testing in sspark"
     );
-    if (!didGetToHomepage) return;
+
     if (!sparkInformation.didConnect) return;
     swapLiquidToSpark();
   }, [
-    didGetToHomepage,
     liquidNodeInformation,
     minMaxLiquidSwapAmounts,
     sparkInformation.didConnect,
