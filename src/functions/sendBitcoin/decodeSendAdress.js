@@ -116,7 +116,7 @@ export default async function decodeSendAddress(props) {
     try {
       input = await chosenPath;
     } catch (err) {
-      console.log(err, "parsing address error");
+      console.error(err, "parsing address error");
       return goBackFunction("Unable to parse address");
     }
     console.log(input, "parsed input");

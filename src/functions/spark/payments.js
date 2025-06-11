@@ -176,7 +176,7 @@ export const sparkPaymenWrapper = async ({
       if (!sparkPayResponse)
         throw new Error("Error when sending spark payment");
 
-      handleSupportPayment(masterInfoObject, supportFee);
+      await handleSupportPayment(masterInfoObject, supportFee);
 
       const tx = {
         id: sparkPayResponse.id,
