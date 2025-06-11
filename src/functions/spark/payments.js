@@ -69,18 +69,13 @@ export const sparkPaymenWrapper = async ({
     let supportFeeResponse;
 
     if (paymentType === "lightning") {
+      console.log(address, "testing address");
       const lightningPayResponse = await sendSparkLightningPayment({
         invoice: address,
       });
       if (!lightningPayResponse)
         throw new Error("Error when sending lightning payment");
-
-      if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
-        sendSparkPayment({
-          receiverSparkAddress: process.env.BLITZ_SPARK_SUPPORT_ADDRESSS,
-          amountSats: supportFee,
-        });
-      }
+      handleSupportPayment(masterInfoObject, supportFee);
 
       console.log(lightningPayResponse, "lightning pay response");
       let sparkQueryResponse = null;
@@ -114,7 +109,7 @@ export const sparkPaymenWrapper = async ({
           time: new Date(lightningPayResponse.updatedAt).getTime(),
           direction: "OUTGOING",
           description: memo || "",
-          preImage: sparkQueryResponse
+          preimage: sparkQueryResponse
             ? sparkQueryResponse.paymentPreimage
             : "",
         },
@@ -181,12 +176,7 @@ export const sparkPaymenWrapper = async ({
       if (!sparkPayResponse)
         throw new Error("Error when sending spark payment");
 
-      if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
-        sendSparkPayment({
-          receiverSparkAddress: process.env.BLITZ_SPARK_SUPPORT_ADDRESSS,
-          amountSats: supportFee,
-        });
-      }
+      handleSupportPayment(masterInfoObject, supportFee);
 
       const tx = {
         id: sparkPayResponse.id,
@@ -262,3 +252,16 @@ export const sparkReceivePaymentWrapper = async ({
     return { didWork: false, error: err.message };
   }
 };
+
+async function handleSupportPayment(masterInfoObject, supportFee) {
+  try {
+    if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
+      sendSparkPayment({
+        receiverSparkAddress: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
+        amountSats: supportFee,
+      });
+    }
+  } catch (err) {
+    console.log("Error sending support payment", err);
+  }
+}
