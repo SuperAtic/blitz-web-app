@@ -51,7 +51,8 @@ export default function TransactionContanier({ frompage }) {
   let lastBanner = null;
 
   transfers.forEach((tx, index) => {
-    const currnetTxTime = new Date(tx.created_at_time).getTime();
+    const details = JSON.parse(tx.details);
+    const currnetTxTime = new Date(details.time).getTime();
     const isDonation =
       tx.transfer_direction === "OUTGOING" &&
       tx.type === "TRANSFER" &&
@@ -81,6 +82,7 @@ export default function TransactionContanier({ frompage }) {
 
     groupedTransfers.push(
       <TxItem
+        details={details}
         navigate={navigate}
         key={index}
         isDonation={isDonation}
@@ -123,9 +125,8 @@ function TxItem({
   currentTime,
   currnetTxTime,
   navigate,
+  details,
 }) {
-  const details = JSON.parse(tx.details);
-
   const timeDifference = currentTime - details.time;
   const minutes = timeDifference / (1000 * 60);
   const hours = minutes / 60;
