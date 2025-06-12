@@ -41,8 +41,6 @@ export default function SettingsContentIndex() {
 
         {selectedPage === "backup wallet" && <ViewMnemoinc />}
         {selectedPage === "spark info" && <SparkInformation />}
-
-        {selectedPage === "delete wallet" && <ResetPage />}
       </div>
     </SafeAreaComponent>
   );

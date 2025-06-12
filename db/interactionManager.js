@@ -50,9 +50,9 @@ async function sendDataToDB(newObject, uuid) {
       await Promise.all(localStoragePromises);
     }
 
-    if (Object.keys(dbStorageData).length > 0) {
-      await addDataToCollection(dbStorageData, "blitzWalletUsers", uuid);
-    }
+    // if (Object.keys(dbStorageData).length > 0) {
+    //   await addDataToCollection(dbStorageData, "blitzWalletUsers", uuid);
+    // }
 
     console.log("sending data to database:", localStorageData, dbStorageData);
     return true;

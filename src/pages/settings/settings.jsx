@@ -25,6 +25,7 @@ import trashIconWhite from "../../assets/trashIconWhite.png";
 import nodeIcon from "../../assets/nodeIcon.png";
 import nodeIconWhite from "../../assets/nodeIconWhite.png";
 import ThemeText from "../../components/themeText/themeText";
+import { useEffect } from "react";
 const GENERALOPTIONS = [
   {
     for: "general",
@@ -115,7 +116,7 @@ const DOOMSDAYSETTINGS = [
   [
     {
       for: "Closing Account",
-      name: "Reset Wallet",
+      name: "Delete Wallet",
       icon: trashIcon,
       iconWhite: trashIconWhite,
       arrowIcon: leftCheveronArrow,
@@ -126,22 +127,43 @@ const DOOMSDAYSETTINGS = [
 export default function SettingsHome() {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const wantsToDeleteAccount = queryParams.get("confirmed");
   const props = location.state;
   const { sparkInformation } = useSpark();
-  const { logout, deleteWallet } = useAuth();
+  const { deleteWallet } = useAuth();
   console.log(sparkInformation);
   const settignsList = props?.isDoomsday ? DOOMSDAYSETTINGS : SETTINGSOPTIONS;
+
+  useEffect(() => {
+    if (wantsToDeleteAccount !== "true") return;
+    deleteWallet();
+    window.location.reload();
+  }, [wantsToDeleteAccount]);
 
   const settingsItems = settignsList.map((item, id) => {
     const internalElements = item.map((settingsElement, id) => {
       return (
         <div
+          key={id}
           onClick={() => {
-            navigate("/settings-item", {
-              state: {
-                for: settingsElement.name,
-              },
-            });
+            if (settingsElement.name === "Delete Wallet") {
+              navigate("/confirm-action", {
+                state: {
+                  confirmHeader: "Are you sure you want to delete your wallet?",
+                  confirmDescription:
+                    "Your wallet seed will be permanently deleted from this device. Without your wallet seed, your Bitcoin will be lost forever.",
+                  fromRoute: "settings",
+                  background: location,
+                },
+              });
+            } else {
+              navigate("/settings-item", {
+                state: {
+                  for: settingsElement.name,
+                },
+              });
+            }
           }}
           className="settingsItemContainer"
         >
@@ -159,7 +181,7 @@ export default function SettingsHome() {
     });
 
     return (
-      <div className="settingsItemGroupContainer">
+      <div key={`itemContainer-${id}`} className="settingsItemGroupContainer">
         <ThemeText
           className={"settingsItemGroupHeader"}
           textContent={

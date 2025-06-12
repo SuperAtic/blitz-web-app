@@ -366,11 +366,12 @@ function Root() {
                                         transition: "none",
                                         fontSize: "15px",
                                         font: "var(--font-family)",
+                                        color: Colors.light.text,
                                       },
                                       "&.Mui-selected .MuiBottomNavigationAction-label":
                                         {
                                           fontSize: "15px",
-                                          color: Colors.light.blue,
+                                          color: Colors.light.text,
                                         },
                                     }}
                                     label="Contacts"
@@ -387,11 +388,12 @@ function Root() {
                                         transition: "none",
                                         fontSize: "15px",
                                         font: "var(--font-family)",
+                                        color: Colors.light.text,
                                       },
                                       "&.Mui-selected .MuiBottomNavigationAction-label":
                                         {
                                           fontSize: "15px",
-                                          color: Colors.light.blue,
+                                          color: Colors.light.text,
                                         },
                                     }}
                                     label="Home"
@@ -408,11 +410,12 @@ function Root() {
                                         transition: "none",
                                         fontSize: "15px",
                                         font: "var(--font-family)",
+                                        color: Colors.light.text,
                                       },
                                       "&.Mui-selected .MuiBottomNavigationAction-label":
                                         {
                                           fontSize: "15px",
-                                          color: Colors.light.blue,
+                                          color: Colors.light.text,
                                         },
                                     }}
                                     label="Store"

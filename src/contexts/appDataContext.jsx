@@ -16,13 +16,13 @@ export const GlobalAppDataProvider = ({ children }) => {
     setGlobalAppDatasInformation((prev) => {
       const newAppData = { ...prev, ...newData };
 
-      if (writeToDB) {
-        addDataToCollection(
-          { appData: newAppData },
-          "blitzWalletUsers",
-          publicKey
-        );
-      }
+      // if (writeToDB) {
+      //   addDataToCollection(
+      //     { appData: newAppData },
+      //     "blitzWalletUsers",
+      //     publicKey
+      //   );
+      // }
       return newAppData;
     });
   };

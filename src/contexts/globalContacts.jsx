@@ -54,13 +54,13 @@ export const GlobalContactsList = ({ children }) => {
     (newData, writeToDB) => {
       setGlobalContactsInformation((prev) => {
         const newContacts = { ...prev, ...newData };
-        if (writeToDB) {
-          addDataToCollection(
-            { contacts: newContacts },
-            "blitzWalletUsers",
-            publicKey
-          );
-        }
+        // if (writeToDB) {
+        //   addDataToCollection(
+        //     { contacts: newContacts },
+        //     "blitzWalletUsers",
+        //     publicKey
+        //   );
+        // }
         return newContacts;
       });
     },
