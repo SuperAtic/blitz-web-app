@@ -7,4 +7,5 @@
   margin: 0 auto;
   flex: 1;
   overflow-y: scroll;
+  display: flex;
 }

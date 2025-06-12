@@ -9,8 +9,9 @@ export default function CustomButton({
   actionFunction,
   textContent,
   useLoading,
+  buttonClassName,
+  textClassName,
 }) {
-  console.log(textStyles);
   return (
     <button
       onClick={() => {
@@ -19,6 +20,7 @@ export default function CustomButton({
       }}
       id="customButton"
       style={{ ...buttonStyles }}
+      className={buttonClassName}
     >
       {useLoading ? (
         <FullLoadingScreen
@@ -28,6 +30,7 @@ export default function CustomButton({
         />
       ) : (
         <ThemeText
+          className={textClassName}
           textContent={textContent}
           textStyles={{
             color: Colors.light.text,
