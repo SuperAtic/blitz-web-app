@@ -3,6 +3,7 @@ import SafeAreaComponent from "../../../components/safeAreaContainer";
 import PageNavBar from "../../../components/navBar/navBar";
 import AboutPage from "../pages/about/about";
 import "./settingsItem.css";
+import ViewMnemoinc from "../../viewkey/viewKey";
 
 export default function SettingsContentIndex() {
   const location = useLocation();
@@ -37,7 +38,7 @@ export default function SettingsContentIndex() {
 
         {selectedPage === "blitz stats" && <ExploreUsers />}
 
-        {selectedPage === "backup wallet" && <SeedPhrasePage />}
+        {selectedPage === "backup wallet" && <ViewMnemoinc />}
         {selectedPage === "spark info" && <SparkInfo />}
 
         {selectedPage === "delete wallet" && <ResetPage />}

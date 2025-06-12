@@ -9,4 +9,10 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  text-align: center;
+}
+@media screen and (max-width: 400px) {
+  .pageNavBar .pageHeaderText {
+    font-size: 20px;
+  }
 }
