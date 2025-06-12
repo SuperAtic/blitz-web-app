@@ -13,10 +13,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home";
-import PersonIcon from "@mui/icons-material/Person";
-import SettingsIcon from "@mui/icons-material/Store";
-import testing from "../src/assets/adminHomeWallet_dark.png";
 import SafeAreaComponent from "./components/safeAreaContainer.jsx";
 import { AuthProvider } from "./contexts/authContext.jsx";
 import AuthGate from "./components/authGate.jsx";
@@ -69,6 +65,7 @@ import { GlobalRescanLiquidSwaps } from "./contexts/rescanLiquidSwaps.jsx";
 import Contacts from "./pages/contacts/contacts.jsx";
 import Store from "./pages/store/store.jsx";
 import TabsIcon from "./components/tabsIcon/tabsIcon.jsx";
+import SettingsContentIndex from "./pages/settings/settingsItem/settingsItem.jsx";
 // const ConfirmPayment = lazy(() =>
 //   import("./pages/confirmPayment/confirmPaymentScreen.jsx")
 // );
@@ -278,9 +275,27 @@ function Root() {
                                     <Route
                                       path="/settings"
                                       element={
-                                        <SafeAreaComponent>
-                                          <SettingsHome />
-                                        </SafeAreaComponent>
+                                        <AnimatedRouteWrapper
+                                          initialAnimation={{ x: "100%" }}
+                                          animate={{ x: 0 }}
+                                          exitAnimation={{ x: "100%" }}
+                                        >
+                                          <SafeAreaComponent>
+                                            <SettingsHome />
+                                          </SafeAreaComponent>
+                                        </AnimatedRouteWrapper>
+                                      }
+                                    />
+                                    <Route
+                                      path="/settings-item"
+                                      element={
+                                        <AnimatedRouteWrapper
+                                          initialAnimation={{ x: "100%" }}
+                                          animate={{ x: 0 }}
+                                          exitAnimation={{ x: "100%" }}
+                                        >
+                                          <SettingsContentIndex />
+                                        </AnimatedRouteWrapper>
                                       }
                                     />
                                     <Route
