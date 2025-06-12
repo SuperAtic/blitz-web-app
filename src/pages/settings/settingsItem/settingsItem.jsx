@@ -4,6 +4,7 @@ import PageNavBar from "../../../components/navBar/navBar";
 import AboutPage from "../pages/about/about";
 import "./settingsItem.css";
 import ViewMnemoinc from "../../viewkey/viewKey";
+import SparkInformation from "../pages/sparkInfo/sparkInfo";
 
 export default function SettingsContentIndex() {
   const location = useLocation();
@@ -39,7 +40,7 @@ export default function SettingsContentIndex() {
         {selectedPage === "blitz stats" && <ExploreUsers />}
 
         {selectedPage === "backup wallet" && <ViewMnemoinc />}
-        {selectedPage === "spark info" && <SparkInfo />}
+        {selectedPage === "spark info" && <SparkInformation />}
 
         {selectedPage === "delete wallet" && <ResetPage />}
       </div>
