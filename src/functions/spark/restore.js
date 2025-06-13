@@ -100,7 +100,7 @@ export const updateSparkTxStatus = async () =>
       // const savedMap = new Map(savedTxs.map(tx => [tx.sparkID, tx])); // use sparkID as key
       console.log(savedTxs);
       let updatedTxs = [];
-      for (txStateUpdate of savedTxs) {
+      for (const txStateUpdate of savedTxs) {
         // no need to do spark here since it wont ever be shown as pending
         if (txStateUpdate.paymentType === "lightning") {
           const details = JSON.parse(txStateUpdate.details);
@@ -132,11 +132,13 @@ export const updateSparkTxStatus = async () =>
           };
           updatedTxs.push(tx);
         } else {
+          const details = JSON.parse(txStateUpdate.details);
+          if (details.direction !== "OUTGOING") continue;
           const sparkResponse = await getSparkBitcoinPaymentRequest(
             txStateUpdate.sparkID
           );
           if (!sparkResponse?.transfer) continue;
-          const details = JSON.parse(txStateUpdate.details);
+
           const tx = {
             useTempId: txStateUpdate.sparkID,
             id: sparkResponse

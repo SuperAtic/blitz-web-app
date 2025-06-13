@@ -10,17 +10,17 @@ import {
 import { sparkReceivePaymentWrapper } from "../functions/spark/payments";
 import { breezLiquidPaymentWrapper } from "../functions/breezLiquid";
 import {
-  claimSparkBitcoinL1Transaction,
+  claimnSparkStaticDepositAddress,
   getSparkBalance,
   getSparkLightningPaymentStatus,
-  getSparkStaticBitcoinL1Address,
+  getSparkStaticBitcoinL1AddressQuote,
   getSparkTransactions,
-  getUnusedSparkBitcoinL1Address,
-  querySparkBitcoinL1Transaction,
+  queryAllStaticDepositAddresses,
   sparkWallet,
   useSparkPaymentType,
 } from "../functions/spark";
 import {
+  addSingleSparkTransaction,
   bulkUpdateSparkTransactions,
   deleteUnpaidSparkLightningTransaction,
   getAllSparkTransactions,
@@ -40,6 +40,9 @@ import { useNodeContext } from "./nodeContext";
 import { calculateBoltzFeeNew } from "../functions/boltz/boltzFeeNew";
 import Storage from "../functions/localStorage";
 import { useAuth } from "./authContext";
+import getDepositAddressTxIds, {
+  handleTxIdState,
+} from "../functions/spark/getDepositAddressTxIds";
 
 // Initiate context
 const SparkWalletManager = createContext(null);
@@ -264,7 +267,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
         handleUpdate
       );
       sparkWallet.on("transfer:claimed", transferHandler);
-      sparkWallet.on("deposit:confirmed", transferHandler);
+      // sparkWallet.on("deposit:confirmed", transferHandler);
       if (!sparkPaymentActionsRef.current) {
         console.log("blocking first listeners run");
         sparkPaymentActionsRef.current = true;
@@ -291,7 +294,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
         handleUpdate
       );
       sparkWallet.off("transfer:claimed", transferHandler);
-      sparkWallet.off("deposit:confirmed", transferHandler);
+      // sparkWallet.off("deposit:confirmed", transferHandler);
     };
     const handleTabBlur = () => removeListeners();
     const handleTabFocus = () => addListeners();
@@ -396,38 +399,109 @@ const SparkWalletProvider = ({ children, navigate }) => {
   //     addListeners();
   //   }
   // }, [sparkInformation.didConnect]);
-
+  // Storage.removeItem("depositAddressTxIds");
   useEffect(() => {
     if (!sparkInformation.didConnect) return;
     // Interval to check deposit addresses to see if they were paid
     const handleDepositAddressCheck = async () => {
       try {
         console.log("l1Deposit check running....");
-        const depoistAddress = await getSparkStaticBitcoinL1Address();
+        const allTxs = await getAllSparkTransactions();
+        const savedTxMap = new Map(allTxs.map((tx) => [tx.sparkID, tx]));
+        const depoistAddress = await queryAllStaticDepositAddresses();
 
-        console.log("Deposit address:", depoistAddress);
-        if (!depoistAddress) return;
+        // Loop through deposit addresses and check if they have been paid
+        for (const address of depoistAddress) {
+          console.log("Checking deposit address:", address);
+          if (!address) continue;
 
-        const txid = await querySparkBitcoinL1Transaction(depoistAddress);
-        console.log(txid);
-        //     if (!response.filter(Boolean).length) return false;
-        //     const [txid, [data]] = response;
-        //     const formattedTx = await transformTxToPaymentObject(
-        //       {
-        //         ...data,
-        //         transferDirection: 'INCOMING',
-        //         address: address,
-        //         txid: txid,
-        //       },
-        //       '',
-        //       'bitcoin',
-        //     );
+          // Get new txids for an address
+          const txids = await getDepositAddressTxIds(address);
+          console.log("Deposit address txids:", txids);
+          if (!txids || !txids.length) continue;
+          const unpaidTxids = txids.filter((txid) => !txid.didClaim);
 
-        // const filteredTxs = newTransactions.filter(Boolean);
+          for (const txid of unpaidTxids) {
+            // get quote for the txid
+            const { didwork, quote, error } =
+              await getSparkStaticBitcoinL1AddressQuote(txid.txid);
 
-        // if (filteredTxs.length) {
-        //   await bulkUpdateSparkTransactions(filteredTxs);
-        // }
+            console.log("Deposit address quote:", quote);
+            if (!didwork) {
+              console.log(error, "Error getting deposit address quote");
+              if (error.includes("UTXO is spent or not found.")) {
+                handleTxIdState(txid, true, address);
+              }
+
+              continue;
+            }
+
+            const hasAlreadySaved = savedTxMap.has(quote.transactionId);
+            console.log("Has already saved transaction:", hasAlreadySaved);
+            if (!hasAlreadySaved) {
+              const pendingTx = {
+                id: quote.transactionId,
+                paymentStatus: "pending",
+                paymentType: "bitcoin",
+                accountId: sparkInformation.identityPubKey,
+                details: {
+                  fee: 0,
+                  amount: quote.creditAmountSats,
+                  address: address,
+                  time: new Date().getTime(),
+                  direction: "INCOMING",
+                  description: "Deposit address payment",
+                  onChainTxid: quote.transactionId,
+                  isRestore: true, // This is a restore payment
+                },
+              };
+              await addSingleSparkTransaction(pendingTx);
+            }
+
+            // If the address has been paid, claim the transaction
+            const claimTx = await claimnSparkStaticDepositAddress({
+              ...quote,
+              sspSignature: quote.signature,
+            });
+            if (!claimTx) continue;
+            console.log("Claimed deposit address transaction:", claimTx);
+
+            await new Promise((res) => setTimeout(res, 2000));
+            // query latest 10 transacctions for sparkID of the claim tx response
+            // update paymetn detials
+            const incomingTxs = await getSparkTransactions(10);
+            const bitcoinTransfer = incomingTxs.transfers.find(
+              (tx) => tx.id === claimTx.transferId
+            );
+
+            const updatedTx = bitcoinTransfer
+              ? {
+                  useTempId: true,
+                  tempId: quote.transactionId,
+                  id: bitcoinTransfer.id,
+                  paymentStatus: "completed",
+                  paymentType: "bitcoin",
+                  accountId: sparkInformation.identityPubKey,
+                  details: {
+                    amount: bitcoinTransfer.totalValue,
+                    fee: Math.abs(
+                      quote.creditAmountSats - bitcoinTransfer.totalValue
+                    ),
+                  },
+                }
+              : {
+                  useTempId: true,
+                  id: claimTx.transferId,
+                  tempId: quote.transactionId,
+                  paymentStatus: "pending",
+                  paymentType: "bitcoin",
+                  accountId: sparkInformation.identityPubKey,
+                };
+
+            await bulkUpdateSparkTransactions([updatedTx]);
+            console.log("Updated bitcoin transaction:", updatedTx);
+          }
+        }
       } catch (err) {
         console.log("Handle deposit address check error", err);
       }
@@ -436,10 +510,10 @@ const SparkWalletProvider = ({ children, navigate }) => {
     if (depositAddressIntervalRef.current) {
       clearInterval(depositAddressIntervalRef.current);
     }
-
+    handleDepositAddressCheck();
     depositAddressIntervalRef.current = setInterval(
       handleDepositAddressCheck,
-      1_000 * 60
+      10_000 * 60 //run every 5 minutes since that is the average block time
     );
   }, [sparkInformation.didConnect]);
 

@@ -111,16 +111,23 @@ export const bulkUpdateSparkTransactions = async (transactions) => {
   try {
     const db = await dbPromise;
     const tx = db.transaction([SPARK_TRANSACTIONS_TABLE_NAME], "readwrite");
+    const store = tx.objectStore(SPARK_TRANSACTIONS_TABLE_NAME);
     for (const t of transactions) {
       const tempSparkId = t.useTempId ? t.tempId : t.id;
+      const finalSparkId = t.id;
       const newDetails = t.details;
-      const existing = await tx.store.get(tempSparkId);
+
+      const existing = await store.get(tempSparkId);
+
       if (existing) {
         let mergedDetails = {};
         try {
           mergedDetails = { ...JSON.parse(existing.details), ...newDetails };
-        } catch {}
-        await tx.store.put({
+        } catch {
+          mergedDetails = JSON.parse(existing.details);
+        }
+
+        await store.put({
           ...existing,
           sparkID: t.id,
           paymentStatus: t.paymentStatus,
@@ -128,8 +135,12 @@ export const bulkUpdateSparkTransactions = async (transactions) => {
           accountId: t.accountId ?? "unknown",
           details: JSON.stringify(mergedDetails),
         });
+        // If the ID changed, delete the old temp entry to avoid duplicates
+        if (finalSparkId !== tempSparkId) {
+          await store.delete(tempSparkId);
+        }
       } else {
-        await tx.store.put({
+        await store.put({
           sparkID: t.id,
           paymentStatus: t.paymentStatus,
           paymentType: t.paymentType ?? "unknown",
@@ -139,6 +150,7 @@ export const bulkUpdateSparkTransactions = async (transactions) => {
       }
     }
     await tx.done;
+
     sparkTransactionsEventEmitter.emit(
       SPARK_TX_UPDATE_ENVENT_NAME,
       "transactions"

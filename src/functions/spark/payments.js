@@ -1,4 +1,5 @@
 import {
+  getSparkAddress,
   getSparkBitcoinPaymentRequest,
   getSparkLightningSendRequest,
   getSparkStaticBitcoinL1Address,
@@ -234,14 +235,14 @@ export const sparkReceivePaymentWrapper = async ({
     } else if (paymentType === "bitcoin") {
       // Handle storage of tx when claiming in spark context
       const depositAddress = await getSparkStaticBitcoinL1Address();
-      console.log(depositAddress);
       return {
         didWork: true,
         invoice: depositAddress,
       };
     } else {
       // No need to save address since it is constant
-      const sparkAddress = await sparkWallet.getSparkAddress();
+      const sparkAddress = await getSparkAddress();
+
       return {
         didWork: true,
         invoice: sparkAddress,

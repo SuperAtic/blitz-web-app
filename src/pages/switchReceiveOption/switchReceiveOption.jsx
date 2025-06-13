@@ -35,12 +35,12 @@ export default function SwitchReceiveOption() {
       <div className="optionsContainer">
         <div onClick={() => setSelectedOption("lightning")} className="option">
           <img src={lightningIcon} alt="" />
-          <p>Lightning | best for small payments</p>
+          <p>Lightning | Best for small payments</p>
         </div>
-        {/* <div onClick={() => setSelectedOption("bitcoin")} className="option">
-            <img src={bitcoinIcon} alt="" />
-            <p>Bitcoin | best for large payments</p>
-          </div> */}
+        <div onClick={() => setSelectedOption("bitcoin")} className="option">
+          <img src={bitcoinIcon} alt="" />
+          <p>Bitcoin | Best for large payments</p>
+        </div>
         <div onClick={() => setSelectedOption("spark")} className="option">
           <img src={sparkIcon} alt="" />
           <p>Spark </p>
