@@ -1,0 +1,41 @@
+#sparkInfoContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+#sparkInfoContainer .contentContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 95%;
+  max-width: 500px;
+  margin: 20px auto 0;
+}
+
+#sparkInfoContainer .contentContainer .techincalContainer {
+  background-color: white;
+  margin: 20px 0;
+  padding: 0 15px;
+  border-radius: 8px;
+}
+#sparkInfoContainer .contentContainer .techincalContainer .technicalRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+#sparkInfoContainer .contentContainer .techincalContainer .techicalLabel {
+  font-weight: 500;
+  margin-right: 5px;
+}
+#sparkInfoContainer .contentContainer .techincalContainer .techicalData {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+#sparkInfoContainer .clipboardIcon {
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+}

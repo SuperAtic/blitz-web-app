@@ -11,12 +11,10 @@ export default function ViewMnemoinc() {
   const [shouldShowMnemoinc, setShouldShowMnemoinc] = useState(false);
   return (
     <div className="viewMnemoincContainer">
-      <BackArrow />
       <div
         style={{ top: shouldShowMnemoinc ? "200%" : 0 }}
         className="mnemoincCover"
       >
-        <BackArrow />
         <div className="coverContent">
           <p className="viewMnemoincText">
             Are you sure you want to show your recover phrase?

@@ -1,0 +1,11 @@
+.settingsContentIndexContianer .navbarText {
+  text-transform: capitalize;
+}
+
+.settingsContentIndexContianer .settingsContentIndex {
+  width: 95%;
+  margin: 0 auto;
+  flex: 1;
+  overflow-y: scroll;
+  display: flex;
+}

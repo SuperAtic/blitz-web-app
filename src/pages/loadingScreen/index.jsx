@@ -28,6 +28,7 @@ import { breezLiquidReceivePaymentWrapper } from "../../functions/breezLiquid";
 import { useNavigate } from "react-router-dom";
 import { JsEventListener } from "../../functions/breezLiquid/JsEventListener.js";
 import { useNodeContext } from "../../contexts/nodeContext.jsx";
+import { Colors } from "../../constants/theme.js";
 
 export default function LoadingScreen() {
   const didInitializeMessageIntervalRef = useRef(false);
@@ -112,7 +113,10 @@ export default function LoadingScreen() {
       <div className="mascotContainer">
         <MascotWalking />
       </div>
-      <ThemeText textContent={hasError ? hasError : loadingMessage} />
+      <ThemeText
+        textStyles={{ color: Colors.light.blue }}
+        textContent={hasError ? hasError : loadingMessage}
+      />
     </div>
   );
   async function initWallet() {
@@ -120,8 +124,8 @@ export default function LoadingScreen() {
 
     try {
       setStartConnectingToSpark(true);
-      // navigate("/wallet", { replace: true });
-      // return;
+      navigate("/wallet", { replace: true });
+      return;
       const listener = new JsEventListener(onLiquidBreezEvent);
       const [didConnectToLiquidNode, txs] = await Promise.all([
         connectToLiquidNode(mnemoinc, listener),

@@ -44,7 +44,7 @@ function Login() {
     async function deleateAllWalletData() {
       try {
         deleteWallet();
-        navigate("/");
+        window.location.reload();
       } catch (err) {
         console.log("Error deleting account", err);
         navigate("/error", {
@@ -96,7 +96,6 @@ function Login() {
           Forgot password?
         </p>
 
-        {/* <div className="buttonsContainer"> */}
         <CustomButton
           actionFunction={handlePassEncription}
           buttonStyles={{
@@ -106,17 +105,6 @@ function Login() {
           textStyles={{ color: Colors.dark.text }}
           textContent={"Unlock wallet"}
         />
-
-        {/* <button
-            onClick={() => {
-              deleteWallet();
-              clearSparkSession();
-              logout();
-            }}
-          >
-            Delete wallet
-          </button> */}
-        {/* </div> */}
       </div>
     </div>
   );
