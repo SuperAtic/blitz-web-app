@@ -20,7 +20,7 @@ export default function ConfirmPayment() {
 
   const paymentType = location.state?.for;
   const formmatingType = location.state?.formattingType;
-  const didSucceed = transaction?.paymentStatus === "completed";
+  const didSucceed = transaction?.paymentStatus !== "failed";
   const paymentFee = transaction?.details.fee;
   const paymentNetwork = transaction?.paymentType;
   const errorMessage = transaction?.details.error || "Unknown Error";

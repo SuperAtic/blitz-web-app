@@ -68,6 +68,7 @@ export const updateSparkTxStatus = async () =>
   {
     // let restoredTxs = [];
     try {
+      console.log("Updating Spark transaction status...");
       // let start = 0;
 
       // Determine cutoff time
@@ -132,10 +133,18 @@ export const updateSparkTxStatus = async () =>
           };
           updatedTxs.push(tx);
         } else {
+          console.log(
+            "Updating bitcoin transaction status for:",
+            txStateUpdate.sparkID
+          );
           const details = JSON.parse(txStateUpdate.details);
           if (details.direction !== "OUTGOING") continue;
           const sparkResponse = await getSparkBitcoinPaymentRequest(
             txStateUpdate.sparkID
+          );
+          console.log(
+            `Spark response for ${txStateUpdate.sparkID}:`,
+            sparkResponse
           );
           if (!sparkResponse?.transfer) continue;
 
@@ -155,6 +164,7 @@ export const updateSparkTxStatus = async () =>
           updatedTxs.push(tx);
         }
       }
+      console.log(updatedTxs, "updated txs");
 
       // while (true) {
       //   const txs = await getSparkTransactions(start + BATCH_SIZE, start);

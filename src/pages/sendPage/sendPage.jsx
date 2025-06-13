@@ -335,7 +335,8 @@ export default function SendPage() {
     return <ErrorWithPayment reason={errorMessage} />;
   }
 
-  const totalFee = (paymentInfo.fee || 0) + (paymentInfo.supportFee || 0);
+  const totalFee =
+    (paymentInfo.paymentFee || 0) + (paymentInfo.supportFee || 0);
 
   return (
     <div className="sendContainer">

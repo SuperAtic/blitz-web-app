@@ -528,6 +528,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
     const startInterval = () => {
       if (intervalId) return;
       console.log("Starting spark update interval");
+      updateSparkTxStatus(50, isFirstSparkUpdateStateInterval.current);
       intervalId = setInterval(async () => {
         try {
           console.log(

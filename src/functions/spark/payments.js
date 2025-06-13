@@ -135,8 +135,7 @@ export const sparkPaymenWrapper = async ({
         const sparkResponse = await getSparkBitcoinPaymentRequest(
           onChainPayResponse.id
         );
-
-        if (sparkResponse?.transfer) {
+        if (sparkResponse?.coopExitTxid) {
           sparkQueryResponse = sparkResponse;
         } else {
           console.log("Waiting for response...");
@@ -150,20 +149,20 @@ export const sparkPaymenWrapper = async ({
         "on-chain query response after confirmation"
       );
       const tx = {
-        id: sparkQueryResponse
-          ? sparkQueryResponse.transfer.sparkId
-          : onChainPayResponse.id,
+        id: onChainPayResponse.id,
         paymentStatus: "pending",
         paymentType: "bitcoin",
         accountId: sparkInformation.identityPubKey,
         details: {
           fee: fee,
-          amount: amountSats,
+          amount: Math.round(amountSats - fee),
           address: address,
           time: new Date(onChainPayResponse.updatedAt).getTime(),
           direction: "OUTGOING",
           description: memo || "",
-          onchainTxid: onChainPayResponse.coopExitTxid,
+          onchainTxid: sparkQueryResponse
+            ? sparkQueryResponse.coopExitTxid
+            : onChainPayResponse.coopExitTxid,
         },
       };
       response = tx;
