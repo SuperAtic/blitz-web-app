@@ -177,8 +177,8 @@ async function processInputType(input, context) {
   setLoadingMessage("Getting invoice details");
 
   switch (input.type.toLowerCase()) {
-    // case LIQUID_TYPES.BitcoinAddress.toLowerCase():
-    //   return await processBitcoinAddress(input, context);
+    case LIQUID_TYPES.BitcoinAddress.toLowerCase():
+      return await processBitcoinAddress(input, context);
 
     case LIQUID_TYPES.Bolt11.toLowerCase(): //works
       return processBolt11Invoice(input, context);
