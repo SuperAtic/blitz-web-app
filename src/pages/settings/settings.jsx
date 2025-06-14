@@ -34,13 +34,13 @@ const GENERALOPTIONS = [
     iconWhite: aboutIconWhite,
     arrowIcon: leftCheveronArrow,
   },
-  // {
-  //   for: "general",
-  //   name: "Display Currency",
-  //   icon: currencyIcon,
-  //   iconWhite: currencyIconWhite,
-  //   arrowIcon: leftCheveronArrow,
-  // },
+  {
+    for: "general",
+    name: "Display Currency",
+    icon: currencyIcon,
+    iconWhite: currencyIconWhite,
+    arrowIcon: leftCheveronArrow,
+  },
   // {
   //   for: "general",
   //   name: "Display Options",

@@ -1,0 +1,42 @@
+#displayCurrencyContainer {
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+#displayCurrencyContainer .displayCurrencyInputContainer {
+  width: 95%;
+  position: fixed;
+  z-index: 99;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: unset;
+  align-items: center;
+  justify-content: center;
+  padding-top: 20px;
+}
+#displayCurrencyContainer .displayCurrencyInput {
+  width: 100%;
+  max-width: 600px;
+}
+#displayCurrencyContainer .fiatCurrencyElementContainer {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top: 90px;
+}
+#displayCurrencyContainer .fiatCurrencyElement {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin: 10px 0;
+}
+#displayCurrencyContainer .nameContainer {
+  margin-left: 10px;
+}
+#displayCurrencyContainer .nameContainer p {
+  margin: 0;
+}
+#displayCurrencyContainer .nameContainer p:last-child {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
