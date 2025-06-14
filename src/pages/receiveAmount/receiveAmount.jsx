@@ -30,12 +30,13 @@ const EditReceivePaymentInformation = () => {
   );
   console.log(amountValue, "amount value");
 
-  const localSatAmount =
+  const localSatAmount = Math.round(
     Number(
       inputDenomination === "sats"
         ? Number(amountValue)
         : Math.round(SATSPERBITCOIN / (fiatStats?.value || 65000)) * amountValue
-    ) || 0;
+    ) || 0
+  );
 
   console.log(fromPage, "testing");
   const handleSubmit = () => {
