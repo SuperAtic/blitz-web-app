@@ -1078,7 +1078,9 @@ export default function DisplayCurrency() {
   const { masterInfoObject, toggleMasterInfoObject } =
     useGlobalContextProvider();
   const selectedFiatCurrency = masterInfoObject.fiatCurrency;
-  const fiatData = masterInfoObject?.fiatCurrenciesList || TEST_FIAT_DATA;
+  const fiatData = !masterInfoObject?.fiatCurrenciesList.length
+    ? masterInfoObject?.fiatCurrenciesList
+    : TEST_FIAT_DATA;
 
   useEffect(() => {
     const initSdk = async () => {
