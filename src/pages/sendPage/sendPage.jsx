@@ -22,9 +22,9 @@ import CustomNumberKeyboard from "../../components/customNumberKeyboard/customNu
 import NumberInputSendPage from "./components/numberInput";
 import CustomButton from "../../components/customButton/customButton";
 import { getBoltzApiUrl } from "../../functions/boltz/boltzEndpoitns";
-import formatBalanceAmount from "../../functions/formatNumber";
-import numberConverter from "../../functions/numberConverter";
+
 import displayCorrectDenomination from "../../functions/displayCorrectDenomination";
+import FormattedSatText from "../../components/formattedSatText/formattedSatText";
 
 export default function SendPage() {
   const location = useLocation();
@@ -61,7 +61,9 @@ export default function SendPage() {
   const canEditPaymentAmount = paymentInfo?.canEditPayment;
   const convertedSendAmount = isBTCdenominated
     ? Math.round(Number(sendingAmount))
-    : Math.round((SATSPERBITCOIN / fiatStats?.value) * Number(sendingAmount));
+    : Math.round(
+        (SATSPERBITCOIN / (fiatStats?.value || 65000)) * Number(sendingAmount)
+      ) || 0;
 
   const isLightningPayment = paymentInfo?.paymentNetwork === "lightning";
   const isLiquidPayment = paymentInfo?.paymentNetwork === "liquid";
@@ -71,15 +73,13 @@ export default function SendPage() {
   const paymentFee =
     (paymentInfo?.paymentFee || 0) + (paymentInfo?.supportFee || 0);
   const canSendPayment =
-    Number(userBalance) >= Number(sendingAmount) + paymentFee &&
-    sendingAmount != 0; //ecash is built into ln
+    Number(userBalance) >= Number(convertedSendAmount) + paymentFee &&
+    convertedSendAmount != 0; //ecash is built into ln
   console.log(
     canSendPayment,
     "can send payment",
     userBalance,
-    sendingAmount,
     paymentFee,
-    sendingAmount,
     paymentInfo
   ); //ecash is built into ln);
   const isUsingSwapWithZeroInvoice =
@@ -342,11 +342,43 @@ export default function SendPage() {
     <div className="sendContainer">
       <NabBar sparkInformation={sparkInformation} />
       <div className="paymentInfoContainer">
-        <h1 className="paymentAmount">{convertedSendAmount || 0} sats</h1>
+        <div className="balanceContainer">
+          <div className="scroll-content">
+            <FormattedSatText
+              containerStyles={{
+                opacity: !convertedSendAmount ? 0.5 : 1,
+              }}
+              styles={{
+                fontSize: "2.75rem",
+                margin: 0,
+              }}
+              neverHideBalance={true}
+              balance={convertedSendAmount || 0}
+            />
+          </div>
+          <FormattedSatText
+            containerStyles={{
+              opacity: !convertedSendAmount ? 0.5 : 1,
+            }}
+            styles={{ fontSize: "1.2rem", margin: 0 }}
+            globalBalanceDenomination={
+              masterInfoObject.userBalanceDenomination === "sats"
+                ? "fiat"
+                : "sats"
+            }
+            neverHideBalance={true}
+            balance={convertedSendAmount}
+          />
+        </div>
+
         {!canEditPaymentAmount && (
           <>
             <p className="paymentFeeDesc">Fee & speed</p>
-            <p className="paymentFeeVal">{totalFee} sats and Instant</p>
+            <FormattedSatText
+              styles={{ marginTop: 0 }}
+              balance={totalFee}
+              backText={"and Instant"}
+            />
           </>
         )}
 
@@ -398,13 +430,12 @@ export default function SendPage() {
 }
 
 function NabBar({ sparkInformation }) {
-  const navigate = useNavigate();
   return (
     <div className="navBar">
-      <img onClick={() => navigate(-1)} src={arrowIcon} alt="" />
+      <BackArrow />
       <div className="label">
-        <img src={walletIcon} alt="" />
-        <p>{Number(sparkInformation.balance)} stats</p>
+        <img src={walletIcon} alt="wallet icon to show user balance" />
+        <FormattedSatText balance={sparkInformation.balance} />
       </div>
     </div>
   );

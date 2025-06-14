@@ -13,6 +13,7 @@ function getKeyboardKeys(showDot) {
 export default function CustomNumberKeyboard({
   setAmountValue,
   containerClassName,
+  keyboardContianerClassName,
   keyClassName,
   frompage,
   showDot,
@@ -74,7 +75,7 @@ export default function CustomNumberKeyboard({
   );
 
   return (
-    <div className="keyboard-container">
+    <div className={`keyboard-container ${keyboardContianerClassName}`}>
       <div className={`number-keyboard ${containerClassName}`}>
         {getKeyboardKeys(showDot).map((num) => (
           <button

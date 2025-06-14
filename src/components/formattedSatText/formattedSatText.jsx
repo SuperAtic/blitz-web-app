@@ -79,7 +79,10 @@ export default function FormattedSatText({
           textStyles={{ ...styles }}
         />
         {backText && (
-          <ThemeText textStyles={{ ...styles }} textContent={`${backText}`} />
+          <ThemeText
+            textStyles={{ ...styles, marginLeft: "5px" }}
+            textContent={`${backText}`}
+          />
         )}
       </div>
     );
@@ -115,7 +118,10 @@ export default function FormattedSatText({
           />
         )}
         {backText && (
-          <ThemeText textStyles={{ ...styles }} textContent={`${backText}`} />
+          <ThemeText
+            textStyles={{ ...styles, marginLeft: "5px" }}
+            textContent={`${backText}`}
+          />
         )}
       </div>
     );
@@ -150,7 +156,10 @@ export default function FormattedSatText({
         />
       )}
       {backText && (
-        <ThemeText textStyles={{ ...styles }} textContent={`${backText}`} />
+        <ThemeText
+          textStyles={{ ...styles, marginLeft: "5px" }}
+          textContent={`${backText}`}
+        />
       )}
     </div>
   );

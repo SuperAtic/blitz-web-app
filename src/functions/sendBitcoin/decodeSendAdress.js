@@ -201,9 +201,6 @@ async function processInputType(input, context) {
     case "spark":
       return await processSparkAddress(input, context);
     default:
-      goBackFunction(
-        `Blitz wallet currently does not support sending to addresses of type: ${input.type.toLowerCase()}`
-      );
-      return null;
+      throw new Error(`Unsupported address type: ${input.type.toLowerCase()}`);
   }
 }

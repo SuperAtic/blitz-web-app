@@ -14,7 +14,7 @@
   width: max-content;
   cursor: pointer;
 }
-.userBalanceContainer p {
+.userBalanceContainer p:first-child {
   text-transform: uppercase;
 }
 .userBalanceContainer h1 {

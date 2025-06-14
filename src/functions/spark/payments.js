@@ -127,6 +127,7 @@ export const sparkPaymenWrapper = async ({
       });
       if (!onChainPayResponse)
         throw new Error("Error when sending bitcoin payment");
+      handleSupportPayment(masterInfoObject, supportFee);
 
       console.log(onChainPayResponse, "on-chain pay response");
       let sparkQueryResponse = null;
