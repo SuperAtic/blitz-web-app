@@ -160,7 +160,7 @@ export const sparkPaymenWrapper = async ({
           time: new Date(onChainPayResponse.updatedAt).getTime(),
           direction: "OUTGOING",
           description: memo || "",
-          onchainTxid: sparkQueryResponse
+          onChainTxid: sparkQueryResponse
             ? sparkQueryResponse.coopExitTxid
             : onChainPayResponse.coopExitTxid,
         },
