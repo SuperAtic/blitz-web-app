@@ -1,11 +1,18 @@
 .userBalanceContainer {
   text-align: center;
   margin-top: 40px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 .userBalanceContainer p,
 .userBalanceContainer h1 {
   margin: 0;
   font-size: 15px;
+}
+.userBalanceContainer .balanceContianer {
+  width: max-content;
+  cursor: pointer;
 }
 .userBalanceContainer p {
   text-transform: uppercase;
