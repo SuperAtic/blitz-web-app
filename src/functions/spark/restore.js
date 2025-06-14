@@ -149,16 +149,15 @@ export const updateSparkTxStatus = async () =>
           if (!sparkResponse?.transfer) continue;
 
           const tx = {
-            useTempId: txStateUpdate.sparkID,
-            id: sparkResponse
-              ? sparkResponse.transfer.sparkId
-              : txStateUpdate.sparkID,
+            useTempId: true,
+            tempId: txStateUpdate.sparkID,
+            id: sparkResponse.transfer.sparkId,
             paymentStatus: "completed",
             paymentType: "bitcoin",
-            accountId: sparkInformation.identityPubKey,
+            accountId: txStateUpdate.accountId,
             details: {
               ...details,
-              onchainTxid: sparkResponse.coopExitTxid,
+              onChainTxid: sparkResponse.coopExitTxid,
             },
           };
           updatedTxs.push(tx);

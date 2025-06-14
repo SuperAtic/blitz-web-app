@@ -5,12 +5,16 @@ export default function CustomInput({
   value,
   textInputClassName,
   containerClassName,
+  containerStyles,
   onFocus,
   onBlur,
 }) {
   console.log(containerClassName);
   return (
-    <div className={`custom-description-input-container ${containerClassName}`}>
+    <div
+      style={{ ...containerStyles }}
+      className={`custom-description-input-container ${containerClassName}`}
+    >
       <input
         type="text"
         value={value}

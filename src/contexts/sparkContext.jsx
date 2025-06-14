@@ -325,10 +325,10 @@ const SparkWalletProvider = ({ children, navigate }) => {
 
     // addListeners();
     // // Clean up on unmount
-    // return () => {
-    //   removeListeners();
-    //   document.removeEventListener("visibilitychange", handleVisibilityChange);
-    // };
+    return () => {
+      removeListeners();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [sparkInformation.didConnect]);
 
   // useEffect(() => {

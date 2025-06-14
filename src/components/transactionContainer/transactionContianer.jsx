@@ -10,9 +10,13 @@ import {
   useSparkPaymentType,
 } from "../../functions/spark";
 import SkeletonLoadingTx from "./skeletonLoadingTx";
+import FormattedSatText from "../formattedSatText/formattedSatText";
+import { useGlobalContextProvider } from "../../contexts/masterInfoObject";
+import { HIDDEN_BALANCE_TEXT } from "../../constants";
 
 export default function TransactionContanier({ frompage }) {
   const { sparkInformation } = useSpark();
+  const { masterInfoObject } = useGlobalContextProvider();
   const includedDonations = useRef(null);
   const currentTime = new Date();
   const navigate = useNavigate();
@@ -90,6 +94,7 @@ export default function TransactionContanier({ frompage }) {
         index={index}
         currentTime={currentTime}
         currnetTxTime={currnetTxTime}
+        masterInfoObject={masterInfoObject}
       />
     );
   });
@@ -126,6 +131,7 @@ function TxItem({
   currnetTxTime,
   navigate,
   details,
+  masterInfoObject,
 }) {
   const timeDifference = currentTime - details.time;
   const minutes = timeDifference / (1000 * 60);
@@ -163,7 +169,9 @@ function TxItem({
       />
       <div className="textContainer">
         <p>
-          {description
+          {masterInfoObject.userBalanceDenomination === "hidden"
+            ? HIDDEN_BALANCE_TEXT
+            : description
             ? description
             : details.direction === "INCOMING"
             ? "Received"
@@ -195,10 +203,16 @@ function TxItem({
           } ${minutes < 1 ? "" : "ago"}`}
         </p>
       </div>
-      <p className="amountText">
-        {details.direction === TransferDirection.OUTGOING ? "-" : "+"}
-        {details.amount + (details.fee || 0)} sats
-      </p>
+      <FormattedSatText
+        frontText={
+          masterInfoObject.userBalanceDenomination !== "hidden"
+            ? details.direction === TransferDirection.OUTGOING
+              ? "-"
+              : "+"
+            : ""
+        }
+        balance={details.amount}
+      />
     </div>
   );
 }

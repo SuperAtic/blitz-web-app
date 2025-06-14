@@ -127,6 +127,7 @@ export const sparkPaymenWrapper = async ({
       });
       if (!onChainPayResponse)
         throw new Error("Error when sending bitcoin payment");
+      handleSupportPayment(masterInfoObject, supportFee);
 
       console.log(onChainPayResponse, "on-chain pay response");
       let sparkQueryResponse = null;
@@ -160,7 +161,7 @@ export const sparkPaymenWrapper = async ({
           time: new Date(onChainPayResponse.updatedAt).getTime(),
           direction: "OUTGOING",
           description: memo || "",
-          onchainTxid: sparkQueryResponse
+          onChainTxid: sparkQueryResponse
             ? sparkQueryResponse.coopExitTxid
             : onChainPayResponse.coopExitTxid,
         },

@@ -5,6 +5,7 @@ import AboutPage from "../pages/about/about";
 import "./settingsItem.css";
 import ViewMnemoinc from "../../viewkey/viewKey";
 import SparkInformation from "../pages/sparkInfo/sparkInfo";
+import DisplayCurrency from "../pages/currency/displayCurrency";
 
 export default function SettingsContentIndex() {
   const location = useLocation();
@@ -13,13 +14,11 @@ export default function SettingsContentIndex() {
   const navigate = useNavigate();
 
   if (
-    selectedPage === "display currency" ||
     selectedPage === "point-of-sale" ||
     selectedPage === "edit contact profile"
   ) {
     return (
       <>
-        {selectedPage === "display currency" && <FiatCurrencyPage />}
         {selectedPage === "point-of-sale" && <PosSettingsPage />}
         {selectedPage === "edit contact profile" && (
           <EditMyProfilePage fromSettings={true} pageType="myProfile" />
@@ -32,6 +31,7 @@ export default function SettingsContentIndex() {
       <PageNavBar textClassName={"navbarText"} text={`${selectedPage}`} />
       <div className="settingsContentIndex">
         {selectedPage === "about" && <AboutPage />}
+        {selectedPage === "display currency" && <DisplayCurrency />}
         {selectedPage === "node info" && <NodeInfo />}
         {selectedPage === "display options" && <DisplayOptions />}
 

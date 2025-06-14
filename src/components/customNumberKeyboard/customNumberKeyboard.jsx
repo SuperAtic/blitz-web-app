@@ -3,9 +3,17 @@ import { useCallback } from "react";
 import deleteIcon from "../../assets/leftCheveronDark.png";
 import "./style.css";
 import numberConverter from "../../functions/numberConverter";
+
+function getKeyboardKeys(showDot) {
+  return KEYBOARD_KEYS.map((key) => {
+    if (key === "C" && showDot) return ".";
+    return key;
+  });
+}
 export default function CustomNumberKeyboard({
   setAmountValue,
   containerClassName,
+  keyboardContianerClassName,
   keyClassName,
   frompage,
   showDot,
@@ -67,16 +75,18 @@ export default function CustomNumberKeyboard({
   );
 
   return (
-    <div className={`number-keyboard ${containerClassName}`}>
-      {KEYBOARD_KEYS.map((num) => (
-        <button
-          key={num}
-          className={`keyboard-key ${keyClassName}`}
-          onClick={() => addPin(num)}
-        >
-          {num === "back" ? <img src={deleteIcon} /> : num}
-        </button>
-      ))}
+    <div className={`keyboard-container ${keyboardContianerClassName}`}>
+      <div className={`number-keyboard ${containerClassName}`}>
+        {getKeyboardKeys(showDot).map((num) => (
+          <button
+            key={num}
+            className={`keyboard-key ${keyClassName}`}
+            onClick={() => addPin(num)}
+          >
+            {num === "back" ? <img src={deleteIcon} /> : num}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

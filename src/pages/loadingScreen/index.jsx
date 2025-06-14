@@ -124,8 +124,8 @@ export default function LoadingScreen() {
 
     try {
       setStartConnectingToSpark(true);
-      navigate("/wallet", { replace: true });
-      return;
+      // navigate("/wallet", { replace: true });
+      // return;
       const listener = new JsEventListener(onLiquidBreezEvent);
       const [didConnectToLiquidNode, txs] = await Promise.all([
         connectToLiquidNode(mnemoinc, listener),

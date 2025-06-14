@@ -9,6 +9,7 @@ import {
   updateConfirmAnimation,
 } from "../../functions/lottieViewColorTransformer";
 import "./confirmPayment.css";
+import FormattedSatText from "../../components/formattedSatText/formattedSatText";
 
 export default function ConfirmPayment() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function ConfirmPayment() {
   const amount = transaction?.details.amount;
   const showPendingMessage = transaction?.paymentStatus === "pending";
 
-  console.log(transaction, "etstasdas");
+  console.log(paymentFee, "etstasdas");
 
   const confirmAnimation = useMemo(() => {
     return updateConfirmAnimation(confirmTxAnimation, "light");
@@ -65,7 +66,13 @@ export default function ConfirmPayment() {
             : "Received successfully"}
         </h1>
 
-        {didSucceed && <h2 className="amountText">{amount} sats</h2>}
+        {didSucceed && (
+          <FormattedSatText
+            containerStyles={{ marginBottom: "20px" }}
+            styles={{ fontSize: "2.5rem", margin: 0 }}
+            balance={amount}
+          />
+        )}
 
         <p className="errorText">
           {didSucceed
@@ -85,7 +92,7 @@ export default function ConfirmPayment() {
               }}
             >
               <p>Fee</p>
-              <p>{paymentFee} sats</p>
+              <FormattedSatText balance={paymentFee} />
             </div>
             <div
               style={{

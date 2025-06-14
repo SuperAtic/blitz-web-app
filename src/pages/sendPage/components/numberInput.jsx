@@ -25,5 +25,12 @@ export default function NumberInputSendPage({
     }
   }, [paymentInfo?.sendAmount]);
 
-  return <CustomNumberKeyboard setAmountValue={setAmount} amount={amount} />;
+  return (
+    <CustomNumberKeyboard
+      showDot={masterInfoObject.userBalanceDenomination === "fiat"}
+      keyboardContianerClassName={"custon-keyboard-styles"}
+      setAmountValue={setAmount}
+      amount={amount}
+    />
+  );
 }
