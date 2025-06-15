@@ -4,7 +4,7 @@ import { useGlobalContacts } from "../../contexts/globalContacts";
 import { useImageCache } from "../../contexts/imageCacheContext";
 import { useGlobalContextProvider } from "../../contexts/masterInfoObject";
 import { useAppStatus } from "../../contexts/appStatus";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ContactElement } from "./components/contactElement/contactElement";
 import CustomInput from "../../components/customInput/customInput";
 import ThemeText from "../../components/themeText/themeText";
@@ -22,6 +22,7 @@ export default function Contacts() {
   const myProfile = globalContactsInformation?.myProfile;
   const didEditProfile = globalContactsInformation?.myProfile?.didEditProfile;
   const navigate = useNavigate();
+  const location = useLocation();
   const [inputText, setInputText] = useState("");
 
   const pinnedContacts = useMemo(() => {
@@ -182,25 +183,27 @@ export default function Contacts() {
               width: "auto",
             }}
             actionFunction={() => {
-              // if (!isConnectedToTheInternet) {
-              //   navigate.navigate("ErrorScreen", {
-              //     errorMessage:
-              //       "Please connect to the internet to use this feature",
-              //   });
-              //   return;
-              // }
-              // if (didEditProfile) {
-              //   //navigate to add contacts popup
-              //   navigation.navigate("CustomHalfModal", {
-              //     wantedContent: "addContacts",
-              //     sliderHight: 0.4,
-              //   });
-              // } else {
-              //   navigation.navigate("EditMyProfilePage", {
-              //     pageType: "myProfile",
-              //     fromSettings: false,
-              //   });
-              // }
+              if (!isConnectedToTheInternet) {
+                navigate("/error", {
+                  state: {
+                    errorMessage:
+                      "Please connect to the internet to use this feature",
+                    background: location,
+                  },
+                });
+                return;
+              }
+              if (didEditProfile) {
+                //navigate to add contacts popup
+                navigate("CustomHalfModal", {
+                  wantedContent: "addContacts",
+                  sliderHight: 0.4,
+                });
+              } else {
+                navigate("/edit-profile", {
+                  state: { pageType: "myProfile", fromSettings: false },
+                });
+              }
             }}
             textContent={`${didEditProfile ? "Add contact" : "Edit profile"}`}
           />

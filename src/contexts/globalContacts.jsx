@@ -116,7 +116,7 @@ export const GlobalContactsList = ({ children }) => {
       toggleGlobalContactsInformation(
         {
           myProfile: { ...globalContactsInformation.myProfile },
-          addedContacts: encriptMessage(
+          addedContacts: encryptMessage(
             contactsPrivateKey,
             globalContactsInformation.myProfile.uuid,
             JSON.stringify(decodedAddedContacts.concat(newContats))
@@ -290,7 +290,7 @@ export const GlobalContactsList = ({ children }) => {
   //           ...globalContactsInformation.myProfile,
   //           lastRotatedAddedContact: getCurrentDateFormatted(),
   //         },
-  //         addedContacts: encriptMessage(
+  //         addedContacts: encryptMessage(
   //           contactsPrivateKey,
   //           publicKey,
   //           JSON.stringify(updatedContactsAddress),

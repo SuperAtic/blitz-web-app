@@ -1,29 +1,40 @@
 import "./style.css";
+
 export default function CustomInput({
   onchange,
   placeholder,
   value,
-  textInputClassName,
-  containerClassName,
-  containerStyles,
+  textInputClassName = "",
+  customInputStyles = {},
+  containerClassName = "",
+  containerStyles = {},
   onFocus,
   onBlur,
+  multiline = false, // <-- NEW prop
 }) {
-  console.log(containerClassName);
+  const commonProps = {
+    value,
+    onChange: (e) => onchange(e.target.value),
+    placeholder,
+    className: `description-input ${textInputClassName}`,
+    onFocus: () => onFocus?.(true),
+    onBlur: () => onBlur?.(false),
+    style: {
+      ...customInputStyles,
+      resize: "none", // <-- Prevents resize
+    },
+  };
+
   return (
     <div
       style={{ ...containerStyles }}
       className={`custom-description-input-container ${containerClassName}`}
     >
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onchange(e.target.value)}
-        placeholder={placeholder}
-        className={`description-input ${textInputClassName}`}
-        onFocus={() => onFocus && onFocus(true)}
-        onBlur={() => onblur && onBlur(false)}
-      />
+      {multiline ? (
+        <textarea {...commonProps} />
+      ) : (
+        <input type="text" {...commonProps} />
+      )}
     </div>
   );
 }

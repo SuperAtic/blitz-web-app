@@ -68,6 +68,7 @@ import TabsIcon from "./components/tabsIcon/tabsIcon.jsx";
 import SettingsContentIndex from "./pages/settings/settingsItem/settingsItem.jsx";
 import HandleLNURLPayments from "./contexts/lnurlContext.jsx";
 import { ImageCacheProvider } from "./contexts/imageCacheContext.jsx";
+import EditMyProfilePage from "./pages/contacts/screens/editMyProfilePage/editMyProfilePage.jsx";
 // const ConfirmPayment = lazy(() =>
 //   import("./pages/confirmPayment/confirmPaymentScreen.jsx")
 // );
@@ -181,6 +182,14 @@ function Root() {
                                         element={
                                           <SafeAreaComponent>
                                             <Contacts />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/edit-profile"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <EditMyProfilePage />
                                           </SafeAreaComponent>
                                         }
                                       />

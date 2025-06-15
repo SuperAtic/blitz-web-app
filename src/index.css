@@ -29,6 +29,10 @@ input:focus {
   outline: none;
   box-shadow: none;
 }
+textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
 a {
   font-weight: 500;
   text-decoration: inherit;
