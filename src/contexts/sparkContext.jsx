@@ -212,7 +212,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
     const selectedStoredPayment = storedTransaction.txs.find(
       (tx) => tx.sparkID === transferId
     );
-    console.log(selectedStoredPayment, "testing");
+    console.log(selectedStoredPayment, "seleceted stored transaction");
     // console.log(isLNURLPayment, 'isLNURL PAYMNET');
     // if (!!isLNURLPayment) {
     //   const dbLNURL = isLNURLPayment.db;
