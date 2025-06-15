@@ -2,26 +2,26 @@ import {
   getSparkLightningPaymentStatus,
   getSparkPaymentStatus,
   useSparkPaymentType,
-} from '.';
+} from ".";
 import {
   deleteUnpaidSparkLightningTransaction,
   getAllUnpaidSparkLightningInvoices,
-} from './transactions';
+} from "./transactions";
 
 export async function transformTxToPaymentObject(
   tx,
   sparkAddress,
   forcePaymentType,
-  isRestore,
+  isRestore
 ) {
   const paymentType = forcePaymentType
     ? forcePaymentType
     : useSparkPaymentType(tx);
 
-  if (paymentType === 'lightning') {
+  if (paymentType === "lightning") {
     const unpaidInvoices = await getAllUnpaidSparkLightningInvoices();
     const possibleMatches = unpaidInvoices.filter(
-      inv => inv.amount === tx.totalValue,
+      (inv) => inv.amount === tx.totalValue
     );
 
     for (const invoice of possibleMatches) {
@@ -38,7 +38,7 @@ export async function transformTxToPaymentObject(
           break;
         }
 
-        await new Promise(res => setTimeout(res, 1000));
+        await new Promise((res) => setTimeout(res, 1000));
         attempts++;
       }
 
@@ -47,19 +47,19 @@ export async function transformTxToPaymentObject(
 
         return {
           id: tx.id,
-          paymentStatus: getSparkPaymentStatus(tx.status),
-          paymentType: 'lightning',
+          paymentStatus: "completed",
+          paymentType: "lightning",
           accountId: tx.receiverIdentityPublicKey,
           details: {
             fee: 0,
             amount: tx.totalValue,
-            address: paymentDetails?.invoice?.encodedInvoice || '',
+            address: paymentDetails?.invoice?.encodedInvoice || "",
             time: tx.updatedTime
               ? new Date(tx.updatedTime).getTime()
               : new Date().getTime(),
             direction: tx.transferDirection,
-            description: invoice?.description || '',
-            preimage: paymentDetails?.paymentPreimage || '',
+            description: invoice?.description || "",
+            preimage: paymentDetails?.paymentPreimage || "",
             isRestore,
           },
         };
@@ -67,29 +67,29 @@ export async function transformTxToPaymentObject(
     }
     return {
       id: tx.id,
-      paymentStatus: getSparkPaymentStatus(tx.status),
-      paymentType: 'lightning',
+      paymentStatus: "completed",
+      paymentType: "lightning",
       accountId: tx.receiverIdentityPublicKey,
       details: {
         fee: 0,
         amount: tx.totalValue,
-        address: '',
+        address: "",
         time: tx.updatedTime
           ? new Date(tx.updatedTime).getTime()
           : new Date().getTime(),
         direction: tx.transferDirection,
-        description: '',
-        preimage: '',
+        description: "",
+        preimage: "",
         isRestore,
       },
     };
   }
 
-  if (paymentType === 'spark') {
+  if (paymentType === "spark") {
     return {
       id: tx.id,
-      paymentStatus: getSparkPaymentStatus(tx.status),
-      paymentType: 'spark',
+      paymentStatus: "completed",
+      paymentType: "spark",
       accountId: tx.receiverIdentityPublicKey,
       details: {
         fee: 0,
@@ -100,17 +100,17 @@ export async function transformTxToPaymentObject(
           : new Date().getTime(),
         direction: tx.transferDirection,
         senderIdentityPublicKey: tx.senderIdentityPublicKey,
-        description: '',
+        description: "",
         isRestore,
       },
     };
   }
 
-  if (paymentType === 'bitcoin') {
+  if (paymentType === "bitcoin") {
     return {
       id: tx.id,
       paymentStatus: getSparkPaymentStatus(tx.status),
-      paymentType: 'bitcoin',
+      paymentType: "bitcoin",
       accountId: tx.ownerIdentityPublicKey,
       details: {
         fee: 0,
@@ -120,7 +120,7 @@ export async function transformTxToPaymentObject(
           ? new Date(tx.updatedTime).getTime()
           : new Date().getTime(),
         direction: tx.transferDirection,
-        description: '',
+        description: "",
         onChainTxid: tx.txid,
         refundTx: tx.refundTx,
         isRestore,
