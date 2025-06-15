@@ -147,7 +147,7 @@ function TxItem({
         alt=""
       />
       <div className="textContainer">
-        <p>
+        <p className="descriptionText">
           {masterInfoObject.userBalanceDenomination === "hidden"
             ? HIDDEN_BALANCE_TEXT
             : description

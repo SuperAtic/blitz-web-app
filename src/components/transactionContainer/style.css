@@ -2,6 +2,8 @@
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .transactionContainer .dateBannerText {
@@ -22,6 +24,7 @@
   align-items: center;
   border-radius: 8px;
   cursor: pointer;
+  display: flex;
 }
 .transactionContainer .transaction img {
   width: 30px;
@@ -32,11 +35,30 @@
   margin: 0;
 }
 .transactionContainer .transaction .textContainer {
-  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.transactionContainer .descriptionText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+  flex-shrink: 1;
 }
 .transactionContainer .transaction .dateText {
   font-weight: 300;
   font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+  flex-shrink: 1;
 }
 .transactionContainer .transaction .amountText {
   align-self: flex-start;
