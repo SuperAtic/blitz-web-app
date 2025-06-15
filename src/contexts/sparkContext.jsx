@@ -212,7 +212,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
     const selectedStoredPayment = storedTransaction.txs.find(
       (tx) => tx.sparkID === transferId
     );
-    console.log(selectedStoredPayment, "testing");
+    console.log(selectedStoredPayment, "seleceted stored transaction");
     // console.log(isLNURLPayment, 'isLNURL PAYMNET');
     // if (!!isLNURLPayment) {
     //   const dbLNURL = isLNURLPayment.db;
@@ -420,6 +420,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
           console.log("Deposit address txids:", txids);
           if (!txids || !txids.length) continue;
           const unpaidTxids = txids.filter((txid) => !txid.didClaim);
+          let claimedTxs = Storage.getItem("claimedBitcoinTxs") || [];
 
           for (const txid of unpaidTxids) {
             // get quote for the txid
@@ -436,6 +437,10 @@ const SparkWalletProvider = ({ children, navigate }) => {
               continue;
             }
 
+            if (claimedTxs?.includes(quote.signature)) {
+              handleTxIdState(txid, true, address);
+              continue;
+            }
             const hasAlreadySaved = savedTxMap.has(quote.transactionId);
             console.log("Has already saved transaction:", hasAlreadySaved);
             if (!hasAlreadySaved) {
@@ -465,6 +470,11 @@ const SparkWalletProvider = ({ children, navigate }) => {
             });
             if (!claimTx) continue;
             console.log("Claimed deposit address transaction:", claimTx);
+
+            if (!claimedTxs?.includes(quote.signature)) {
+              claimedTxs.push(quote.signature);
+              Storage.setItem("claimedBitcoinTxs", claimedTxs);
+            }
 
             await new Promise((res) => setTimeout(res, 2000));
             // query latest 10 transacctions for sparkID of the claim tx response
