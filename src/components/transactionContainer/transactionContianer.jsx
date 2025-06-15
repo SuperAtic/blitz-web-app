@@ -1,14 +1,9 @@
-import { useRef, useState } from "react";
 import { useSpark } from "../../contexts/sparkContext";
 import { TransferDirection } from "@buildonspark/spark-sdk/types";
 import "./style.css";
 import arrow from "../../assets/arrow-left-blue.png";
 import pendingTx from "../../assets/pendingTx.png";
 import { useNavigate } from "react-router-dom";
-import {
-  useIsSparkPaymentPending,
-  useSparkPaymentType,
-} from "../../functions/spark";
 import SkeletonLoadingTx from "./skeletonLoadingTx";
 import FormattedSatText from "../formattedSatText/formattedSatText";
 import { useGlobalContextProvider } from "../../contexts/masterInfoObject";
@@ -17,7 +12,6 @@ import { HIDDEN_BALANCE_TEXT } from "../../constants";
 export default function TransactionContanier({ frompage }) {
   const { sparkInformation } = useSpark();
   const { masterInfoObject } = useGlobalContextProvider();
-  const includedDonations = useRef(null);
   const currentTime = new Date();
   const navigate = useNavigate();
 
@@ -57,21 +51,9 @@ export default function TransactionContanier({ frompage }) {
   transfers.forEach((tx, index) => {
     const details = JSON.parse(tx.details);
     const currnetTxTime = new Date(details.time).getTime();
-    const isDonation =
-      tx.transfer_direction === "OUTGOING" &&
-      tx.type === "TRANSFER" &&
-      (tx.receiver_identity_pubkey ===
-        import.meta.env.VITE_BLITZ_SPARK_PUBKEY ||
-        tx.receiver_identity_pubkey ===
-          import.meta.env.VITE_BLITZ_SPARK_PUBKEY_OLD);
-
-    if (includedDonations.current) {
-      includedDonations.current = isDonation;
-    }
 
     if (tx?.type === "PREIMAGE_SWAP" && tx?.status === "INVOICE_CREATED")
       return;
-    if (isDonation) return;
 
     const bannerText = getBannerText(currentTime, currnetTxTime);
 
@@ -89,7 +71,6 @@ export default function TransactionContanier({ frompage }) {
         details={details}
         navigate={navigate}
         key={index}
-        isDonation={isDonation}
         tx={tx}
         index={index}
         currentTime={currentTime}
@@ -126,9 +107,7 @@ export default function TransactionContanier({ frompage }) {
 function TxItem({
   tx,
   index,
-  isDonation,
   currentTime,
-  currnetTxTime,
   navigate,
   details,
   masterInfoObject,
@@ -168,7 +147,7 @@ function TxItem({
         alt=""
       />
       <div className="textContainer">
-        <p>
+        <p className="descriptionText">
           {masterInfoObject.userBalanceDenomination === "hidden"
             ? HIDDEN_BALANCE_TEXT
             : description
