@@ -1,5 +1,6 @@
 import { addDataToCollection } from ".";
 import { QUICK_PAY_STORAGE_KEY } from "../src/constants";
+import { BLITZ_FEE_PERCET, BLITZ_FEE_SATS } from "../src/constants/math";
 import Storage from "../src/functions/localStorage";
 
 const PRESET_LOCAL_DATA = {
@@ -29,6 +30,11 @@ const PRESET_LOCAL_DATA = {
     lastUpdated: new Date().getTime(),
     data: null,
   },
+  enabledDeveloperSupport: {
+    isEnabled: true,
+    baseFee: BLITZ_FEE_SATS,
+    baseFeePercent: BLITZ_FEE_PERCET,
+  },
 };
 
 async function sendDataToDB(newObject, uuid) {
@@ -50,9 +56,9 @@ async function sendDataToDB(newObject, uuid) {
       await Promise.all(localStoragePromises);
     }
 
-    // if (Object.keys(dbStorageData).length > 0) {
-    //   await addDataToCollection(dbStorageData, "blitzWalletUsers", uuid);
-    // }
+    if (Object.keys(dbStorageData).length > 0) {
+      await addDataToCollection(dbStorageData, "blitzWalletUsers", uuid);
+    }
 
     console.log("sending data to database:", localStorageData, dbStorageData);
     return true;

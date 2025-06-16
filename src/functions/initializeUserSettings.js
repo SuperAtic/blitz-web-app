@@ -29,12 +29,12 @@ export default async function initializeUserSettings(
 
     if (!privateKey || !publicKey) throw Error("Failed to retrieve keys");
 
-    // await initializeFirebase(publicKey, privateKey);
+    await initializeFirebase(publicKey, privateKey);
 
     // Wrap both of thses in promise.all to fetch together.
     let [blitzStoredData, localStoredData, lastUpdatedExploreData] =
       await Promise.all([
-        Promise.resolve({}), //getDataFromCollection("blitzWalletUsers", publicKey),
+        getDataFromCollection("blitzWalletUsers", publicKey),
         fetchLocalStorageItems(),
         Promise.resolve(Storage.getItem("savedExploreData")),
       ]);
@@ -82,7 +82,6 @@ export default async function initializeUserSettings(
     };
 
     const fiatCurrency = blitzStoredData.fiatCurrency || "USD";
-    let enabledLNURL = blitzStoredData.enabledLNURL;
 
     const userBalanceDenomination =
       blitzStoredData.userBalanceDenomination || "sats";
@@ -189,10 +188,6 @@ export default async function initializeUserSettings(
       contacts.myProfile.nameLower = contacts.myProfile.name.toLowerCase();
       needsToUpdate = true;
     }
-    if (enabledLNURL === undefined) {
-      enabledLNURL = true;
-      needsToUpdate = true;
-    }
 
     if (!ecashWalletSettings) {
       ecashWalletSettings = {
@@ -204,6 +199,7 @@ export default async function initializeUserSettings(
 
     if (!lnurlPubKey) {
       lnurlPubKey = generateBitcoinKeyPair(mnemoinc).publicKey;
+      console.log(lnurlPubKey, "lnurl pub key");
       needsToUpdate = true;
     }
 
@@ -245,7 +241,6 @@ export default async function initializeUserSettings(
     tempObject["enabledEcash"] = enabledEcash;
     tempObject["pushNotifications"] = pushNotifications;
     tempObject["hideUnknownContacts"] = hideUnknownContacts;
-    tempObject["enabledLNURL"] = enabledLNURL;
     tempObject["useTrampoline"] = useTrampoline;
     tempObject["offlineReceiveAddresses"] = offlineReceiveAddresses;
     tempObject["lnurlPubKey"] = lnurlPubKey;
@@ -260,7 +255,7 @@ export default async function initializeUserSettings(
     tempObject["enabledDeveloperSupport"] = enabledDeveloperSupport;
 
     if (needsToUpdate || Object.keys(blitzStoredData).length === 0) {
-      // await sendDataToDB(tempObject, publicKey);
+      await sendDataToDB(tempObject, publicKey);
     }
 
     delete tempObject["contacts"];
