@@ -119,7 +119,8 @@ export const updateSparkTxStatus = async () =>
           if (!sparkResponse?.transfer) continue;
 
           const tx = {
-            useTempId: txStateUpdate.sparkID,
+            useTempId: true,
+            tempId: txStateUpdate.sparkID,
             id: sparkResponse
               ? sparkResponse.transfer.sparkId
               : txStateUpdate.sparkID,
