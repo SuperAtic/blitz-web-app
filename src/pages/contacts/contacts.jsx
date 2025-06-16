@@ -125,7 +125,9 @@ export default function Contacts() {
       )}
       {decodedAddedContacts.filter(
         (contact) => !hideUnknownContacts || contact.isAdded
-      ).length !== 0 && myProfile.didEditProfile ? (
+      ).length !== 0 &&
+      false &&
+      myProfile.didEditProfile ? (
         <div
           className="hasContactsContainer"
           style={{ flex: 1, overflow: "hidden" }}
