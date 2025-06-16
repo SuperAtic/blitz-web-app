@@ -69,6 +69,7 @@ import SettingsContentIndex from "./pages/settings/settingsItem/settingsItem.jsx
 import HandleLNURLPayments from "./contexts/lnurlContext.jsx";
 import { ImageCacheProvider } from "./contexts/imageCacheContext.jsx";
 import EditMyProfilePage from "./pages/contacts/screens/editMyProfilePage/editMyProfilePage.jsx";
+import MyProfilePage from "./pages/contacts/screens/myProfilePage/myProfilePage.jsx";
 // const ConfirmPayment = lazy(() =>
 //   import("./pages/confirmPayment/confirmPaymentScreen.jsx")
 // );
@@ -191,6 +192,20 @@ function Root() {
                                           <SafeAreaComponent>
                                             <EditMyProfilePage />
                                           </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/my-profile"
+                                        element={
+                                          <AnimatedRouteWrapper
+                                            initialAnimation={{ x: "100%" }}
+                                            animate={{ x: 0 }}
+                                            exitAnimation={{ x: "100%" }}
+                                          >
+                                            <SafeAreaComponent>
+                                              <MyProfilePage />
+                                            </SafeAreaComponent>
+                                          </AnimatedRouteWrapper>
                                         }
                                       />
                                       <Route

@@ -82,6 +82,7 @@ export const addSingleUnpaidSparkLightningTransaction = async (tx) => {
         tx.shouldNavigate || tx?.shouldNavigate === undefined ? 0 : 1,
       details: JSON.stringify(tx.details),
     });
+    console.log("added single unpaid spark tx", tx);
     return true;
   } catch (err) {
     console.error("addSingleUnpaidSparkLightningTransaction error:", err);

@@ -11,6 +11,8 @@ import ThemeText from "../../components/themeText/themeText";
 import CustomButton from "../../components/customButton/customButton";
 import questionMark from "../../assets/questionMarkSVG.svg";
 import "./contacts.css";
+import ContactProfileImage from "./components/profileImage/profileImage";
+import { Colors } from "../../constants/theme";
 
 export default function Contacts() {
   const { masterInfoObject } = useGlobalContextProvider();
@@ -73,7 +75,7 @@ export default function Contacts() {
     <div id="contactsPage">
       {myProfile?.didEditProfile && (
         <div className="contactsPageTopBar">
-          <div
+          {/* <div
             className="addContactsContainer"
             onPress={() => {
               keyboardNavigate(() => {
@@ -91,7 +93,7 @@ export default function Contacts() {
               });
             }}
           >
-            {/* <Icon
+             <Icon
               name={"addContactsIcon"}
               width={30}
               height={30}
@@ -105,32 +107,19 @@ export default function Contacts() {
                     : COLORS.darkModeBackground
                   : COLORS.lightModeBackground
               }
-            /> */}
-          </div>
+            /> 
+          </div> */}
           <div
+            style={{ backgroundColor: Colors.light.backgroundOffset }}
             className="myContactContainer"
-            onPress={() => {
-              // keyboardNavigate(() => {
-              //   navigate.navigate("MyContactProfilePage", {});
-              // });
+            onClick={() => {
+              navigate("/my-profile");
             }}
           >
-            <div
-              className="myContactImageContainer"
-              style={
-                {
-                  // ...styles.profileImageContainer,
-                  // backgroundColor: backgroundOffset,
-                }
-              }
-            >
-              {/* <ContactProfileImage
-                updated={cache[masterInfoObject?.uuid]?.updated}
-                uri={cache[masterInfoObject?.uuid]?.localUri}
-                darkModeType={darkModeType}
-                theme={theme}
-              /> */}
-            </div>
+            <ContactProfileImage
+              updated={cache[masterInfoObject?.uuid]?.updated}
+              uri={cache[masterInfoObject?.uuid]?.localUri}
+            />
           </div>
         </div>
       )}
@@ -195,9 +184,11 @@ export default function Contacts() {
               }
               if (didEditProfile) {
                 //navigate to add contacts popup
-                navigate("CustomHalfModal", {
-                  wantedContent: "addContacts",
-                  sliderHight: 0.4,
+                navigate("/error", {
+                  state: {
+                    errorMessage: "Feture coming soon...",
+                    background: location,
+                  },
                 });
               } else {
                 navigate("/edit-profile", {

@@ -120,7 +120,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
             });
 
             // If transfer is defined, assign and break out of while loop
-            if (result?.transfer !== undefined) {
+            if (result?.transfer) {
               paymentDetials = result;
               break;
             }

@@ -20,6 +20,7 @@ import { Colors } from "../../../../constants/theme";
 import imagesIcon from "../../../../assets/imagesDark.png";
 import xSmallIconBlack from "../../../../assets/x-small-black.png";
 import CustomInput from "../../../../components/customInput/customInput";
+import { VALID_USERNAME_REGEX } from "../../../../constants";
 
 export default function EditMyProfilePage() {
   const navigate = useNavigate();
@@ -29,7 +30,6 @@ export default function EditMyProfilePage() {
     globalContactsInformation,
   } = useGlobalContacts();
 
-  const { t } = useTranslation();
   const location = useLocation();
   const props = location.state;
   const pageType = props?.pageType || props.route?.params?.pageType;
@@ -65,6 +65,7 @@ export default function EditMyProfilePage() {
                 true
               );
             }
+            navigate(-1);
           }}
         />
         <p>{fromSettings ? "Edit Profile" : ""}</p>
@@ -178,14 +179,21 @@ function InnerContent({
       <div className="editProfileScrollContainer">
         <div
           className="profileImageContainer"
-          onPress={() => {
+          onClick={() => {
+            navigate("/error", {
+              state: {
+                errorMessage: "Feature coming soon...",
+                background: location,
+              },
+            });
+            return;
             if (!isEditingMyProfile && !selectedAddedContact.isLNURL) return;
             if (isAddingImage) return;
             if (!hasImage) {
               addProfilePicture();
               return;
             }
-            navigate.navigate("AddOrDeleteContactImage", {
+            navigate("AddOrDeleteContactImage", {
               addPhoto: addProfilePicture,
               deletePhoto: deleteProfilePicture,
               hasImage: hasImage,
@@ -315,7 +323,7 @@ function InnerContent({
                 changeInputText(data, "uniquename");
               }}
               value={inputs.uniquename || ""}
-              placeholder={"Username..."}
+              placeholder={myContact.uniqueName}
               customInputStyles={{
                 color:
                   inputs.uniquename.length < 30
@@ -407,6 +415,7 @@ function InnerContent({
       ) {
         navigate(-1);
       } else {
+        console.log(uniqueName, "testing");
         if (!VALID_USERNAME_REGEX.test(uniqueName)) {
           navigate("/error", {
             state: {
@@ -417,6 +426,7 @@ function InnerContent({
           });
           return;
         }
+
         if (myContact?.uniqueName != uniqueName) {
           const isFreeUniqueName = await isValidUniqueName(
             "blitzWalletUsers",

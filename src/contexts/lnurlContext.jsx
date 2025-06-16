@@ -28,36 +28,6 @@ export default function HandleLNURLPayments() {
   //   const tempWalletCacheRef = useRef(new Map());
   const deleteActiveLNURLPaymentsRef = useRef([]);
 
-  //   const [privateKey, setPrivateKey] = useState(null);
-
-  //   // Initialize private key once
-  //   useEffect(() => {
-  //     if (!masterInfoObject.uuid) return;
-  //     if (didCreateSessionPrivateKey.current) return;
-
-  //     didCreateSessionPrivateKey.current = true;
-
-  //     async function getSessionPrivateKey() {
-  //       try {
-  //         const userMnemonic = await retrieveData("mnemonic");
-  //         if (!userMnemonic) {
-  //           console.error("No mnemonic found");
-  //           return;
-  //         }
-  //         requestAnimationFrame(() => {
-  //           requestAnimationFrame(() => {
-  //             const derivedMnemonic = getBitcoinKeyPair(userMnemonic);
-  //             setPrivateKey(derivedMnemonic.privateKey);
-  //           });
-  //         });
-  //       } catch (error) {
-  //         console.error("Error getting session private key:", error);
-  //       }
-  //     }
-
-  //     getSessionPrivateKey();
-  //   }, [masterInfoObject.uuid]);
-
   // Load saved LNURL payments once
   useEffect(() => {
     if (!sparkAddress) return;
@@ -180,88 +150,6 @@ export default function HandleLNURLPayments() {
         });
         processedIds.push(payment.id);
         deleteActiveLNURLPaymentsRef.current.push(payment.id);
-        // return;
-        // try {
-        //   // Skip if run count exceeds limit
-        //   if (payment.runCount >= 5) {
-        //     console.log(`Payment ${payment.id} exceeded retry limit`);
-        //     continue;
-        //   }
-
-        //   const derivedMnemonic = getSharedKey(
-        //     privateKey,
-        //     payment.sharedPublicKey,
-        //   );
-
-        //   let cached = tempWalletCacheRef.current.get(derivedMnemonic);
-        //   let tempSparkWallet = cached?.wallet;
-
-        //   if (!tempSparkWallet) {
-        //     tempSparkWallet = await initializeTempSparkWallet(derivedMnemonic);
-        //     if (!tempSparkWallet) {
-        //       newQueue.push({...payment, runCount: payment.runCount + 1});
-        //       continue;
-        //     }
-
-        //     tempWalletCacheRef.current.set(derivedMnemonic, {
-        //       wallet: tempSparkWallet,
-        //       timestamp: Date.now(),
-        //     });
-        //   }
-
-        //   console.log(`Initialized LNULR wallet for ${payment.id}`);
-
-        //   const balance = await tempSparkWallet.getBalance();
-
-        //   console.log(`Has a balance of ${Number(balance.balance)}`);
-
-        //   if (Number(balance.balance) === 0) {
-        //     const now = new Date().getTime();
-
-        //     if (payment.expiredTime < now) {
-        //       processedIds.push(payment.id);
-        //       deleteActiveLNURLPaymentsRef.current.push(payment.id);
-        //       continue;
-        //     }
-        //     newQueue.push({...payment, runCount: payment.runCount + 1});
-        //     continue;
-        //   }
-
-        //   const paymentResponse = await tempSparkWallet.transfer({
-        //     amountSats: Number(balance.balance),
-        //     receiverSparkAddress: sparkAddress,
-        //   });
-
-        //   if (!paymentResponse) {
-        //     newQueue.push({...payment, runCount: payment.runCount + 1});
-        //     continue;
-        //   }
-
-        //   const shouldNavigate =
-        //     payment.shouldNavigate &&
-        //     !processedIds.some(
-        //       id => currentQueue.find(p => p.id === id)?.shouldNavigate,
-        //     );
-
-        //   setBlockedIdentityPubKeys(prev => {
-        //     if (prev.some(p => p.transferResponse?.id === paymentResponse.id))
-        //       return prev;
-        //     return [
-        //       ...prev,
-        //       {
-        //         transferResponse: {...paymentResponse},
-        //         db: payment,
-        //         shouldNavigate,
-        //       },
-        //     ];
-        //   });
-
-        //   processedIds.push(payment.id);
-        //   deleteActiveLNURLPaymentsRef.current.push(payment.id);
-        // } catch (err) {
-        //   console.error('Error processing payment:', payment.id, err);
-        //   newQueue.push({...payment, runCount: payment.runCount + 1});
-        // }
       }
 
       // Update queue and clean up processed payments
@@ -286,14 +174,6 @@ export default function HandleLNURLPayments() {
           console.error("Error deleting processed payments:", error);
         }
       }
-
-      // const now = Date.now();
-      // const oneHour = 60 * 60 * 1000;
-      // for (const [key, value] of tempWalletCacheRef.current.entries()) {
-      //   if (now - value.timestamp > oneHour) {
-      //     tempWalletCacheRef.current.delete(key);
-      //   }
-      // }
 
       if (newQueue.length > 0) {
         timeoutRef.current = setTimeout(() => {
