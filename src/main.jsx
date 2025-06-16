@@ -66,6 +66,10 @@ import Contacts from "./pages/contacts/contacts.jsx";
 import Store from "./pages/store/store.jsx";
 import TabsIcon from "./components/tabsIcon/tabsIcon.jsx";
 import SettingsContentIndex from "./pages/settings/settingsItem/settingsItem.jsx";
+import HandleLNURLPayments from "./contexts/lnurlContext.jsx";
+import { ImageCacheProvider } from "./contexts/imageCacheContext.jsx";
+import EditMyProfilePage from "./pages/contacts/screens/editMyProfilePage/editMyProfilePage.jsx";
+import MyProfilePage from "./pages/contacts/screens/myProfilePage/myProfilePage.jsx";
 // const ConfirmPayment = lazy(() =>
 //   import("./pages/confirmPayment/confirmPaymentScreen.jsx")
 // );
@@ -103,330 +107,359 @@ function Root() {
                         <BitcoinPriceProvider>
                           <GlobalAppDataProvider>
                             <LiquidEventProvider>
-                              <AuthGate />
-                              <AnimatePresence mode="wait">
-                                <Suspense
-                                  fallback={
-                                    <SafeAreaComponent>
-                                      <div
-                                        style={{
-                                          flex: 1,
-                                          width: "100%",
-                                          height: "100%",
-                                          alignItems: "center",
-                                          justifyContent: "center",
-                                        }}
-                                      >
-                                        Loading...
-                                      </div>
-                                    </SafeAreaComponent>
-                                  }
-                                >
-                                  <Routes location={background || location}>
-                                    {/* Public Routes */}
-                                    <Route
-                                      path="/"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <Home />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/disclaimer"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <DisclaimerPage />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/createAccount"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <CreateSeed />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/createPassword"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <CreatePassword />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/login"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <Login />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/wallet"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <WalletHome />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/contacts"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <Contacts />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/store"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <Store />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/receiveAmount"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <EditReceivePaymentInformation />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/receive"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <ReceiveQRPage />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/send"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <SendPage />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/receive-options"
-                                      element={
-                                        <AnimatedRouteWrapper
-                                          initialAnimation={{ y: "100%" }}
-                                          animate={{ y: 0 }}
-                                          exitAnimation={{ y: "100%" }}
+                              <ImageCacheProvider>
+                                <HandleLNURLPayments />
+                                <AuthGate />
+                                <AnimatePresence mode="wait">
+                                  <Suspense
+                                    fallback={
+                                      <SafeAreaComponent>
+                                        <div
+                                          style={{
+                                            flex: 1,
+                                            width: "100%",
+                                            height: "100%",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                          }}
                                         >
+                                          Loading...
+                                        </div>
+                                      </SafeAreaComponent>
+                                    }
+                                  >
+                                    <Routes location={background || location}>
+                                      {/* Public Routes */}
+                                      <Route
+                                        path="/"
+                                        element={
                                           <SafeAreaComponent>
-                                            <SwitchReceiveOption />
+                                            <Home />
                                           </SafeAreaComponent>
-                                        </AnimatedRouteWrapper>
-                                      }
-                                    />
-                                    <Route
-                                      path="/expanded-tx"
-                                      element={
-                                        <AnimatedRouteWrapper
-                                          initialAnimation={{ y: "100%" }}
-                                          animate={{ y: 0 }}
-                                          exitAnimation={{ y: "100%" }}
-                                        >
+                                        }
+                                      />
+                                      <Route
+                                        path="/disclaimer"
+                                        element={
                                           <SafeAreaComponent>
-                                            <ExpandedTxPage />
+                                            <DisclaimerPage />
                                           </SafeAreaComponent>
-                                        </AnimatedRouteWrapper>
-                                      }
-                                    />
-                                    <Route
-                                      path="/technical-details"
-                                      element={
-                                        <AnimatedRouteWrapper
-                                          initialAnimation={{ y: "100%" }}
-                                          animate={{ y: 0 }}
-                                          exitAnimation={{ y: "100%" }}
-                                        >
+                                        }
+                                      />
+                                      <Route
+                                        path="/createAccount"
+                                        element={
                                           <SafeAreaComponent>
-                                            <TechnicalDetailsPage />
+                                            <CreateSeed />
                                           </SafeAreaComponent>
-                                        </AnimatedRouteWrapper>
-                                      }
-                                    />
-                                    <Route
-                                      path="/camera"
-                                      element={<Camera />}
-                                    />
-                                    <Route
-                                      path="/confirm-page"
-                                      element={
-                                        <AnimatedRouteWrapper
-                                          initialAnimation={{ opacity: 0 }}
-                                          animate={{ opacity: 1 }}
-                                          exitAnimation={{ opacity: 0 }}
-                                        >
+                                        }
+                                      />
+                                      <Route
+                                        path="/createPassword"
+                                        element={
                                           <SafeAreaComponent>
-                                            <ConfirmPayment />
+                                            <CreatePassword />
                                           </SafeAreaComponent>
-                                        </AnimatedRouteWrapper>
-                                      }
-                                    />
-                                    <Route
-                                      path="/settings"
-                                      element={
-                                        <AnimatedRouteWrapper
-                                          initialAnimation={{ x: "100%" }}
-                                          animate={{ x: 0 }}
-                                          exitAnimation={{ x: "100%" }}
-                                        >
+                                        }
+                                      />
+                                      <Route
+                                        path="/login"
+                                        element={
                                           <SafeAreaComponent>
-                                            <SettingsHome />
+                                            <Login />
                                           </SafeAreaComponent>
-                                        </AnimatedRouteWrapper>
-                                      }
-                                    />
-                                    <Route
-                                      path="/settings-item"
-                                      element={
-                                        <AnimatedRouteWrapper
-                                          initialAnimation={{ x: "100%" }}
-                                          animate={{ x: 0 }}
-                                          exitAnimation={{ x: "100%" }}
-                                        >
-                                          <SettingsContentIndex />
-                                        </AnimatedRouteWrapper>
-                                      }
-                                    />
-                                    <Route
-                                      path="/key"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <ViewMnemoinc />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/restore"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <RestoreWallet />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/viewAllTransactions"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <ViewAllTxsPage />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    <Route
-                                      path="/connecting"
-                                      element={
-                                        <SafeAreaComponent>
-                                          <LoadingScreen />
-                                        </SafeAreaComponent>
-                                      }
-                                    />
-                                    {/* <Route
+                                        }
+                                      />
+                                      <Route
+                                        path="/wallet"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <WalletHome />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/contacts"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <Contacts />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/edit-profile"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <EditMyProfilePage />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/my-profile"
+                                        element={
+                                          <AnimatedRouteWrapper
+                                            initialAnimation={{ x: "100%" }}
+                                            animate={{ x: 0 }}
+                                            exitAnimation={{ x: "100%" }}
+                                          >
+                                            <SafeAreaComponent>
+                                              <MyProfilePage />
+                                            </SafeAreaComponent>
+                                          </AnimatedRouteWrapper>
+                                        }
+                                      />
+                                      <Route
+                                        path="/store"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <Store />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/receiveAmount"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <EditReceivePaymentInformation />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/receive"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <ReceiveQRPage />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/send"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <SendPage />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/receive-options"
+                                        element={
+                                          <AnimatedRouteWrapper
+                                            initialAnimation={{ y: "100%" }}
+                                            animate={{ y: 0 }}
+                                            exitAnimation={{ y: "100%" }}
+                                          >
+                                            <SafeAreaComponent>
+                                              <SwitchReceiveOption />
+                                            </SafeAreaComponent>
+                                          </AnimatedRouteWrapper>
+                                        }
+                                      />
+                                      <Route
+                                        path="/expanded-tx"
+                                        element={
+                                          <AnimatedRouteWrapper
+                                            initialAnimation={{ y: "100%" }}
+                                            animate={{ y: 0 }}
+                                            exitAnimation={{ y: "100%" }}
+                                          >
+                                            <SafeAreaComponent>
+                                              <ExpandedTxPage />
+                                            </SafeAreaComponent>
+                                          </AnimatedRouteWrapper>
+                                        }
+                                      />
+                                      <Route
+                                        path="/technical-details"
+                                        element={
+                                          <AnimatedRouteWrapper
+                                            initialAnimation={{ y: "100%" }}
+                                            animate={{ y: 0 }}
+                                            exitAnimation={{ y: "100%" }}
+                                          >
+                                            <SafeAreaComponent>
+                                              <TechnicalDetailsPage />
+                                            </SafeAreaComponent>
+                                          </AnimatedRouteWrapper>
+                                        }
+                                      />
+                                      <Route
+                                        path="/camera"
+                                        element={<Camera />}
+                                      />
+                                      <Route
+                                        path="/confirm-page"
+                                        element={
+                                          <AnimatedRouteWrapper
+                                            initialAnimation={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exitAnimation={{ opacity: 0 }}
+                                          >
+                                            <SafeAreaComponent>
+                                              <ConfirmPayment />
+                                            </SafeAreaComponent>
+                                          </AnimatedRouteWrapper>
+                                        }
+                                      />
+                                      <Route
+                                        path="/settings"
+                                        element={
+                                          <AnimatedRouteWrapper
+                                            initialAnimation={{ x: "100%" }}
+                                            animate={{ x: 0 }}
+                                            exitAnimation={{ x: "100%" }}
+                                          >
+                                            <SafeAreaComponent>
+                                              <SettingsHome />
+                                            </SafeAreaComponent>
+                                          </AnimatedRouteWrapper>
+                                        }
+                                      />
+                                      <Route
+                                        path="/settings-item"
+                                        element={
+                                          <AnimatedRouteWrapper
+                                            initialAnimation={{ x: "100%" }}
+                                            animate={{ x: 0 }}
+                                            exitAnimation={{ x: "100%" }}
+                                          >
+                                            <SettingsContentIndex />
+                                          </AnimatedRouteWrapper>
+                                        }
+                                      />
+                                      <Route
+                                        path="/key"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <ViewMnemoinc />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/restore"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <RestoreWallet />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/viewAllTransactions"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <ViewAllTxsPage />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      <Route
+                                        path="/connecting"
+                                        element={
+                                          <SafeAreaComponent>
+                                            <LoadingScreen />
+                                          </SafeAreaComponent>
+                                        }
+                                      />
+                                      {/* <Route
                                     path="/error"
                                     element={<ErrorScreen />}
                                   /> */}
-                                  </Routes>
+                                    </Routes>
 
-                                  {location.pathname === "/confirm-action" && (
-                                    <ConfirmActionPage />
-                                  )}
-                                  {location.pathname === "/error" && (
-                                    <ErrorScreen />
-                                  )}
-                                </Suspense>
-                              </AnimatePresence>
-                              {shouldShowBottomTabs && (
-                                <BottomNavigation
-                                  value={value}
-                                  onChange={(event, newValue) =>
-                                    setValue(newValue)
-                                  }
-                                  showLabels
-                                  style={{
-                                    height: "70px",
-                                    position: "fixed",
-                                    bottom: 0,
-                                    width: "100%",
-                                    zIndex: 100, // optional: to make sure it's above other content
-                                  }}
-                                >
-                                  <BottomNavigationAction
-                                    disableRipple
-                                    sx={{
-                                      "& .MuiBottomNavigationAction-label": {
-                                        transition: "none",
-                                        fontSize: "15px",
-                                        font: "var(--font-family)",
-                                        color: Colors.light.text,
-                                      },
-                                      "&.Mui-selected .MuiBottomNavigationAction-label":
-                                        {
+                                    {location.pathname ===
+                                      "/confirm-action" && (
+                                      <ConfirmActionPage />
+                                    )}
+                                    {location.pathname === "/error" && (
+                                      <ErrorScreen />
+                                    )}
+                                  </Suspense>
+                                </AnimatePresence>
+                                {shouldShowBottomTabs && (
+                                  <BottomNavigation
+                                    value={value}
+                                    onChange={(event, newValue) =>
+                                      setValue(newValue)
+                                    }
+                                    showLabels
+                                    style={{
+                                      height: "70px",
+                                      position: "fixed",
+                                      bottom: 0,
+                                      width: "100%",
+                                      zIndex: 100, // optional: to make sure it's above other content
+                                    }}
+                                  >
+                                    <BottomNavigationAction
+                                      disableRipple
+                                      sx={{
+                                        "& .MuiBottomNavigationAction-label": {
+                                          transition: "none",
                                           fontSize: "15px",
+                                          font: "var(--font-family)",
                                           color: Colors.light.text,
                                         },
-                                    }}
-                                    label="Contacts"
-                                    icon={
-                                      <TabsIcon value={value} icon="contacts" />
-                                    }
-                                    component={Link}
-                                    to="/contacts"
-                                  />
-                                  <BottomNavigationAction
-                                    disableRipple
-                                    sx={{
-                                      "& .MuiBottomNavigationAction-label": {
-                                        transition: "none",
-                                        fontSize: "15px",
-                                        font: "var(--font-family)",
-                                        color: Colors.light.text,
-                                      },
-                                      "&.Mui-selected .MuiBottomNavigationAction-label":
-                                        {
+                                        "&.Mui-selected .MuiBottomNavigationAction-label":
+                                          {
+                                            fontSize: "15px",
+                                            color: Colors.light.text,
+                                          },
+                                      }}
+                                      label="Contacts"
+                                      icon={
+                                        <TabsIcon
+                                          value={value}
+                                          icon="contacts"
+                                        />
+                                      }
+                                      component={Link}
+                                      to="/contacts"
+                                    />
+                                    <BottomNavigationAction
+                                      disableRipple
+                                      sx={{
+                                        "& .MuiBottomNavigationAction-label": {
+                                          transition: "none",
                                           fontSize: "15px",
+                                          font: "var(--font-family)",
                                           color: Colors.light.text,
                                         },
-                                    }}
-                                    label="Home"
-                                    icon={
-                                      <TabsIcon value={value} icon="wallet" />
-                                    }
-                                    component={Link}
-                                    to="/wallet"
-                                  />
-                                  <BottomNavigationAction
-                                    disableRipple
-                                    sx={{
-                                      "& .MuiBottomNavigationAction-label": {
-                                        transition: "none",
-                                        fontSize: "15px",
-                                        font: "var(--font-family)",
-                                        color: Colors.light.text,
-                                      },
-                                      "&.Mui-selected .MuiBottomNavigationAction-label":
-                                        {
+                                        "&.Mui-selected .MuiBottomNavigationAction-label":
+                                          {
+                                            fontSize: "15px",
+                                            color: Colors.light.text,
+                                          },
+                                      }}
+                                      label="Home"
+                                      icon={
+                                        <TabsIcon value={value} icon="wallet" />
+                                      }
+                                      component={Link}
+                                      to="/wallet"
+                                    />
+                                    <BottomNavigationAction
+                                      disableRipple
+                                      sx={{
+                                        "& .MuiBottomNavigationAction-label": {
+                                          transition: "none",
                                           fontSize: "15px",
+                                          font: "var(--font-family)",
                                           color: Colors.light.text,
                                         },
-                                    }}
-                                    label="Store"
-                                    icon={
-                                      <TabsIcon value={value} icon="store" />
-                                    }
-                                    component={Link}
-                                    to="/store"
-                                  />
-                                </BottomNavigation>
-                              )}
+                                        "&.Mui-selected .MuiBottomNavigationAction-label":
+                                          {
+                                            fontSize: "15px",
+                                            color: Colors.light.text,
+                                          },
+                                      }}
+                                      label="Store"
+                                      icon={
+                                        <TabsIcon value={value} icon="store" />
+                                      }
+                                      component={Link}
+                                      to="/store"
+                                    />
+                                  </BottomNavigation>
+                                )}
+                              </ImageCacheProvider>
                             </LiquidEventProvider>
                           </GlobalAppDataProvider>
                         </BitcoinPriceProvider>

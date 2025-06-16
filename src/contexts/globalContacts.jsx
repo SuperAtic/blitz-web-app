@@ -42,6 +42,7 @@ export const GlobalContactsList = ({ children }) => {
     {}
   );
   const [contactsMessags, setContactsMessagses] = useState({});
+  const [decodedAddedContacts, setDecodedAddedContacts] = useState([]);
 
   const didTryToUpdate = useRef(false);
   const lookForNewMessages = useRef(false);
@@ -54,28 +55,44 @@ export const GlobalContactsList = ({ children }) => {
     (newData, writeToDB) => {
       setGlobalContactsInformation((prev) => {
         const newContacts = { ...prev, ...newData };
-        // if (writeToDB) {
-        //   addDataToCollection(
-        //     { contacts: newContacts },
-        //     "blitzWalletUsers",
-        //     publicKey
-        //   );
-        // }
+        if (writeToDB) {
+          addDataToCollection(
+            { contacts: newContacts },
+            "blitzWalletUsers",
+            publicKey
+          );
+        }
         return newContacts;
       });
     },
     [publicKey]
   );
 
-  const decodedAddedContacts = useMemo(() => {
-    if (!publicKey || !addedContacts) return [];
-    return typeof addedContacts === "string"
-      ? [
-          ...JSON.parse(
-            decryptMessage(contactsPrivateKey, publicKey, addedContacts)
-          ),
-        ]
-      : [];
+  useEffect(() => {
+    if (!publicKey || !addedContacts) return;
+
+    const decrypt = async () => {
+      if (typeof addedContacts === "string") {
+        try {
+          const decoded = await decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            addedContacts
+          );
+          console.log(decoded);
+          const parsed = JSON.parse(decoded);
+          console.log(parsed);
+          setDecodedAddedContacts(parsed);
+        } catch (e) {
+          console.error("Error decrypting or parsing:", e);
+          setDecodedAddedContacts([]);
+        }
+      } else {
+        setDecodedAddedContacts([]);
+      }
+    };
+
+    decrypt();
   }, [addedContacts, publicKey, contactsPrivateKey]);
 
   const updatedCachedMessagesStateFunction = useCallback(async () => {
@@ -116,7 +133,7 @@ export const GlobalContactsList = ({ children }) => {
       toggleGlobalContactsInformation(
         {
           myProfile: { ...globalContactsInformation.myProfile },
-          addedContacts: encriptMessage(
+          addedContacts: encryptMessage(
             contactsPrivateKey,
             globalContactsInformation.myProfile.uuid,
             JSON.stringify(decodedAddedContacts.concat(newContats))
@@ -148,68 +165,69 @@ export const GlobalContactsList = ({ children }) => {
   }, [updatedCachedMessagesStateFunction]);
 
   useEffect(() => {
-    // if (!Object.keys(globalContactsInformation).length) return;
-    // const now = new Date().getTime();
-    // // Unsubscribe from previous listeners before setting new ones
-    // if (unsubscribeMessagesRef.current) {
-    //   unsubscribeMessagesRef.current();
-    // }
-    // if (unsubscribeSentMessagesRef.current) {
-    //   unsubscribeSentMessagesRef.current();
-    // }
-    // const inboundMessageQuery = query(
-    //   collection(db, "contactMessages"),
-    //   where("toPubKey", "==", globalContactsInformation.myProfile.uuid),
-    //   orderBy("timestamp"),
-    //   startAfter(now)
-    // );
-    // const outbounddMessageQuery = query(
-    //   collection(db, "contactMessages"),
-    //   where("fromPubKey", "==", globalContactsInformation.myProfile.uuid),
-    //   orderBy("timestamp"),
-    //   startAfter(now)
-    // );
-    // // Set up the realtime listener
-    // unsubscribeMessagesRef.current = onSnapshot(
-    //   inboundMessageQuery,
-    //   (snapshot) => {
-    //     if (!snapshot?.docChanges()?.length) return;
-    //     snapshot.docChanges().forEach((change) => {
-    //       console.log("received a new message", change.type);
-    //       if (change.type === "added") {
-    //         const newMessage = change.doc.data();
-    //         queueSetCashedMessages({
-    //           newMessagesList: [newMessage],
-    //           myPubKey: globalContactsInformation.myProfile.uuid,
-    //         });
-    //       }
-    //     });
-    //   }
-    // );
-    // unsubscribeSentMessagesRef.current = onSnapshot(
-    //   outbounddMessageQuery,
-    //   (snapshot) => {
-    //     if (!snapshot?.docChanges()?.length) return;
-    //     snapshot.docChanges().forEach((change) => {
-    //       console.log("sent a new message", change.type);
-    //       if (change.type === "added") {
-    //         const newMessage = change.doc.data();
-    //         queueSetCashedMessages({
-    //           newMessagesList: [newMessage],
-    //           myPubKey: globalContactsInformation.myProfile.uuid,
-    //         });
-    //       }
-    //     });
-    //   }
-    // );
-    // return () => {
-    //   if (unsubscribeMessagesRef.current) {
-    //     unsubscribeMessagesRef.current();
-    //   }
-    //   if (unsubscribeSentMessagesRef.current) {
-    //     unsubscribeSentMessagesRef.current();
-    //   }
-    // };
+    return;
+    if (!Object.keys(globalContactsInformation).length) return;
+    const now = new Date().getTime();
+    // Unsubscribe from previous listeners before setting new ones
+    if (unsubscribeMessagesRef.current) {
+      unsubscribeMessagesRef.current();
+    }
+    if (unsubscribeSentMessagesRef.current) {
+      unsubscribeSentMessagesRef.current();
+    }
+    const inboundMessageQuery = query(
+      collection(db, "contactMessages"),
+      where("toPubKey", "==", globalContactsInformation.myProfile.uuid),
+      orderBy("timestamp"),
+      startAfter(now)
+    );
+    const outbounddMessageQuery = query(
+      collection(db, "contactMessages"),
+      where("fromPubKey", "==", globalContactsInformation.myProfile.uuid),
+      orderBy("timestamp"),
+      startAfter(now)
+    );
+    // Set up the realtime listener
+    unsubscribeMessagesRef.current = onSnapshot(
+      inboundMessageQuery,
+      (snapshot) => {
+        if (!snapshot?.docChanges()?.length) return;
+        snapshot.docChanges().forEach((change) => {
+          console.log("received a new message", change.type);
+          if (change.type === "added") {
+            const newMessage = change.doc.data();
+            queueSetCashedMessages({
+              newMessagesList: [newMessage],
+              myPubKey: globalContactsInformation.myProfile.uuid,
+            });
+          }
+        });
+      }
+    );
+    unsubscribeSentMessagesRef.current = onSnapshot(
+      outbounddMessageQuery,
+      (snapshot) => {
+        if (!snapshot?.docChanges()?.length) return;
+        snapshot.docChanges().forEach((change) => {
+          console.log("sent a new message", change.type);
+          if (change.type === "added") {
+            const newMessage = change.doc.data();
+            queueSetCashedMessages({
+              newMessagesList: [newMessage],
+              myPubKey: globalContactsInformation.myProfile.uuid,
+            });
+          }
+        });
+      }
+    );
+    return () => {
+      if (unsubscribeMessagesRef.current) {
+        unsubscribeMessagesRef.current();
+      }
+      if (unsubscribeSentMessagesRef.current) {
+        unsubscribeSentMessagesRef.current();
+      }
+    };
   }, [globalContactsInformation?.myProfile?.uuid]);
 
   useEffect(() => {
@@ -221,92 +239,6 @@ export const GlobalContactsList = ({ children }) => {
     //   updatedCachedMessagesStateFunction
     // );
   }, [globalContactsInformation, updatedCachedMessagesStateFunction]);
-
-  // No longer need to handle this manualy as it happens automaticly from peoples activity
-  // useEffect(() => {
-  //   if (
-  //     !Object.keys(globalContactsInformation).length ||
-  //     !contactsPrivateKey ||
-  //     !publicKey
-  //   )
-  //     return;
-  //   if (didTryToUpdate.current) return;
-  //   didTryToUpdate.current = true;
-
-  //   const updateContactsAddresses = async () => {
-  //     if (
-  //       !decodedAddedContacts ||
-  //       decodedAddedContacts.length === 0 ||
-  //       !isMoreThan21Days(
-  //         globalContactsInformation.myProfile?.lastRotatedAddedContact,
-  //       )
-  //     )
-  //       return;
-
-  //     // break array into size of 10 to meet firestore limits
-  //     const chunkArray = (arr, size) =>
-  //       arr.length > size
-  //         ? [arr.slice(0, size), ...chunkArray(arr.slice(size), size)]
-  //         : [arr];
-
-  //     // take document uuids from valid contacts (LNURL address does not need to be looked up)
-  //     const uuidChunks = chunkArray(
-  //       decodedAddedContacts.map(c => !c.isLNURL && c.uuid),
-  //       10,
-  //     );
-
-  //     console.log('uuid chunks', uuidChunks);
-
-  //     // Request database for updated contact addresses
-  //     const bulkResults = (
-  //       await Promise.all(
-  //         uuidChunks.map(uuids => bulkGetUnknownContacts(uuids)),
-  //       )
-  //     )
-  //       .flat()
-  //       .filter(Boolean);
-
-  //     // create an object of {id:address}
-  //     const uuidToAddressMap = bulkResults.reduce((acc, doc) => {
-  //       const uuid = doc.contacts.myProfile?.uuid;
-  //       if (uuid) acc[uuid] = doc.contacts.myProfile.receiveAddress;
-  //       return acc;
-  //     }, {});
-
-  //     console.log('uuid address map', uuidToAddressMap);
-  //     // Updated saved contacts address to new address if they have changed but skip LNURL
-  //     const updatedContactsAddress = decodedAddedContacts.map(contact => {
-  //       const newAddress = uuidToAddressMap[contact.uuid];
-  //       return newAddress &&
-  //         newAddress !== contact.receiveAddress &&
-  //         !contact.isLNURL
-  //         ? {...contact, receiveAddress: newAddress}
-  //         : contact;
-  //     });
-
-  //     toggleGlobalContactsInformation(
-  //       {
-  //         myProfile: {
-  //           ...globalContactsInformation.myProfile,
-  //           lastRotatedAddedContact: getCurrentDateFormatted(),
-  //         },
-  //         addedContacts: encriptMessage(
-  //           contactsPrivateKey,
-  //           publicKey,
-  //           JSON.stringify(updatedContactsAddress),
-  //         ),
-  //       },
-  //       true,
-  //     );
-  //   };
-
-  //   updateContactsAddresses();
-  // }, [
-  //   globalContactsInformation,
-  //   decodedAddedContacts,
-  //   contactsPrivateKey,
-  //   publicKey,
-  // ]);
 
   return (
     <GlobalContacts.Provider

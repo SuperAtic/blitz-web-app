@@ -36,6 +36,31 @@ const Storage = {
       console.error("Error removing from localStorage", err);
     }
   },
+  getAllKeys: () => {
+    try {
+      let values = [];
+      const numberOfItems = localStorage.length;
+      for (let index = 0; index < numberOfItems; index++) {
+        const keyName = localStorage.key(index);
+        values.push(keyName);
+      }
+      return values;
+    } catch (err) {
+      console.error("Error getting all keys from localStorage", err);
+    }
+  },
+  multiGet: (keyNames) => {
+    try {
+      let values = [];
+      for (const key of keyNames) {
+        const value = Storage.getItem(key);
+        values.push([key, value]);
+      }
+      return values;
+    } catch (err) {
+      console.error("Error getting all keys from localStorage", err);
+    }
+  },
 };
 
 export default Storage;

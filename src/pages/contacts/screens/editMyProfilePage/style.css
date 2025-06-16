@@ -1,0 +1,60 @@
+#editMyProfile {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inner container */
+#editMyProfile .editProfileInnerContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+#editMyProfile .editProfileScrollContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+#editMyProfile .profileImageContainer {
+  position: relative;
+  width: max-content;
+  align-self: center;
+}
+#editMyProfile .profileImageBackground {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#editMyProfile .selectFromPhotoesImage {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: absolute;
+  right: 20px;
+  bottom: -5px;
+}
+#editMyProfile .selectFromPhotoesImage img {
+  width: 50%;
+  height: 50%;
+}
+
+#editMyProfile .textInputContainer {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+#editMyProfile .textInputContainer .editPageContainer {
+  width: 100%;
+  margin: 0;
+  max-width: unset;
+}

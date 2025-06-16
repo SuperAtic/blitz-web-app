@@ -1,0 +1,34 @@
+#contactsPage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 50px;
+}
+/* navbar */
+#contactsPage .contactsPageTopBar {
+  display: flex;
+  justify-content: end;
+}
+#contactsPage .contactsPageTopBar .myContactContainer {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* No contacts container */
+#contactsPage .noContactsContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+#contactsPage .questionMarkIcon {
+  width: 95%;
+  max-width: 300px;
+}

@@ -81,7 +81,7 @@ export const setPOSTransactions = async ({ transactionsList, privateKey }) => {
     const tx = db.transaction(POS_TRANSACTION_TABLE_NAME, "readwrite");
 
     for (const msg of transactionsList) {
-      const decrypted = decryptMessage(
+      const decrypted = await decryptMessage(
         privateKey,
         import.meta.env.VITE_BACKEND_PUB_KEY,
         msg.tx
