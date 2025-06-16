@@ -42,6 +42,7 @@ export const GlobalContactsList = ({ children }) => {
     {}
   );
   const [contactsMessags, setContactsMessagses] = useState({});
+  const [decodedAddedContacts, setDecodedAddedContacts] = useState([]);
 
   const didTryToUpdate = useRef(false);
   const lookForNewMessages = useRef(false);
@@ -67,15 +68,31 @@ export const GlobalContactsList = ({ children }) => {
     [publicKey]
   );
 
-  const decodedAddedContacts = useMemo(() => {
-    if (!publicKey || !addedContacts) return [];
-    return typeof addedContacts === "string"
-      ? [
-          ...JSON.parse(
-            decryptMessage(contactsPrivateKey, publicKey, addedContacts)
-          ),
-        ]
-      : [];
+  useEffect(() => {
+    if (!publicKey || !addedContacts) return;
+
+    const decrypt = async () => {
+      if (typeof addedContacts === "string") {
+        try {
+          const decoded = await decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            addedContacts
+          );
+          console.log(decoded);
+          const parsed = JSON.parse(decoded);
+          console.log(parsed);
+          setDecodedAddedContacts(parsed);
+        } catch (e) {
+          console.error("Error decrypting or parsing:", e);
+          setDecodedAddedContacts([]);
+        }
+      } else {
+        setDecodedAddedContacts([]);
+      }
+    };
+
+    decrypt();
   }, [addedContacts, publicKey, contactsPrivateKey]);
 
   const updatedCachedMessagesStateFunction = useCallback(async () => {
