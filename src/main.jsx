@@ -374,90 +374,102 @@ function Root() {
                                   </Suspense>
                                 </AnimatePresence>
                                 {shouldShowBottomTabs && (
-                                  <BottomNavigation
-                                    value={value}
-                                    onChange={(event, newValue) =>
-                                      setValue(newValue)
-                                    }
-                                    showLabels
+                                  <div
                                     style={{
-                                      height: "70px",
-                                      position: "fixed",
-                                      bottom: 0,
-                                      width: "100%",
-                                      zIndex: 100, // optional: to make sure it's above other content
+                                      backgroundColor: Colors.light.background,
                                     }}
+                                    id="bottonTabsContainer"
                                   >
-                                    <BottomNavigationAction
-                                      disableRipple
-                                      sx={{
-                                        "& .MuiBottomNavigationAction-label": {
-                                          transition: "none",
-                                          fontSize: "15px",
-                                          font: "var(--font-family)",
-                                          color: Colors.light.text,
-                                        },
-                                        "&.Mui-selected .MuiBottomNavigationAction-label":
-                                          {
-                                            fontSize: "15px",
-                                            color: Colors.light.text,
-                                          },
+                                    <div
+                                      className="border"
+                                      style={{
+                                        backgroundColor:
+                                          Colors.light.backgroundOffset,
                                       }}
-                                      label="Contacts"
-                                      icon={
-                                        <TabsIcon
-                                          value={value}
-                                          icon="contacts"
-                                        />
-                                      }
-                                      component={Link}
-                                      to="/contacts"
                                     />
-                                    <BottomNavigationAction
-                                      disableRipple
-                                      sx={{
-                                        "& .MuiBottomNavigationAction-label": {
-                                          transition: "none",
-                                          fontSize: "15px",
-                                          font: "var(--font-family)",
-                                          color: Colors.light.text,
-                                        },
-                                        "&.Mui-selected .MuiBottomNavigationAction-label":
-                                          {
-                                            fontSize: "15px",
-                                            color: Colors.light.text,
-                                          },
+                                    <BottomNavigation
+                                      className="customBottomNavStyles"
+                                      value={value}
+                                      onChange={(event, newValue) =>
+                                        setValue(newValue)
+                                      }
+                                      showLabels
+                                      style={{
+                                        backgroundColor:
+                                          Colors.light.background,
                                       }}
-                                      label="Home"
-                                      icon={
-                                        <TabsIcon value={value} icon="wallet" />
-                                      }
-                                      component={Link}
-                                      to="/wallet"
-                                    />
-                                    <BottomNavigationAction
-                                      disableRipple
-                                      sx={{
-                                        "& .MuiBottomNavigationAction-label": {
-                                          transition: "none",
-                                          fontSize: "15px",
-                                          font: "var(--font-family)",
-                                          color: Colors.light.text,
-                                        },
-                                        "&.Mui-selected .MuiBottomNavigationAction-label":
-                                          {
-                                            fontSize: "15px",
-                                            color: Colors.light.text,
-                                          },
-                                      }}
-                                      label="Store"
-                                      icon={
-                                        <TabsIcon value={value} icon="store" />
-                                      }
-                                      component={Link}
-                                      to="/store"
-                                    />
-                                  </BottomNavigation>
+                                    >
+                                      <BottomNavigationAction
+                                        disableRipple
+                                        className="bottomTextElement"
+                                        sx={{
+                                          "& .MuiBottomNavigationAction-label":
+                                            {
+                                              color: Colors.light.text,
+                                            },
+                                          "&.Mui-selected .MuiBottomNavigationAction-label":
+                                            {
+                                              color: Colors.light.text,
+                                            },
+                                        }}
+                                        label="Contacts"
+                                        icon={
+                                          <TabsIcon
+                                            value={value}
+                                            icon="contacts"
+                                          />
+                                        }
+                                        component={Link}
+                                        to="/contacts"
+                                      />
+                                      <BottomNavigationAction
+                                        disableRipple
+                                        className="bottomTextElement"
+                                        sx={{
+                                          "& .MuiBottomNavigationAction-label":
+                                            {
+                                              color: Colors.light.text,
+                                            },
+                                          "&.Mui-selected .MuiBottomNavigationAction-label":
+                                            {
+                                              color: Colors.light.text,
+                                            },
+                                        }}
+                                        label="Home"
+                                        icon={
+                                          <TabsIcon
+                                            value={value}
+                                            icon="wallet"
+                                          />
+                                        }
+                                        component={Link}
+                                        to="/wallet"
+                                      />
+                                      <BottomNavigationAction
+                                        disableRipple
+                                        className="bottomTextElement"
+                                        sx={{
+                                          "& .MuiBottomNavigationAction-label":
+                                            {
+                                              color: Colors.light.text,
+                                            },
+                                          "&.Mui-selected .MuiBottomNavigationAction-label":
+                                            {
+                                              color: Colors.light.text,
+                                            },
+                                        }}
+                                        label="Store"
+                                        icon={
+                                          <TabsIcon
+                                            value={value}
+                                            icon="store"
+                                          />
+                                        }
+                                        component={Link}
+                                        to="/store"
+                                      />
+                                    </BottomNavigation>
+                                  </div>
                                 )}
                               </ImageCacheProvider>
                             </LiquidEventProvider>
