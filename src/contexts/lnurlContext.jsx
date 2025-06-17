@@ -28,97 +28,172 @@ export default function HandleLNURLPayments() {
   //   const tempWalletCacheRef = useRef(new Map());
   const deleteActiveLNURLPaymentsRef = useRef([]);
 
-  // Load saved LNURL payments once
+  // // Load saved LNURL payments once
+  // useEffect(() => {
+  //   if (!sparkAddress) return;
+  //   if (didRunSavedlNURL.current) return;
+
+  //   didRunSavedlNURL.current = true;
+
+  //   async function getSavedLNURLPayments() {
+  //     try {
+  //       const payments = await getLnurlPayments(masterInfoObject.uuid);
+  //       if (!payments.length) return;
+
+  //       console.log(`Restoring ${payments.length} offline lnurl payments`);
+
+  //       for (let index = 0; index < payments.length; index++) {
+  //         const payment = payments[index];
+  //         paymentQueueRef.current.push({
+  //           ...payment,
+  //           id: payment.id,
+  //           shouldNavigate: false,
+  //           runCount: 0,
+  //         });
+  //       }
+
+  //       processQueue();
+  //     } catch (error) {
+  //       console.error("Error loading saved LNURL payments:", error);
+  //     }
+  //   }
+
+  //   getSavedLNURLPayments();
+  // }, [sparkAddress, masterInfoObject.uuid]);
+
+  // // Set up Firebase listener once
+  // useEffect(() => {
+  //   if (!sparkAddress || loadListener.current) {
+  //     return;
+  //   }
+
+  //   console.log(masterInfoObject.uuid, "Setting up Firebase listener");
+  //   loadListener.current = true;
+
+  //   const setupListener = () => {
+  //     try {
+  //       const paymentsRef = collection(
+  //         db,
+  //         "blitzWalletUsers",
+  //         masterInfoObject.uuid,
+  //         "lnurlPayments"
+  //       );
+
+  //       // Consider if you want documents from now or from a specific time
+  //       const now = new Date().getTime();
+  //       const q = query(paymentsRef, where("timestamp", ">", now));
+
+  //       const unsubscribe = onSnapshot(
+  //         q,
+  //         (snapshot) => {
+  //           let hasNewPayments = false;
+  //           snapshot.docChanges().forEach((change) => {
+  //             if (change.type === "added") {
+  //               const payment = change.doc.data();
+  //               console.log(payment, "Added to payment queue");
+  //               paymentQueueRef.current.push({
+  //                 ...payment,
+  //                 id: change.doc.id,
+  //                 shouldNavigate: true,
+  //                 runCount: 0,
+  //               });
+  //               hasNewPayments = true;
+  //             }
+  //           });
+  //           if (hasNewPayments) {
+  //             processQueue();
+  //           }
+  //         },
+  //         (error) => {
+  //           console.error("Error in Firebase listener:", error);
+  //           // loadListener.current = false;
+  //           // Optionally retry after delay
+  //           // setTimeout(setupListener, 5000);
+  //         }
+  //       );
+
+  //       // Store unsubscribe function for cleanup
+  //       return unsubscribe;
+  //     } catch (error) {
+  //       console.error("Error setting up Firebase listener:", error);
+  //       loadListener.current = false;
+  //       return null;
+  //     }
+  //   };
+
+  //   const unsubscribe = setupListener();
+
+  //   return () => {
+  //     if (unsubscribe) {
+  //       unsubscribe();
+  //     }
+  //     loadListener.current = false;
+  //   };
+  // }, [sparkAddress, masterInfoObject.uuid]);
+
   useEffect(() => {
-    if (!sparkAddress) return;
-    if (didRunSavedlNURL.current) return;
+    if (!sparkAddress || loadListener.current) return;
 
-    didRunSavedlNURL.current = true;
-
-    async function getSavedLNURLPayments() {
-      try {
-        const payments = await getLnurlPayments(masterInfoObject.uuid);
-        if (!payments.length) return;
-
-        console.log(`Restoring ${payments.length} offline lnurl payments`);
-
-        for (let index = 0; index < payments.length; index++) {
-          const payment = payments[index];
-          paymentQueueRef.current.push({
-            ...payment,
-            id: payment.id,
-            shouldNavigate: false,
-            runCount: 0,
-          });
-        }
-
-        processQueue();
-      } catch (error) {
-        console.error("Error loading saved LNURL payments:", error);
-      }
-    }
-
-    getSavedLNURLPayments();
-  }, [sparkAddress, masterInfoObject.uuid]);
-
-  // Set up Firebase listener once
-  useEffect(() => {
-    if (!sparkAddress || loadListener.current) {
-      return;
-    }
-
-    console.log(masterInfoObject.uuid, "Setting up Firebase listener");
     loadListener.current = true;
 
     const setupListener = () => {
-      try {
-        const paymentsRef = collection(
-          db,
-          "blitzWalletUsers",
-          masterInfoObject.uuid,
-          "lnurlPayments"
-        );
+      const paymentsRef = collection(
+        db,
+        "blitzWalletUsers",
+        masterInfoObject.uuid,
+        "lnurlPayments"
+      );
 
-        // Consider if you want documents from now or from a specific time
-        const now = new Date().getTime();
-        const q = query(paymentsRef, where("timestamp", ">", now));
+      // Remove the timestamp filter to get ALL payments initially
+      const q = query(paymentsRef);
 
-        const unsubscribe = onSnapshot(
-          q,
-          (snapshot) => {
-            let hasNewPayments = false;
-            snapshot.docChanges().forEach((change) => {
-              if (change.type === "added") {
-                const payment = change.doc.data();
-                console.log(payment, "Added to payment queue");
-                paymentQueueRef.current.push({
-                  ...payment,
-                  id: change.doc.id,
-                  shouldNavigate: true,
-                  runCount: 0,
-                });
-                hasNewPayments = true;
-              }
+      let isInitialLoad = true;
+
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        if (isInitialLoad) {
+          // First load - process all existing payments
+          snapshot.docs.forEach((doc) => {
+            const payment = doc.data();
+            paymentQueueRef.current.push({
+              ...payment,
+              id: doc.id,
+              shouldNavigate: false, // Don't navigate for restored payments
+              runCount: 0,
             });
-            if (hasNewPayments) {
-              processQueue();
-            }
-          },
-          (error) => {
-            console.error("Error in Firebase listener:", error);
-            // loadListener.current = false;
-            // Optionally retry after delay
-            // setTimeout(setupListener, 5000);
-          }
-        );
+          });
 
-        // Store unsubscribe function for cleanup
-        return unsubscribe;
-      } catch (error) {
-        console.error("Error setting up Firebase listener:", error);
-        loadListener.current = false;
-        return null;
-      }
+          if (paymentQueueRef.current.length > 0) {
+            console.log(
+              `Restoring ${paymentQueueRef.current.length} offline lnurl payments`
+            );
+            processQueue();
+          }
+
+          isInitialLoad = false;
+
+          // Now update the query to only listen for new payments
+          // You'd need to modify this to use a timestamp filter going forward
+        } else {
+          // Handle real-time updates
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+              const payment = change.doc.data();
+              paymentQueueRef.current.push({
+                ...payment,
+                id: change.doc.id,
+                shouldNavigate: true,
+                runCount: 0,
+              });
+            }
+          });
+
+          if (snapshot.docChanges().length > 0) {
+            processQueue();
+          }
+        }
+      });
+
+      return unsubscribe;
     };
 
     const unsubscribe = setupListener();
