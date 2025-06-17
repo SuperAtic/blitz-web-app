@@ -18,7 +18,7 @@ import "./style.css";
 import ContactProfileImage from "../../components/profileImage/profileImage";
 import { Colors } from "../../../../constants/theme";
 import imagesIcon from "../../../../assets/imagesDark.png";
-import xSmallIconBlack from "../../../../assets/x-small-black.png";
+import xSmallIconBlack from "../../../../assets/x-small-black.webp";
 import CustomInput from "../../../../components/customInput/customInput";
 import { VALID_USERNAME_REGEX } from "../../../../constants";
 
