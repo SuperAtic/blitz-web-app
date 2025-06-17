@@ -70,54 +70,65 @@ export default function HandleLNURLPayments() {
     console.log(masterInfoObject.uuid, "Setting up Firebase listener");
     loadListener.current = true;
 
-    try {
-      const paymentsRef = collection(
-        db,
-        "blitzWalletUsers",
-        masterInfoObject.uuid,
-        "lnurlPayments"
-      );
+    const setupListener = () => {
+      try {
+        const paymentsRef = collection(
+          db,
+          "blitzWalletUsers",
+          masterInfoObject.uuid,
+          "lnurlPayments"
+        );
 
-      const now = new Date().getTime();
-      const q = query(paymentsRef, where("timestamp", ">", now));
+        // Consider if you want documents from now or from a specific time
+        const now = new Date().getTime();
+        const q = query(paymentsRef, where("timestamp", ">", now));
 
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          let hasNewPayments = false;
-
-          snapshot.docChanges().forEach((change) => {
-            if (change.type === "added") {
-              const payment = change.doc.data();
-              console.log(payment, "Added to payment queue");
-
-              paymentQueueRef.current.push({
-                ...payment,
-                id: change.doc.id,
-                shouldNavigate: true,
-                runCount: 0,
-              });
-
-              hasNewPayments = true;
+        const unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            let hasNewPayments = false;
+            snapshot.docChanges().forEach((change) => {
+              if (change.type === "added") {
+                const payment = change.doc.data();
+                console.log(payment, "Added to payment queue");
+                paymentQueueRef.current.push({
+                  ...payment,
+                  id: change.doc.id,
+                  shouldNavigate: true,
+                  runCount: 0,
+                });
+                hasNewPayments = true;
+              }
+            });
+            if (hasNewPayments) {
+              processQueue();
             }
-          });
-
-          if (hasNewPayments) {
-            processQueue();
+          },
+          (error) => {
+            console.error("Error in Firebase listener:", error);
+            // loadListener.current = false;
+            // Optionally retry after delay
+            // setTimeout(setupListener, 5000);
           }
-        },
-        (error) => {
-          console.error("Error in Firebase listener:", error);
-          // Attempt to reconnect after a delay
-          setTimeout(() => {
-            loadListener.current = false;
-          }, 5000);
-        }
-      );
-    } catch (error) {
-      console.error("Error setting up Firebase listener:", error);
+        );
+
+        // Store unsubscribe function for cleanup
+        return unsubscribe;
+      } catch (error) {
+        console.error("Error setting up Firebase listener:", error);
+        loadListener.current = false;
+        return null;
+      }
+    };
+
+    const unsubscribe = setupListener();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
       loadListener.current = false;
-    }
+    };
   }, [sparkAddress, masterInfoObject.uuid]);
 
   // Process payment queue
