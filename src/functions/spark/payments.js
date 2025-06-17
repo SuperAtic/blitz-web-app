@@ -257,7 +257,7 @@ export const sparkReceivePaymentWrapper = async ({
 async function handleSupportPayment(masterInfoObject, supportFee) {
   try {
     if (masterInfoObject?.enabledDeveloperSupport?.isEnabled) {
-      sendSparkPayment({
+      await sendSparkPayment({
         receiverSparkAddress: import.meta.env.VITE_BLITZ_SPARK_ADDRESS,
         amountSats: supportFee,
       });
