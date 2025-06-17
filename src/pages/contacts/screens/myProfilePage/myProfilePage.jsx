@@ -81,7 +81,7 @@ export default function MyProfilePage() {
         onClick={() => {
           navigate("/error", {
             state: {
-              errorMessage: "Feture coming soon...",
+              errorMessage: "Feature coming soon...",
               background: location,
             },
           });

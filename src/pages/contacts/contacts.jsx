@@ -188,7 +188,7 @@ export default function Contacts() {
                 //navigate to add contacts popup
                 navigate("/error", {
                   state: {
-                    errorMessage: "Feture coming soon...",
+                    errorMessage: "Feature coming soon...",
                     background: location,
                   },
                 });
