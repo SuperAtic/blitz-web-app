@@ -36,7 +36,7 @@ export default function AboutPage() {
       </p>
 
       <div className="peopleContainer">
-        <p className="sectionHeader">Good to know</p>
+        <p className="sectionHeader">Creator</p>
         <CustomButton
           actionFunction={() =>
             openLinkToNewTab(`https://x.com/blakekaufman17`)
@@ -46,7 +46,7 @@ export default function AboutPage() {
           buttonClassName={"peopleLink"}
           textContent={"Blake Kaufman"}
         />
-        <p className="sectionHeader">Good to know</p>
+        <p className="sectionHeader">UI/UX</p>
         <CustomButton
           actionFunction={() => openLinkToNewTab(`https://x.com/Stromens`)}
           buttonStyles={{ backgroundColor: Colors.light.blue }}

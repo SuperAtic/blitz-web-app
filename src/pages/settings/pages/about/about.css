@@ -17,6 +17,11 @@
 #aboutPageContainer .peopleContainer {
   margin-top: 50px;
 }
+#aboutPageContainer .peopleContainer .sectionHeader:nth-child(3) {
+  margin-top: 30px;
+  margin-bottom: 0px;
+}
 #aboutPageContainer .peopleLink {
+  width: 100%;
   margin: 10px 0;
 }
