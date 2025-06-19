@@ -327,7 +327,7 @@ const SparkWalletProvider = ({ children, navigate }) => {
     // // Clean up on unmount
     return () => {
       removeListeners();
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      // document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [sparkInformation.didConnect]);
 

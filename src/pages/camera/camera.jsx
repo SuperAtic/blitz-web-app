@@ -1,196 +1,174 @@
 import { useRef, useEffect, useState } from "react";
-import jsQR from "jsqr";
+import { useLocation, useNavigate } from "react-router-dom";
+import QrScanner from "qr-scanner";
+
 import BackArrow from "../../components/backArrow/backArrow";
-import { Scanner } from "@yudiel/react-qr-scanner";
+import getDataFromClipboard from "../../functions/getDataFromClipboard";
 
 import "./style.css";
-import getDataFromClipboard from "../../functions/getDataFromClipboard";
-import { useNavigate } from "react-router-dom";
+import { Colors } from "../../constants/theme";
+import CustomButton from "../../components/customButton/customButton";
+import flashLightNoFill from "../../assets/flashlightNoFillWhite.png";
+import flashLightFill from "../../assets/flashlight.png";
+import images from "../../assets/images.png";
+
+// QrScanner. = "/qr-scanner-worker.min.js"; // Adjust if you move the file
 
 export default function Camera() {
   const navigate = useNavigate();
+  const location = useLocation();
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const streamRef = useRef(null);
+  const scannerRef = useRef(null);
   const didScan = useRef(false);
-  const animationFrameId = useRef(null);
+  const fileInput = document.getElementById("file-selector");
   const [pauseCamera, setPauseCamera] = useState(false);
-  const [isCameraReady, setIsCameraReady] = useState(true);
+  const [isCameraReady, setIsCameraReady] = useState(false);
+  const [isFlashlightOn, setIsFlashLightOn] = useState(false);
 
-  // useEffect(() => {
-  //   const video = videoRef.current;
-  //   const canvas = canvasRef.current;
-  //   const ctx = canvas.getContext("2d");
-  //   let isMounted = true;
+  useEffect(() => {
+    if (pauseCamera || didScan.current || !videoRef.current) return;
 
-  //   const scan = () => {
-  //     if (!isMounted || !video || video.readyState !== video.HAVE_ENOUGH_DATA) {
-  //       animationFrameId.current = requestAnimationFrame(scan);
-  //       return;
-  //     }
+    const scanner = new QrScanner(
+      videoRef.current,
+      (result) => {
+        if (didScan.current) return;
+        didScan.current = true;
 
-  //     canvas.width = video.videoWidth;
-  //     canvas.height = video.videoHeight;
-  //     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  //     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  //     const code = jsQR(imageData.data, imageData.width, imageData.height);
+        console.log(result.data);
+        return;
+        scanner.stop();
+        setPauseCamera(true);
+        navigate("/send", { state: { btcAddress: result.data } });
+      },
+      {
+        returnDetailedScanResult: true,
+        highlightScanRegion: false,
+        highlightCodeOutline: false,
+      }
+    );
 
-  //     if (code && !didScan.current) {
-  //       didScan.current = true;
-  //       // Stop camera resources before navigating
-  //       if (animationFrameId.current) {
-  //         cancelAnimationFrame(animationFrameId.current);
-  //         animationFrameId.current = null;
-  //       }
+    scanner.isFlashOn();
+    scannerRef.current = scanner;
 
-  //       if (streamRef.current) {
-  //         streamRef.current.getTracks().forEach((track) => track.stop());
-  //         streamRef.current = null;
-  //       }
+    scanner
+      .start()
+      .then(() => setIsCameraReady(true))
+      .catch((err) => {
+        console.error("Failed to start scanner:", err);
+        setIsCameraReady(false);
+      });
 
-  //       navigate("/send", { state: { btcAddress: code.data } });
-  //       return; // Exit scan loop after successful scan
-  //     }
-
-  //     if (isMounted) {
-  //       animationFrameId.current = requestAnimationFrame(scan);
-  //     }
-  //   };
-
-  //   const setupCamera = async () => {
-  //     try {
-  //       const stream = await navigator.mediaDevices.getUserMedia({
-  //         video: { facingMode: "environment" },
-  //       });
-
-  //       if (!isMounted) {
-  //         stream.getTracks().forEach((track) => track.stop());
-  //         return;
-  //       }
-
-  //       streamRef.current = stream;
-  //       video.srcObject = stream;
-  //       video.setAttribute("playsinline", true);
-
-  //       // Wait for video to be ready to play
-  //       await video.play();
-
-  //       if (!isMounted) {
-  //         stream.getTracks().forEach((track) => track.stop());
-  //         return;
-  //       }
-
-  //       setIsCameraReady(true);
-  //       animationFrameId.current = requestAnimationFrame(scan);
-  //     } catch (err) {
-  //       console.error("Camera error:", err);
-  //     }
-  //   };
-
-  //   setupCamera();
-
-  //   // Cleanup function
-  //   return () => {
-  //     console.log("Camera component unmounting, cleaning up resources");
-  //     isMounted = false;
-  //     setIsCameraReady(false);
-
-  //     // Cancel animation frame first
-  //     if (animationFrameId.current) {
-  //       cancelAnimationFrame(animationFrameId.current);
-  //       animationFrameId.current = null;
-  //     }
-
-  //     // Then stop all tracks
-  //     if (streamRef.current) {
-  //       const tracks = streamRef.current.getTracks();
-  //       tracks.forEach((track) => {
-  //         track.stop();
-  //         console.log("Track stopped:", track.kind);
-  //       });
-  //       streamRef.current = null;
-  //     }
-
-  //     // Clear video source
-  //     if (videoRef.current) {
-  //       videoRef.current.srcObject = null;
-  //       videoRef.current.load(); // Force video to clear its source
-  //     }
-  //   };
-  // }, [navigate]);
-
-  const handleScan = (rawValue) => {
-    setPauseCamera(true);
-    navigate("/send", { state: { btcAddress: rawValue } });
-  };
+    return () => {
+      scanner.stop();
+      scanner.destroy();
+      scannerRef.current = null;
+    };
+  }, [navigate, pauseCamera]);
 
   const handlePaste = async () => {
     if (didScan.current) return;
     didScan.current = true;
 
-    // Stop camera resources before navigating
     setPauseCamera(true);
-
     const data = await getDataFromClipboard();
     navigate("/send", { state: { btcAddress: data } });
+  };
+  const toggleFlashLight = async () => {
+    try {
+      const hasFlash = await scannerRef.current.hasFlash();
+      if (!hasFlash) {
+        navigate("/error", {
+          state: {
+            errorMessage: "Device does not have a flash",
+            background: location,
+          },
+        });
+        return;
+      }
+      await scannerRef.current.toggleFlash();
+      const isFlashOn = await scannerRef.current.isFlashOn();
+      setIsFlashLightOn(isFlashOn);
+    } catch (err) {
+      console.log("camera flash error", err);
+    }
+  };
+
+  const fileListener = () => {
+    const file = fileInput.files[0];
+
+    if (!file) {
+      return;
+    }
+    QrScanner.scanImage(file, { returnDetailedScanResult: true })
+      .then((result) => {
+        console.log(result);
+        const qrData = result.data;
+        if (didScan.current) return;
+        didScan.current = true;
+        navigate("/send", { state: { btcAddress: data } });
+
+        fileInput.removeEventListener("change", fileListener);
+      })
+      .catch((e) => {
+        navigate("/error", {
+          state: {
+            errorMessage: "No QR code found.",
+            background: location,
+          },
+        });
+
+        fileInput.removeEventListener("change", fileListener);
+      });
+  };
+  const getDataFromFile = async () => {
+    try {
+      fileInput.addEventListener("change", fileListener);
+      fileInput.click();
+    } catch (err) {
+      console.log("camera flash error", err);
+    }
   };
 
   return (
     <div className="camera-page">
-      <Scanner
-        paused={pauseCamera}
-        classNames={"cameraComponenet"}
-        formats={["qr_code"]}
-        onError={() => setIsCameraReady(false)}
-        onScan={(result) => {
-          const [data] = result;
-
-          handleScan(data.rawValue);
-
-          console.log(result, data);
-        }}
-      />
-      {/* <video ref={videoRef} className="camera-video" playsInline muted /> */}
-      {/* <canvas ref={canvasRef} style={{ display: "none" }} /> */}
-      <div className="camera-overlay">
-        <div className="overlay">
-          <div className="backContainer">
-            <BackArrow showWhite={true} />
-          </div>
-          {/* <div className="top-row">
-            <div className="qr-vertical-buttons"> */}
-          {/* <button onClick={toggleFlash}>
-            <img
-              className="icon"
-              src={
-                isFlashOn ? ICONS.FlashLightIcon : ICONS.flashlightNoFillWhite
-              }
-              alt="Flash Toggle"
-            />
-          </button>
-          <button onClick={getPhoto}>
-            <img className="icon" src={ICONS.ImagesIcon} alt="Gallery" />
-          </button> */}
-          {/* </div>
-          </div> */}
-        </div>
-
-        <div className="middle-row">
-          <div className="overlay" />
-          <div className="qr-box-outline">
-            {!isCameraReady && <p>Loading Camera...</p>}
-          </div>
-          <div className="overlay" />
-        </div>
-
-        <div className="overlay">
-          <div className="bottom-controls">
-            <button className="paste-btn" onClick={handlePaste}>
-              Paste
-            </button>
-          </div>
+      <div className="backContainer">
+        <BackArrow showWhite={true} />
+      </div>
+      <div id="video-container" className="example-style-2">
+        <video
+          ref={videoRef}
+          className="camera-video"
+          disablePictureInPicture
+          playsInline
+          muted
+          style={{ width: "100%" }}
+        />
+        <div
+          className="scan-region-highlight"
+          style={{
+            border: `4px solid ${Colors.light.blue}`,
+          }}
+        >
+          {!isCameraReady && <p>Loading camera...</p>}
         </div>
       </div>
+      <div onClick={getDataFromFile} className="fileContainer">
+        <input hidden type="file" id="file-selector" accept="image/*" />
+        <img className="optionImage" src={images} alt="images icon" />
+      </div>
+      <div onClick={toggleFlashLight} className="flashLightContainer">
+        <img
+          className="optionImage"
+          src={isFlashlightOn ? flashLightFill : flashLightNoFill}
+          alt="flash light icon"
+        />
+      </div>
+      <CustomButton
+        actionFunction={handlePaste}
+        textContent={"Paste"}
+        buttonClassName={"handleCameraPaste"}
+        textClassName={"handleCameraPasteText"}
+      />
     </div>
   );
 }
