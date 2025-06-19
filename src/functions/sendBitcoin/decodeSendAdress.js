@@ -11,6 +11,7 @@ import displayCorrectDenomination from "../displayCorrectDenomination";
 import getLiquidAddressFromSwap from "../boltz/magicRoutingHints";
 import { LIQUID_TYPES } from "../../constants";
 import processSparkAddress from "./processSparkAddress";
+import { decodeBip21SparkAddress } from "../spark/handleBip21SparkAddress";
 
 export default async function decodeSendAddress(props) {
   let {

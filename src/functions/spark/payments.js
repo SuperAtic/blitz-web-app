@@ -10,7 +10,12 @@ import {
   sparkWallet,
 } from ".";
 
-import { SPARK_TO_LN_FEE, SPARK_TO_SPARK_FEE } from "../../constants/math";
+import {
+  SATSPERBITCOIN,
+  SPARK_TO_LN_FEE,
+  SPARK_TO_SPARK_FEE,
+} from "../../constants/math";
+import { formatBip21SparkAddress } from "./handleBip21SparkAddress";
 import {
   addSingleUnpaidSparkLightningTransaction,
   bulkUpdateSparkTransactions,
@@ -217,7 +222,7 @@ export const sparkReceivePaymentWrapper = async ({
       const invoice = await sparkWallet.createLightningInvoice({
         amountSats,
         memo,
-        expirySeconds: 1000 * 60 * 60 * 24, //Add 24 hours validity to invoice
+        expirySeconds: 1000 * 60 * 60 * 12, //Add 24 hours validity to invoice
       });
 
       const tempTransaction = {
@@ -235,17 +240,37 @@ export const sparkReceivePaymentWrapper = async ({
     } else if (paymentType === "bitcoin") {
       // Handle storage of tx when claiming in spark context
       const depositAddress = await getSparkStaticBitcoinL1Address();
+
+      let formmattedAddress = amountSats
+        ? `bitcoin:${depositAddress}?amount:${Number(
+            amountSats / SATSPERBITCOIN
+          ).toFixed(8)}${
+            memo
+              ? `&label=${encodeURIComponent(memo)}&message${encodeURIComponent(
+                  memo
+                )}`
+              : ""
+          }`
+        : depositAddress;
+
       return {
         didWork: true,
-        invoice: depositAddress,
+        invoice: formmattedAddress,
       };
     } else {
       // No need to save address since it is constant
       const sparkAddress = await getSparkAddress();
+      const formattedSparkAddress = formatBip21SparkAddress({
+        address: sparkAddress,
+        amount: amountSats,
+        message: memo,
+      });
+
+      let formmattedAddress = amountSats ? formattedSparkAddress : sparkAddress;
 
       return {
         didWork: true,
-        invoice: sparkAddress,
+        invoice: formmattedAddress,
       };
     }
   } catch (err) {
