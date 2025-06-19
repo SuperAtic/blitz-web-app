@@ -6,8 +6,10 @@ import QRCodeQrapper from "../../components/qrCode/qrCode";
 import "./style.css";
 import ReceiveButtonsContainer from "./components/buttonContainer";
 import { initializeAddressProcess } from "../../functions/receiveBitcoin/addressGeneration";
+import { useGlobalContacts } from "../../contexts/globalContacts";
 
 export default function ReceiveQRPage() {
+  const { globalContactsInformation } = useGlobalContacts();
   const navigate = useNavigate();
   const location = useLocation();
   const props = location.state;
@@ -27,7 +29,7 @@ export default function ReceiveQRPage() {
   const [addressState, setAddressState] = useState({
     selectedRecieveOption: selectedRecieveOption,
     isReceivingSwap: false,
-    generatedAddress: "",
+    generatedAddress: `${globalContactsInformation.myProfile.uniqueName}@blitz-wallet.com`,
     isGeneratingInvoice: false,
     minMaxSwapAmount: { min: 0, max: 0 },
     swapPegInfo: {},
@@ -45,6 +47,12 @@ export default function ReceiveQRPage() {
       paymentDescription,
       selectedRecieveOption
     );
+    if (
+      !initialSendAmount &&
+      selectedRecieveOption.toLowerCase() === "lightning"
+    )
+      return;
+
     initializeAddressProcess({
       userBalanceDenomination: "sats",
       receivingAmount: initialSendAmount,

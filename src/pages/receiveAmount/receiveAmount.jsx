@@ -40,7 +40,6 @@ const EditReceivePaymentInformation = () => {
 
   console.log(fromPage, "testing");
   const handleSubmit = () => {
-    if (!Number(localSatAmount)) return;
     console.log("Running in edit payment information submit function");
 
     navigate(`/receive`, {
@@ -105,7 +104,7 @@ const EditReceivePaymentInformation = () => {
           type="text"
           value={paymentDescription}
           onChange={(e) => setPaymentDescription(e.target.value)}
-          placeholder={"Description..."}
+          placeholder={"Add a note..."}
           className="description-input"
           onFocus={() => setIsKeyboardFocused(true)}
           onBlur={() => setIsKeyboardFocused(false)}
@@ -145,7 +144,6 @@ const EditReceivePaymentInformation = () => {
       <CustomButton
         actionFunction={handleSubmit}
         buttonStyles={{
-          opacity: !Number(localSatAmount) ? 0.5 : 1,
           maxWidth: "200px",
           margin: "0 auto",
         }}
