@@ -18,8 +18,8 @@ const EditReceivePaymentInformation = () => {
   const { fiatStats } = useNodeContext();
   const props = location.state;
 
-  const receiveOption = props?.receiceOption;
-  const fromPage = props?.fromPage;
+  const receiveOption = props?.receiveOption;
+  const fromPage = props?.from;
 
   const [amountValue, setAmountValue] = useState("");
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
