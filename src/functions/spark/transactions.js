@@ -121,13 +121,20 @@ export const bulkUpdateSparkTransactions = async (transactions) => {
       const existing = await store.get(tempSparkId);
 
       if (existing) {
-        let mergedDetails = {};
+        let existingDetails = {};
         try {
-          mergedDetails = { ...JSON.parse(existing.details), ...newDetails };
+          existingDetails = JSON.parse(existing.details);
         } catch {
-          mergedDetails = JSON.parse(existing.details);
+          existingDetails = {};
         }
+        let mergedDetails = { ...existingDetails };
 
+        for (const key in newDetails) {
+          const value = newDetails[key];
+          if (value !== "" && value !== null && value !== undefined) {
+            mergedDetails[key] = value;
+          }
+        }
         await store.put({
           ...existing,
           sparkID: t.id,
