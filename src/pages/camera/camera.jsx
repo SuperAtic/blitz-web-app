@@ -31,14 +31,15 @@ export default function Camera() {
     const scanner = new QrScanner(
       videoRef.current,
       (result) => {
+        console.log(result, "result in camera scan");
+        const data = result.data;
+        if (!data) return;
         if (didScan.current) return;
         didScan.current = true;
 
-        console.log(result.data);
-        return;
         scanner.stop();
         setPauseCamera(true);
-        navigate("/send", { state: { btcAddress: result.data } });
+        navigate("/send", { state: { btcAddress: data } });
       },
       {
         returnDetailedScanResult: true,
@@ -66,6 +67,7 @@ export default function Camera() {
   }, [navigate, pauseCamera]);
 
   const handlePaste = async () => {
+    console.log("result from paste option", data);
     if (didScan.current) return;
     didScan.current = true;
 
@@ -101,8 +103,9 @@ export default function Camera() {
     }
     QrScanner.scanImage(file, { returnDetailedScanResult: true })
       .then((result) => {
-        console.log(result);
-        const qrData = result.data;
+        console.log(result, "result from file listener");
+        const data = result.data;
+        if (!data) return;
         if (didScan.current) return;
         didScan.current = true;
         navigate("/send", { state: { btcAddress: data } });
