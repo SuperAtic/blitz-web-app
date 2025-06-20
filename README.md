@@ -20,10 +20,15 @@ Blitz Wallet Web App is a React application that allows users to interact with t
 
 ## TODO
 
-- [ ] Receive Bitcoin payments
+- [x] Send / Receive Bitcoin payments
+- [x] LNURL
 - [ ] Dark modes
-- [ ] Fiat currencies
-- [ ] Add Blitz Contacts
+- [x] Fiat currencies
+- [ ] Blitz Contacts
+- [ ] Store items
+- [ ] Match Blitz Mobile settings options
+- [ ] More send options (from image, manual input, from contacts)
+- [ ] Liquid receive option
 
 ## Contribute
 
