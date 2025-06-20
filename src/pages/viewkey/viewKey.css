@@ -21,10 +21,18 @@
   margin-bottom: 20px;
 }
 .viewMnemoincContainer .mnemoincContainer {
-  margin-bottom: auto;
   max-height: 362px;
   overflow-y: scroll;
   scrollbar-width: auto;
+  display: flex;
+  justify-content: center;
+}
+.viewMnemoincContainer .mnemoincContainer .qrCodeWraperContainer {
+  width: 100%;
+  height: 362px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .viewMnemoincContainer .mnemoincContainer::-webkit-scrollbar {
@@ -46,6 +54,7 @@
   transition: top 0.8s ease-in-out;
   display: flex;
   flex-direction: column;
+  z-index: 99;
 }
 .viewMnemoincContainer .mnemoincCover .coverContent {
   flex: 1;
@@ -72,6 +81,37 @@
   button:first-child {
   background-color: var(--primaryBlue);
   color: white;
+}
+
+.viewMnemoincContainer .switchContainer {
+  width: 200px;
+  margin: 20px auto auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid gainsboro;
+  padding: 10px 0;
+  border-radius: 50px;
+  position: relative;
+}
+.viewMnemoincContainer .optionSlider {
+  height: 85%;
+  width: 95px;
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  border-radius: 50px;
+  transition: left 0.5s ease-in-out;
+}
+.viewMnemoincContainer .switchContainer p {
+  margin: 0;
+  position: relative;
+  z-index: 11;
+  width: 50%;
+  text-align: center;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 400px) {
