@@ -11,10 +11,15 @@ export default function ConfirmActionPage() {
   const location = useLocation();
   const [visible, setVisible] = useState(true); // controls animation
 
-  const confirmHeader = location?.state?.confirmHeader;
-  const confirmMessage = location?.state?.confirmDescription;
-  const fromRoute = location?.state?.fromRoute;
-  const navigateBack = location?.state?.navigateBack;
+  const {
+    confirmHeader,
+    confirmDescription: confirmMessage,
+    fromRoute,
+    navigateBack,
+    customProps,
+    useCustomProps,
+    useProps,
+  } = location.state;
 
   const handleExitComplete = () => {
     switch (navigateBack) {
@@ -23,6 +28,14 @@ export default function ConfirmActionPage() {
         break;
       case "homePage":
         navigate("/");
+        break;
+      case "settings-item":
+        navigate("/settings-item", {
+          state: {
+            for: "backup wallet",
+          },
+          replace: true,
+        });
         break;
       default:
         navigate(-1);
@@ -71,7 +84,16 @@ export default function ConfirmActionPage() {
               <CustomButton
                 actionFunction={() => {
                   if (fromRoute) {
-                    navigate(`/${fromRoute}?confirmed=true`);
+                    if (useProps) {
+                      navigate(
+                        `/${fromRoute}`,
+                        useCustomProps
+                          ? { state: customProps, replace: true }
+                          : { state: { confirmed: true }, replace: true }
+                      );
+                    } else {
+                      navigate(`/${fromRoute}?confirmed=true`);
+                    }
                     return;
                   }
                   handleOkClick();
