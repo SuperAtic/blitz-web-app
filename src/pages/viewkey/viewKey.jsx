@@ -1,14 +1,54 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BackArrow from "../../components/backArrow/backArrow";
 import { KeyContainer } from "../../components/keyContainer/keyContainer";
 import { useAuth } from "../../contexts/authContext";
 import "./viewKey.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Colors } from "../../constants/theme";
+import calculateSeedQR from "../../functions/calculateSeedQR";
+import QRCodeQrapper from "../../components/qrCode/qrCode";
 
 export default function ViewMnemoinc() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const props = location.state;
   const { mnemoinc } = useAuth();
-  const [shouldShowMnemoinc, setShouldShowMnemoinc] = useState(false);
+  const [shouldShowMnemoinc, setShouldShowMnemoinc] = useState(
+    !!props?.confirmed
+  );
+  const [showSeedAsWords, setShowSeedAsWords] = useState(true);
+  const seedQRCalculation = calculateSeedQR(mnemoinc);
+
+  useEffect(() => {
+    if (!props?.confirmed) return;
+    setShowSeedAsWords(false);
+  }, [props]);
+
+  console.log(props, "test props");
+
+  const toggleSeedAsWords = () => {
+    if (showSeedAsWords && !props?.confirmed) {
+      navigate("/confirm-action", {
+        state: {
+          confirmHeader: "Are you sure you want to show this QR Code?",
+          confirmDescription:
+            "Scanning your seed is convenient, but be sure you're using a secure and trusted device. This helps keep your wallet safe.",
+          useCustomProps: true,
+          customProps: {
+            confirmed: true,
+            for: "backup wallet",
+          },
+          useProps: true,
+          navigateBack: "settings-item",
+          fromRoute: "settings-item",
+          background: location,
+        },
+        replace: true,
+      });
+      return;
+    }
+    setShowSeedAsWords((prev) => !prev);
+  };
   return (
     <div className="viewMnemoincContainer">
       <div
@@ -28,7 +68,29 @@ export default function ViewMnemoinc() {
       <p className="warning1">Keep this phrase in a secure and safe place</p>
       <p className="warning2">Do not share it with anyone!</p>
       <div className="mnemoincContainer">
-        <KeyContainer keys={mnemoinc.split(" ")} />
+        {showSeedAsWords ? (
+          <KeyContainer keys={mnemoinc.split(" ")} />
+        ) : (
+          <div className="qrCodeWraperContainer" style={{ height: "362px" }}>
+            <QRCodeQrapper data={seedQRCalculation} />
+          </div>
+        )}
+      </div>
+
+      <div
+        onClick={toggleSeedAsWords}
+        style={{ backgroundColor: Colors.light.backgroundOffset }}
+        className="switchContainer"
+      >
+        <div
+          style={{
+            backgroundColor: Colors.dark.text,
+            left: showSeedAsWords ? "3px" : "100px",
+          }}
+          className="optionSlider"
+        />
+        <p>Words</p>
+        <p>QR Code</p>
       </div>
     </div>
   );

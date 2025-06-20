@@ -39,7 +39,7 @@ export default function SettingsContentIndex() {
 
         {selectedPage === "blitz stats" && <ExploreUsers />}
 
-        {selectedPage === "backup wallet" && <ViewMnemoinc />}
+        {selectedPage === "backup wallet" && <ViewMnemoinc props={props} />}
         {selectedPage === "spark info" && <SparkInformation />}
       </div>
     </SafeAreaComponent>
