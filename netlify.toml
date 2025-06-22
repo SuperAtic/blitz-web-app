@@ -1,5 +1,16 @@
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/twitterCard.png"
+  to = "/twitterCard.png"
+  status = 200
+
 # Catch-all redirect for SPA (React)
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
