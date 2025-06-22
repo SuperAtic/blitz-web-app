@@ -48,7 +48,6 @@ export default function Camera() {
       }
     );
 
-    scanner.isFlashOn();
     scannerRef.current = scanner;
 
     scanner
@@ -88,7 +87,7 @@ export default function Camera() {
         return;
       }
       await scannerRef.current.toggleFlash();
-      const isFlashOn = await scannerRef.current.isFlashOn();
+      const isFlashOn = scannerRef.current.isFlashOn();
       setIsFlashLightOn(isFlashOn);
     } catch (err) {
       console.log("camera flash error", err);
