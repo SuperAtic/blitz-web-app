@@ -17,6 +17,8 @@
 .seedContainer .keyContainerWrapper {
   width: 90%;
   max-width: 320px;
+  max-height: 362px;
+  overflow-y: scroll;
   margin: 20px auto;
 }
 .seedContainer .firstWarningText {
@@ -40,10 +42,26 @@
   grid-template-columns: 1fr 1fr;
   column-gap: 10px;
 }
-.seedContainer .buttonsContainer button {
-  max-width: 150px;
+.seedContainer .buttonsContainer .customButton {
+  max-width: unset;
 }
+
 .seedContainer .buttonsContainer button:first-child {
   background-color: var(--primaryBlue);
   color: #fff;
+}
+
+@media screen and (max-width: 390px) {
+  .seedContainer .keyContainer {
+    grid-template-columns: 1fr;
+  }
+}
+@media screen and (max-width: 300px) {
+  .seedContainer .buttonsContainer {
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+  }
+  .seedContainer .buttonsContainer button {
+    margin: 0 auto;
+  }
 }

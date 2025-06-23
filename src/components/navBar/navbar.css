@@ -4,12 +4,21 @@
   display: flex;
   align-items: center;
 }
+.pageNavBar .backArrowContainer {
+  position: absolute;
+  left: 0;
+  z-index: 1;
+}
 .pageNavBar .pageHeaderText {
   font-size: 25px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   text-align: center;
+  white-space: nowrap; /* Prevent line break */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add "..." at end */
+  max-width: 100%; /* Optional: constrain width */
+  flex: 1; /* Fill available space if needed */
+  padding: 0 35px;
+  margin: 0;
 }
 @media screen and (max-width: 400px) {
   .pageNavBar .pageHeaderText {

@@ -18,9 +18,8 @@ export default function CustomButton({
         if (!actionFunction) return;
         actionFunction();
       }}
-      id="customButton"
       style={{ ...buttonStyles }}
-      className={buttonClassName}
+      className={`customButton ${buttonClassName}`}
     >
       {useLoading ? (
         <FullLoadingScreen

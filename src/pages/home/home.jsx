@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import "./login.css";
+import CustomButton from "../../components/customButton/customButton";
+import { Colors } from "../../constants/theme";
 
 function Home() {
   const navigate = useNavigate();
@@ -8,8 +10,17 @@ function Home() {
       <h1>Blitz</h1>
 
       <div className="buttonContainer">
-        <button onClick={() => navigate("/disclaimer")}>Make new wallet</button>
-        <button onClick={() => navigate("/restore")}>Enter seed phrase</button>
+        <CustomButton
+          buttonClassName={"actionButton"}
+          actionFunction={() => navigate("/disclaimer")}
+          textStyles={{ color: Colors.dark.text }}
+          textContent={"Make new wallet"}
+        />
+        <CustomButton
+          buttonClassName={"actionButton"}
+          actionFunction={() => navigate("/restore")}
+          textContent={"Enter seed phrase"}
+        />
       </div>
       <p>Your Wallet, your coins, 100% open-source</p>
     </div>

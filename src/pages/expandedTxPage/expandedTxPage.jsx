@@ -1,6 +1,4 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import SafeAreaComponent from "../../components/safeAreaContainer";
-import { motion } from "framer-motion";
 import BackArrow from "../../components/backArrow/backArrow";
 import "./style.css";
 import { Colors } from "../../constants/theme";
@@ -33,6 +31,8 @@ export default function ExpandedTxPage() {
       setWindowWidth(window.innerWidth);
     });
   }, []);
+
+  console.log(windowWidth);
 
   return (
     <>
@@ -77,11 +77,7 @@ export default function ExpandedTxPage() {
             </div>
           </div>
           <ThemeText
-            textStyles={{
-              fontSize: "20px",
-              textAlign: "center",
-              marginTop: "20px",
-            }}
+            className={"receiveAmountLabel"}
             textContent={`${
               transaction.details.direction === "OUTGOING" ? "Sent" : "Received"
             } amount`}
@@ -90,7 +86,7 @@ export default function ExpandedTxPage() {
             containerStyles={{ marginTop: "-5px" }}
             neverHideBalance={true}
             styles={{
-              fontSize: "40px",
+              fontSize: windowWidth < 200 ? "30px" : "40px",
               margin: 0,
             }}
             balance={transaction.details.amount}
@@ -125,7 +121,6 @@ export default function ExpandedTxPage() {
           <div className="infoGridContainer">
             <ThemeText textContent={"Time"} />
             <ThemeText
-              textStyles={{ textAlign: "right" }}
               textContent={`${
                 paymentDate.getHours() <= 9
                   ? "0" + paymentDate.getHours()
@@ -138,15 +133,13 @@ export default function ExpandedTxPage() {
             />
             <ThemeText textContent={"Fee"} />
             <FormattedSatText
-              containerStyles={{ justifyContent: "end" }}
-              styles={{ testAlign: "right" }}
+              styles={{ marginTop: 0, marginBottom: 0 }}
               neverHideBalance={true}
               balance={isFailed ? 0 : transaction.details.fee}
             />
             <ThemeText textContent={"Type"} />
             <ThemeText
               textStyles={{
-                textAlign: "right",
                 textTransform: "capitalize",
               }}
               textContent={paymentType}
@@ -168,11 +161,13 @@ export default function ExpandedTxPage() {
               navigate("/technical-details", { state: { transaction } })
             }
             buttonStyles={{
-              width: "auto",
+              width: "100%",
+              maxWidth: "max-content",
+              minWidth: "unset",
               backgroundColor: Colors.light.blue,
-              margin: "30px 0",
+              margin: "30px auto",
             }}
-            textStyles={{ color: Colors.light.background }}
+            textStyles={{ color: Colors.dark.text }}
             textContent={"Technical details"}
           />
           <ReceiptDots windowWidth={windowWidth} />

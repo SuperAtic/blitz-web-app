@@ -23,5 +23,6 @@
 }
 #aboutPageContainer .peopleLink {
   width: 100%;
+  max-width: unset;
   margin: 10px 0;
 }

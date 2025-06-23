@@ -117,30 +117,6 @@ const EditReceivePaymentInformation = () => {
         showDot={inputDenomination === "fiat"}
         fiatStats={fiatStats}
       />
-      {/* {!isKeyboardFocused && ( */}
-      {/* <div className="keyboard-container">
-        <div className="number-keyboard">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "delete"].map((num) => (
-            <button
-              key={num}
-              className="keyboard-key"
-              onClick={() => {
-                if (num === "delete") {
-                  setAmountValue((prev) => prev.slice(0, -1));
-                } else if (num === "C" && inputDenomination === "sats") {
-                  setAmountValue("");
-                } else {
-                  setAmountValue((prev) => prev + num);
-                }
-              }}
-            >
-              {num === "delete" ? <img src={deleteIcon} /> : num}
-            </button>
-          ))}
-        </div> */}
-
-      {/* </div> */}
-      {/* )} */}
       <CustomButton
         actionFunction={handleSubmit}
         buttonStyles={{

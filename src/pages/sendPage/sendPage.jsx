@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import "./send.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import BackArrow from "../../components/backArrow/backArrow";
-import { processInputType } from "../../functions/sendPayment";
 import walletIcon from "../../assets/adminHomeWallet_dark.png";
 import arrowIcon from "../../assets/arrow-left-blue.png";
 import deleteIcon from "../../assets/leftCheveronDark.png";

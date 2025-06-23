@@ -40,9 +40,8 @@
 }
 .disclaimerContainer button {
   background-color: var(--primaryBlue);
-  color: #fff;
-  width: 150px;
   margin: 0 auto;
+  max-width: 155px;
 }
 
 .disclaimerContainer a {
@@ -50,4 +49,10 @@
   opacity: 0.7;
   margin-top: 5px;
   font-size: 15px;
+}
+
+@media screen and (max-width: 300px) {
+  .disclaimerContainer h1 {
+    font-size: 30px;
+  }
 }

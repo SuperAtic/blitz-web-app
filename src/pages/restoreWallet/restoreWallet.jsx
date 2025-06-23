@@ -11,6 +11,8 @@ import BackArrow from "../../components/backArrow/backArrow";
 import SuggestedWordContainer from "../../components/suggestedWordContainer/suggestedWords";
 import "./restoreWallet.css";
 import PageNavBar from "../../components/navBar/navBar";
+import CustomButton from "../../components/customButton/customButton";
+import { Colors } from "../../constants/theme";
 
 const NUMARRAY = Array.from({ length: 12 }, (_, i) => i + 1);
 const INITIAL_KEY_STATE = NUMARRAY.reduce((acc, num) => {
@@ -138,8 +140,13 @@ export default function RestoreWallet() {
 
       {/* {!currentFocused && ( */}
       <div className="buttonsContainer">
-        <button onClick={handleSeedFromClipboard}>Paste</button>
-        <button onClick={keyValidation}>Restore</button>
+        <CustomButton
+          buttonStyles={{ backgroundColor: Colors.light.blue }}
+          textStyles={{ color: Colors.dark.text }}
+          actionFunction={handleSeedFromClipboard}
+          textContent={"Paste"}
+        />
+        <CustomButton actionFunction={keyValidation} textContent={"Restore"} />
       </div>
       {/* )} */}
 

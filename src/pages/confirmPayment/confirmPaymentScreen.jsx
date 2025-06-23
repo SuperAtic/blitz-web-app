@@ -10,6 +10,8 @@ import {
 } from "../../functions/lottieViewColorTransformer";
 import "./confirmPayment.css";
 import FormattedSatText from "../../components/formattedSatText/formattedSatText";
+import CustomButton from "../../components/customButton/customButton";
+import { Colors } from "../../constants/theme";
 
 export default function ConfirmPayment() {
   const navigate = useNavigate();
@@ -114,29 +116,23 @@ export default function ConfirmPayment() {
         )}
 
         {!didSucceed && (
-          <button
-            onClick={() => {
+          <CustomButton
+            actionFunction={() => {
               const mailto = `mailto:blake@blitz-wallet.com?subject=Payment Failed&body=${encodeURIComponent(
                 errorMessage
               )}`;
               window.location.href = mailto;
             }}
-            style={{
-              marginTop: 10,
-              marginBottom: 20,
-              background: "none",
-              border: "none",
-              color: "#007bff",
-              cursor: "pointer",
-            }}
-          >
-            Send report to developer
-          </button>
+            buttonClassName={"errorButton"}
+            textStyles={{ color: Colors.light.blue }}
+            textContent={"Send report to developer"}
+          />
         )}
-
-        <button onClick={handleBack} className="continueBTN">
-          Continue
-        </button>
+        <CustomButton
+          textStyles={{ color: Colors.dark.text }}
+          buttonClassName={"continueBTN"}
+          textContent={"Continue"}
+        />
       </div>
     </div>
   );

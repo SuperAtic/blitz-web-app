@@ -1,3 +1,8 @@
+.receiveQrPage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 .receiveQrPage .confirmTxAnimation {
   width: 95%;
   height: auto;
@@ -37,6 +42,9 @@
 }
 .receiveQrPage .contentContainer .paymentNetwork {
   text-transform: capitalize;
+}
+.receiveQrPage .contentContainer .errorButton {
+  background-color: transparent;
 }
 
 .receiveQrPage .contentContainer .continueBTN {
