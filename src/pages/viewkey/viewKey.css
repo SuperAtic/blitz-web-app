@@ -88,7 +88,7 @@
 
 .viewMnemoincContainer .switchContainer {
   width: 200px;
-  margin: 20px auto auto;
+  margin: 20px auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -115,6 +115,10 @@
   width: 50%;
   text-align: center;
   cursor: pointer;
+}
+.viewMnemoincContainer .copySeedBTNContainer {
+  margin: 0 auto auto;
+  width: max-content;
 }
 
 @media screen and (max-width: 400px) {

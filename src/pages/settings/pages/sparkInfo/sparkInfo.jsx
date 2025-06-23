@@ -2,9 +2,12 @@ import { useSpark } from "../../../../contexts/sparkContext";
 import clipbardIcon from "../../../../assets/clipboardIcon.png";
 import copyToClipboard from "../../../../functions/copyToClipboard";
 import "./sparkInfo.css";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function SparkInformation() {
   const { sparkInformation } = useSpark();
+  const navigate = useNavigate();
+  const location = useLocation();
   return (
     <div id="sparkInfoContainer">
       <div className="contentContainer">
@@ -12,7 +15,13 @@ export default function SparkInformation() {
           <div className="technicalRow">
             <p className="techicalLabel">Spark address</p>
             <span
-              onClick={() => copyToClipboard(sparkInformation.sparkAddress)}
+              onClick={() =>
+                copyToClipboard(
+                  sparkInformation.sparkAddress,
+                  navigate,
+                  location
+                )
+              }
               className="techicalData"
             >
               <p>
@@ -32,7 +41,13 @@ export default function SparkInformation() {
           <div className="technicalRow">
             <p className="techicalLabel">Public key</p>
             <span
-              onClick={() => copyToClipboard(sparkInformation.identityPubKey)}
+              onClick={() =>
+                copyToClipboard(
+                  sparkInformation.identityPubKey,
+                  navigate,
+                  location
+                )
+              }
               className="techicalData"
             >
               <p>
