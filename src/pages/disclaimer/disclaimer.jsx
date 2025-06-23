@@ -2,6 +2,8 @@ import BackArrow from "../../components/backArrow/backArrow";
 import disclaimerKeys from "../../assets/disclaimerKeys.png";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
+import CustomButton from "../../components/customButton/customButton";
+import { Colors } from "../../constants/theme";
 
 function DisclaimerPage() {
   const navigate = useNavigate();
@@ -20,7 +22,11 @@ function DisclaimerPage() {
         <p className="quoteText">
           "With great power comes great responsibility" - Uncle Ben
         </p>
-        <button onClick={() => navigate("/createAccount")}>Next</button>
+        <CustomButton
+          actionFunction={() => navigate("/createAccount")}
+          textStyles={{ color: Colors.dark.text }}
+          textContent={"Next"}
+        />
         <a href="https://blitz-wallet.com/pages/terms/">Terms and Conditions</a>
       </div>
     </div>

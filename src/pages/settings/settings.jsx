@@ -202,76 +202,7 @@ export default function SettingsHome() {
   return (
     <div className="settingsPage">
       <PageNavBar text="Settings" />
-      <div className="contentContainer">
-        {settingsItems}
-        {/* <div className="techincalContainer">
-          <div className="technicalRow">
-            <p className="techicalLabel">Spark address</p>
-            <span
-              onClick={() => copyToClipboard(sparkInformation.sparkAddress)}
-              className="techicalData"
-            >
-              <p>
-                {sparkInformation.sparkAddress.slice(0, 5)}...
-                {sparkInformation.sparkAddress.slice(
-                  sparkInformation.sparkAddress.length - 5
-                )}
-              </p>
-              <img
-                className="clipboardIcon"
-                src={clipbardIcon}
-                alt=""
-                srcset=""
-              />
-            </span>
-          </div>
-          <div className="technicalRow">
-            <p className="techicalLabel">Public key</p>
-            <span
-              onClick={() => copyToClipboard(sparkInformation.identityPubKey)}
-              className="techicalData"
-            >
-              <p>
-                {sparkInformation.identityPubKey.slice(0, 5)}...
-                {sparkInformation.identityPubKey.slice(
-                  sparkInformation.identityPubKey.length - 5
-                )}
-              </p>
-              <img
-                className="clipboardIcon"
-                src={clipbardIcon}
-                alt=""
-                srcset=""
-              />
-            </span>
-          </div>
-        </div>
-        <button onClick={() => navigate("/key")}>
-          <img src={keyIcon} alt="" srcset="" /> Backup recovery phrase
-        </button>
-        <button
-          onClick={() => {
-            logout();
-          }}
-        >
-          <img
-            style={{ transform: "rotate(90deg)" }}
-            src={shareIcon}
-            alt=""
-            srcset=""
-          />
-          Logout
-        </button>
-        <button
-          onClick={() => {
-            deleteWallet();
-            navigate("/");
-          }}
-        >
-          <img src={trashIcon} alt="" srcset="" /> Delete wallet
-        </button>
-        */}
-      </div>
+      <div className="contentContainer">{settingsItems}</div>
     </div>
   );
 }

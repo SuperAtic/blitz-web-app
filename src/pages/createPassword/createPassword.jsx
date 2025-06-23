@@ -5,6 +5,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { encrypt } from "../../functions/encription";
 import { useAuth } from "../../contexts/authContext";
+import CustomButton from "../../components/customButton/customButton";
+import { Colors } from "../../constants/theme";
 function CreatePassword() {
   const navigate = useNavigate();
   const { login, setMnemoinc } = useAuth();
@@ -56,19 +58,21 @@ function CreatePassword() {
           id="checkPass"
         />
 
-        <button
-          style={{
+        <CustomButton
+          actionFunction={handlePassEncription}
+          buttonStyles={{
             opacity:
               !password.initialPass ||
               !password.checkPass ||
               password.initialPass !== password.checkPass
                 ? 0.5
                 : 1,
+            maxWidth: "unset",
+            minWidth: "unset",
           }}
-          onClick={handlePassEncription}
-        >
-          Create wallet
-        </button>
+          textStyles={{ color: Colors.dark.text }}
+          textContent={"Create Wallet"}
+        />
       </div>
     </div>
   );

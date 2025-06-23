@@ -1,12 +1,21 @@
-#customButton {
+.customButton {
+  width: 100%;
   min-width: 120px;
+  max-width: max-content;
   min-height: 45px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 5px 25px;
+  font-size: 1em;
+  font-weight: 400;
+  font-family: inherit;
+  background-color: #fff;
+  color: #121212;
+  cursor: pointer;
 }
 
-#customButton p {
+.customButton p {
   margin: 0;
 }

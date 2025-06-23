@@ -101,6 +101,9 @@ function Login() {
           buttonStyles={{
             backgroundColor: Colors.light.blue,
             opacity: !password ? 0.5 : 1,
+            width: "100%",
+            maxWidth: "unset",
+            minWidth: "unset",
           }}
           textStyles={{ color: Colors.dark.text }}
           textContent={"Unlock wallet"}

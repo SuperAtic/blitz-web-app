@@ -55,8 +55,15 @@ export default function ViewMnemoinc() {
             Are you sure you want to show your recover phrase?
           </p>
           <div className="buttonContianer">
-            <button onClick={() => setShouldShowMnemoinc(true)}>Yes</button>
-            <button onClick={() => navigate(-1)}>No</button>
+            <CustomButton
+              actionFunction={() => setShouldShowMnemoinc(true)}
+              textStyles={{ color: Colors.dark.text }}
+              textContent={"Yes"}
+            />
+            <CustomButton
+              actionFunction={() => navigate(-1)}
+              textContent={"No"}
+            />
           </div>
         </div>
       </div>

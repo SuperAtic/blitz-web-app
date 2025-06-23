@@ -41,7 +41,10 @@ export default function AboutPage() {
           actionFunction={() =>
             openLinkToNewTab(`https://x.com/blakekaufman17`)
           }
-          buttonStyles={{ backgroundColor: Colors.light.blue }}
+          buttonStyles={{
+            backgroundColor: Colors.light.blue,
+            minWidth: "unset",
+          }}
           textStyles={{ color: Colors.dark.text }}
           buttonClassName={"peopleLink"}
           textContent={"Blake Kaufman"}
@@ -49,7 +52,10 @@ export default function AboutPage() {
         <p className="sectionHeader">UI/UX</p>
         <CustomButton
           actionFunction={() => openLinkToNewTab(`https://x.com/Stromens`)}
-          buttonStyles={{ backgroundColor: Colors.light.blue }}
+          buttonStyles={{
+            backgroundColor: Colors.light.blue,
+            minWidth: "unset",
+          }}
           textStyles={{ color: Colors.dark.text }}
           buttonClassName={"peopleLink"}
           textContent={"Oliver Koblizek"}

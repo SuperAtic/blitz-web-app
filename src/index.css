@@ -59,8 +59,9 @@ p {
 }
 
 button {
-  border-radius: 8px;
   border: 1px solid transparent;
+  /* border-radius: 8px;
+
   padding: 5px 35px;
   font-size: 1em;
   font-weight: 400;
@@ -69,7 +70,7 @@ button {
   color: #121212;
   cursor: pointer;
   transition: border-color 0.25s;
-  min-height: 40px;
+  min-height: 40px; */
 }
 
 /* Hide scrollbars for all elements */

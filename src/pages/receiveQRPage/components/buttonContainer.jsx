@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import copyToClipboard from "../../../functions/copyToClipboard";
 import "./buttonContainer.css";
+import CustomButton from "../../../components/customButton/customButton";
 
 export default function ReceiveButtonsContainer({
   generatingInvoiceQRCode,
@@ -16,8 +17,8 @@ export default function ReceiveButtonsContainer({
 
   return (
     <div className="receiveButtonContainer">
-      <button
-        onClick={() =>
+      <CustomButton
+        actionFunction={() =>
           navigate(`/receiveAmount`, {
             state: {
               receiveOption,
@@ -25,23 +26,19 @@ export default function ReceiveButtonsContainer({
             },
           })
         }
-      >
-        Edit
-      </button>
-      <button
-        style={{
-          opacity: generatingInvoiceQRCode ? 0.5 : 1,
-        }}
-        onClick={() => {
+        textContent={"Edit"}
+      />
+      <CustomButton
+        buttonStyles={{ opacity: generatingInvoiceQRCode ? 0.5 : 1 }}
+        actionFunction={() => {
           if (!generatedAddress) return;
           copyToClipboard(generatedAddress, navigate, location);
         }}
-      >
-        Copy
-      </button>
+        textContent={"Copy"}
+      />
 
-      <button
-        onClick={() =>
+      <CustomButton
+        actionFunction={() =>
           navigate(`/receive-options`, {
             state: {
               receiveOption,
@@ -50,9 +47,8 @@ export default function ReceiveButtonsContainer({
             },
           })
         }
-      >
-        Choose format
-      </button>
+        textContent={"Choose format"}
+      />
     </div>
   );
 }

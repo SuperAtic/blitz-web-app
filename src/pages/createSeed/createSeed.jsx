@@ -7,6 +7,8 @@ import { KeyContainer } from "../../components/keyContainer/keyContainer";
 import { useLocation, useNavigate } from "react-router-dom";
 import copyToClipboard from "../../functions/copyToClipboard";
 import { useAuth } from "../../contexts/authContext";
+import CustomButton from "../../components/customButton/customButton";
+import { Colors } from "../../constants/theme";
 
 function CreateSeed() {
   const { mnemoinc, setMnemoinc } = useAuth();
@@ -65,22 +67,21 @@ function CreateSeed() {
       <p className="secondWarningText">WE CAN NOT help you if you lose it</p>
 
       <div className="buttonsContainer">
-        <button
-          onClick={() => {
-            copyToClipboard(seed.join(" "), navigate, location);
-          }}
-        >
-          Copy
-        </button>
-        <button
-          onClick={() =>
+        <CustomButton
+          actionFunction={() =>
+            copyToClipboard(seed.join(" "), navigate, location)
+          }
+          textStyles={{ color: Colors.dark.text }}
+          textContent={"Copy"}
+        />
+        <CustomButton
+          actionFunction={() =>
             navigate("/createPassword", {
               state: { mnemoinc: seed.join(" ") },
             })
           }
-        >
-          Next
-        </button>
+          textContent={"Next"}
+        />
       </div>
     </div>
   );

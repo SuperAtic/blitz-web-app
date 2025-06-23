@@ -1,5 +1,6 @@
 .expandedTxContainer {
   height: 100%;
+  max-width: 600px;
   width: 95%;
   align-self: center;
   overflow-y: scroll;
@@ -18,6 +19,7 @@
   margin-bottom: 20px;
   position: relative;
 }
+
 .expandedTxContainer .receiptContainer .paymentStatusOuterContainer {
   width: 100px;
   height: 100px;
@@ -53,6 +55,11 @@
 .expandedTxContainer .receiptContainer .paymentStatusIcon {
   width: 60%;
   height: 60%;
+}
+.expandedTxContainer .receiptContainer .receiveAmountLabel {
+  font-size: 20px;
+  text-align: center;
+  margin-top: 20px;
 }
 
 .expandedTxContainer .paymentStatusTextContanier {
@@ -98,6 +105,12 @@
   grid-template-columns: 1fr 1fr;
   align-items: center;
 }
+.expandedTxContainer .infoGridContainer p:nth-child(1n) {
+  margin-bottom: 0px;
+}
+.expandedTxContainer .infoGridContainer p:nth-child(2n) {
+  margin: 0;
+}
 
 .expandedTxContainer .descriptionContainer {
   width: 100%;
@@ -117,4 +130,26 @@
 }
 .expandedTxContainer .descriptionScrollviewContainer p {
   margin: 0;
+}
+
+@media screen and (max-width: 320px) {
+  .expandedTxContainer .paymentStatusTextContanier {
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+  .expandedTxContainer .paymentStatusTextContanier p {
+    margin: 0;
+    text-align: center;
+  }
+
+  .expandedTxContainer .infoGridContainer {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 200px) {
+  .expandedTxContainer .receiptContainer .receiveAmountLabel {
+    font-size: 16px;
+  }
 }
