@@ -66,12 +66,12 @@ export default function Camera() {
   }, [navigate, pauseCamera]);
 
   const handlePaste = async () => {
-    console.log("result from paste option", data);
     if (didScan.current) return;
     didScan.current = true;
 
     setPauseCamera(true);
     const data = await getDataFromClipboard();
+    console.log("result from paste option", data);
     navigate("/send", { state: { btcAddress: data } });
   };
   const toggleFlashLight = async () => {
