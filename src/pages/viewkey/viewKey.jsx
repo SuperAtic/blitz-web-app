@@ -7,6 +7,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Colors } from "../../constants/theme";
 import calculateSeedQR from "../../functions/calculateSeedQR";
 import QRCodeQrapper from "../../components/qrCode/qrCode";
+import CustomButton from "../../components/customButton/customButton";
+import copyToClipboard from "../../functions/copyToClipboard";
 
 export default function ViewMnemoinc() {
   const navigate = useNavigate();
@@ -18,13 +20,6 @@ export default function ViewMnemoinc() {
   );
   const [showSeedAsWords, setShowSeedAsWords] = useState(true);
   const seedQRCalculation = calculateSeedQR(mnemoinc);
-
-  useEffect(() => {
-    if (!props?.confirmed) return;
-    setShowSeedAsWords(false);
-  }, [props]);
-
-  console.log(props, "test props");
 
   const toggleSeedAsWords = () => {
     if (showSeedAsWords && !props?.confirmed) {
@@ -92,6 +87,23 @@ export default function ViewMnemoinc() {
         <p>Words</p>
         <p>QR Code</p>
       </div>
+      <CustomButton
+        actionFunction={() => {
+          const response = copyToClipboard(
+            showSeedAsWords ? mnemoinc : seedQRCalculation
+          );
+          navigate("/error", {
+            state: {
+              errorMessage: response
+                ? "Copied to clipboard!"
+                : "Error with copy",
+              background: location,
+            },
+          });
+        }}
+        buttonClassName={"copySeedBTNContainer"}
+        textContent={"Copy"}
+      />
     </div>
   );
 }
