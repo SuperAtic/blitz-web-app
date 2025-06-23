@@ -1,5 +1,6 @@
 import { crypto } from "liquidjs-lib";
 import bolt11 from "bolt11";
+import { Buffer } from "buffer";
 
 import { ECPairFactory } from "ecpair";
 import ecc from "@bitcoinerlab/secp256k1";

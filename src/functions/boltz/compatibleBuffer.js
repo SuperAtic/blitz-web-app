@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 export default function createCompatibleBuffer(input, encoding = "hex") {
   // First ensure the global Buffer is properly polyfilled
   if (typeof window !== "undefined" && !window.Buffer) {

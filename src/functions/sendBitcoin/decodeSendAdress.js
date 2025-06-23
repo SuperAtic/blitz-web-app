@@ -9,7 +9,7 @@ import processLiquidAddress from "./processLiquidAddress";
 import { getLiquidSdk } from "../connectToLiquid";
 import displayCorrectDenomination from "../displayCorrectDenomination";
 import getLiquidAddressFromSwap from "../boltz/magicRoutingHints";
-import { LIQUID_TYPES } from "../../constants";
+import { LIQUID_TYPES, SATSPERBITCOIN } from "../../constants";
 import processSparkAddress from "./processSparkAddress";
 import { decodeBip21SparkAddress } from "../spark/handleBip21SparkAddress";
 
@@ -64,8 +64,8 @@ export default async function decodeSendAddress(props) {
           goBackFunction(
             `Cannot send more than ${displayCorrectDenomination({
               amount: maxZeroConf,
-              nodeInformation,
               masterInfoObject,
+              fiatStats,
             })} to a merchant`
           );
           return;

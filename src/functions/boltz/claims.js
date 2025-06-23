@@ -2,6 +2,7 @@ import { ECPairFactory } from "ecpair";
 import { readClaimsFromStorage, saveClaimsToStorage } from "./storage";
 import * as ecc from "@bitcoinerlab/secp256k1";
 import { lessThanTenMin } from "./date";
+import { Buffer } from "buffer";
 
 const infoToStored = (claim) => ({
   ...claim,

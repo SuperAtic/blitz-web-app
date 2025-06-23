@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import deleteIcon from "../../assets/leftCheveronDark.png";
 import "./style.css";
 import numberConverter from "../../functions/numberConverter";
+import { SATSPERBITCOIN } from "../../constants";
 
 function getKeyboardKeys(showDot) {
   return KEYBOARD_KEYS.map((key) => {
@@ -89,4 +90,9 @@ export default function CustomNumberKeyboard({
       </div>
     </div>
   );
+}
+
+function integerPartLength(num) {
+  const match = num.toString().match(/^(\d+)/);
+  return match ? match[1].length : 0;
 }

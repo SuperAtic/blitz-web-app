@@ -32,7 +32,7 @@ export const WebViewProvider = ({ children }) => {
       console.log("Saved claim info:", savedClaimInfo);
       if (savedClaimInfo.length === 0) return;
       let newClaims = [];
-      for (claim in savedClaimInfo) {
+      for (const claim in savedClaimInfo) {
         const createdOn = new Date(claim.createdOn);
         const now = new Date();
         if (!claim?.swapInfo?.id) continue;
@@ -79,7 +79,7 @@ export const WebViewProvider = ({ children }) => {
       }}
     >
       {children}
-      <WebView
+      {/* <WebView
         domStorageEnabled
         javaScriptEnabled
         ref={webViewRef}
@@ -99,7 +99,7 @@ export const WebViewProvider = ({ children }) => {
           )
         }
         onLoadEnd={() => setIsWebViewReady(true)}
-      />
+      /> */}
     </WebViewContext.Provider>
   );
 };

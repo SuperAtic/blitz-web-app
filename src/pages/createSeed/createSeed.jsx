@@ -4,42 +4,49 @@ import { useEffect, useState } from "react";
 import { generateMnemonic } from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
 import { KeyContainer } from "../../components/keyContainer/keyContainer";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import copyToClipboard from "../../functions/copyToClipboard";
+import { useAuth } from "../../contexts/authContext";
+
 function CreateSeed() {
+  const { mnemoinc, setMnemoinc } = useAuth();
   const navigate = useNavigate();
-  const [seed, setSeed] = useState([]);
-  useEffect(() => {
-    async function generateSeed() {
-      try {
-        let generatedMnemonic = generateMnemonic(wordlist);
-        const unuiqueKeys = new Set(generatedMnemonic.split(" "));
+  const location = useLocation();
+  const seed = mnemoinc?.split(" ");
 
-        if (unuiqueKeys.size !== 12) {
-          let runCount = 0;
-          let didFindValidMnemoinc = false;
-          while (runCount < 50 && !didFindValidMnemoinc) {
-            console.log(
-              `Running retry for account mnemoinc count: ${runCount}`
-            );
-            runCount += 1;
-            const newTry = generateMnemonic(wordlist);
-            const uniqueItems = new Set(newTry.split(" "));
-            if (uniqueItems.size != 12) continue;
-            didFindValidMnemoinc = true;
-            generatedMnemonic = newTry;
-          }
+  const generateSeed = () => {
+    try {
+      let generatedMnemonic = generateMnemonic(wordlist);
+      const unuiqueKeys = new Set(generatedMnemonic.split(" "));
+
+      if (unuiqueKeys.size !== 12) {
+        let runCount = 0;
+        let didFindValidMnemoinc = false;
+        while (runCount < 50 && !didFindValidMnemoinc) {
+          console.log(`Running retry for account mnemoinc count: ${runCount}`);
+          runCount += 1;
+          const newTry = generateMnemonic(wordlist);
+          const uniqueItems = new Set(newTry.split(" "));
+          if (uniqueItems.size != 12) continue;
+          didFindValidMnemoinc = true;
+          generatedMnemonic = newTry;
         }
-
-        const filtedMnemoinc = generatedMnemonic.split(" ");
-
-        setSeed(filtedMnemoinc);
-      } catch (err) {
-        console.log("Error generating seed", err);
       }
+      setMnemoinc(generatedMnemonic);
+    } catch (err) {
+      navigate("/error", {
+        state: {
+          errorMessage: err.message,
+          background: location,
+        },
+      });
+      console.log("Error generating seed", err);
     }
+  };
+  useEffect(() => {
+    if (mnemoinc) return;
     generateSeed();
-  }, []);
+  }, [mnemoinc]);
 
   return (
     <div className="seedContainer">

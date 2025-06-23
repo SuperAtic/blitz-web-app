@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 if (Buffer.prototype.constructor.name === "Buffer2") {
   const originalEquals = Buffer.prototype.equals;
   Buffer.prototype.equals = function (other) {

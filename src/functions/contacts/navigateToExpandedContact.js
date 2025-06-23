@@ -1,3 +1,5 @@
+import { encryptMessage } from "../encodingAndDecoding";
+
 export default async function navigateToExpandedContact(
   contact,
   decodedAddedContacts,

@@ -37,7 +37,7 @@ export async function initWallet({
     }
     return { didWork: true };
   } catch (err) {
-    setHasError(String(err.message));
+    console.log(err, "error initializing function");
     return { didWork: false, error: err.message };
   }
 }
