@@ -1,0 +1,29 @@
+name: "[CI] ESLint Check"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  eslint:
+    name: Run ESLint
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          set -euxo pipefail
+          npm install
+
+      - name: Run ESLint
+        run: |
+          set -euxo pipefail
+          npm run lint
