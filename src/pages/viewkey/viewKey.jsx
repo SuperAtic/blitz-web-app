@@ -66,7 +66,7 @@ export default function ViewMnemoinc() {
         </div>
       </div>
       <p className="warning1">Keep this phrase in a secure and safe place</p>
-      <p className="warning2">Do not share it with anyone!</p>
+      <p className="warning2">Don’t share or screenshot this phrase!</p>
       <div className="mnemoincContainer">
         {showSeedAsWords ? (
           <KeyContainer keys={mnemoinc.split(" ")} />
