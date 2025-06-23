@@ -8,7 +8,7 @@ export default function calculateBitcoinTxFee({
 }) {
   const sdk = getLiquidSdk();
   const feeRates = sdk.recommendedFees();
-  const overhead = 10.5; // Overhead in bytes for the transaction 4(tx version) + 1(input count) + 1(output count) + 4(locktime) +  0.5(segwit maarket & segwit flag)
+  let overhead = 10.5; // Overhead in bytes for the transaction 4(tx version) + 1(input count) + 1(output count) + 4(locktime) +  0.5(segwit maarket & segwit flag)
   const inputTxSize = 57.5; // Average size of an input transaction in bytes
   const outputTxSize = 43; // Average size of an output transaction in bytes
 

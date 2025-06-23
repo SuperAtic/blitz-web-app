@@ -28,6 +28,7 @@ export default [
       "react/react-in-jsx-scope": "off",
       "dot-notation": "off",
       curly: "off",
+      "eact-hooks/rules-of-hooks": "off",
       "react-hooks/exhaustive-deps": "off",
       "no-undef": "error",
       "no-unused-vars": "off",

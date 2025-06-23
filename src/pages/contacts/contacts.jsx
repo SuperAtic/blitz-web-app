@@ -27,6 +27,8 @@ export default function Contacts() {
   const location = useLocation();
   const [inputText, setInputText] = useState("");
 
+  console.log("test", import.meta.env.MODE);
+
   const pinnedContacts = useMemo(() => {
     return decodedAddedContacts
       .filter((contact) => contact.isFavorite)
@@ -123,85 +125,88 @@ export default function Contacts() {
           </div>
         </div>
       )}
-      {decodedAddedContacts.filter(
-        (contact) => !hideUnknownContacts || contact.isAdded
-      ).length !== 0 &&
-      false &&
-      myProfile.didEditProfile ? (
-        <div
-          className="hasContactsContainer"
-          style={{ flex: 1, overflow: "hidden" }}
-        >
-          {pinnedContacts.length != 0 && (
-            <div
-              className="pinnedContactElementContainer"
-              style={{ height: 120 }}
-            >
-              <div className="pinnedContactScrollview">{pinnedContacts}</div>
-            </div>
-          )}
-          <CustomInput
-            placeholderText={"Search added contacts..."}
-            inputText={inputText}
-            setInputText={setInputText}
-            containerStyles={{ width: "100%" }}
-          />
-          {contactElements}
-        </div>
-      ) : (
-        <div className="noContactsContainer">
-          <img
-            className="questionMarkIcon"
-            src={questionMark}
-            alt="question mark to show no contact has been created"
-          />
-          <ThemeText
-            textStyles={{
-              width: "95%",
-              maxWidth: "300px",
-              textAlign: "center",
-            }}
-            textContent={
-              didEditProfile
-                ? "You have no contacts."
-                : "Edit your profile to begin using contacts."
-            }
-          />
+      {
+        // decodedAddedContacts.filter(
+        //   (contact) => !hideUnknownContacts || contact.isAdded
+        // ).length !== 0 &&
+        // false &&
+        // myProfile.didEditProfile
+        false ? (
+          <div
+            className="hasContactsContainer"
+            style={{ flex: 1, overflow: "hidden" }}
+          >
+            {pinnedContacts.length != 0 && (
+              <div
+                className="pinnedContactElementContainer"
+                style={{ height: 120 }}
+              >
+                <div className="pinnedContactScrollview">{pinnedContacts}</div>
+              </div>
+            )}
+            <CustomInput
+              placeholderText={"Search added contacts..."}
+              inputText={inputText}
+              setInputText={setInputText}
+              containerStyles={{ width: "100%" }}
+            />
+            {contactElements}
+          </div>
+        ) : (
+          <div className="noContactsContainer">
+            <img
+              className="questionMarkIcon"
+              src={questionMark}
+              alt="question mark to show no contact has been created"
+            />
+            <ThemeText
+              textStyles={{
+                width: "95%",
+                maxWidth: "300px",
+                textAlign: "center",
+              }}
+              textContent={
+                didEditProfile
+                  ? "You have no contacts."
+                  : "Edit your profile to begin using contacts."
+              }
+            />
 
-          <CustomButton
-            buttonStyles={{
-              // ...CENTER,
-              width: "auto",
-            }}
-            actionFunction={() => {
-              if (!isConnectedToTheInternet) {
-                navigate("/error", {
-                  state: {
-                    errorMessage:
-                      "Please connect to the internet to use this feature",
-                    background: location,
-                  },
-                });
-                return;
-              }
-              if (didEditProfile) {
-                //navigate to add contacts popup
-                navigate("/error", {
-                  state: {
-                    errorMessage: "Feature coming soon...",
-                    background: location,
-                  },
-                });
-              } else {
-                navigate("/edit-profile", {
-                  state: { pageType: "myProfile", fromSettings: false },
-                });
-              }
-            }}
-            textContent={`${didEditProfile ? "Add contact" : "Edit profile"}`}
-          />
-        </div>
-      )}
+            <CustomButton
+              buttonStyles={{
+                // ...CENTER,
+                width: "auto",
+              }}
+              actionFunction={() => {
+                if (!isConnectedToTheInternet) {
+                  navigate("/error", {
+                    state: {
+                      errorMessage:
+                        "Please connect to the internet to use this feature",
+                      background: location,
+                    },
+                  });
+                  return;
+                }
+                if (didEditProfile) {
+                  //navigate to add contacts popup
+                  navigate("/error", {
+                    state: {
+                      errorMessage: "Feature coming soon...",
+                      background: location,
+                    },
+                  });
+                } else {
+                  navigate("/edit-profile", {
+                    state: { pageType: "myProfile", fromSettings: false },
+                  });
+                }
+              }}
+              textContent={`${didEditProfile ? "Add contact" : "Edit profile"}`}
+            />
+          </div>
+        )
+      }
     </div>
   );
 }

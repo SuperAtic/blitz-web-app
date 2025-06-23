@@ -11,7 +11,7 @@ export async function getLNAddressForLiquidPayment(
       paymentInfo.type?.toLowerCase() === LIQUID_TYPES.LnUrlPay.toLowerCase()
     ) {
       const url = `${paymentInfo.data.callback}?amount=${sendingValue * 1000}${
-        !!paymentInfo?.data.commentAllowed
+        paymentInfo?.data.commentAllowed
           ? `&comment=${encodeURIComponent(
               paymentInfo?.data?.message || description || ""
             )}`

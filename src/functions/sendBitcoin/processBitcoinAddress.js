@@ -37,7 +37,6 @@ export default async function processBitcoinAddress(input, context) {
     data: newPaymentInfo,
     type: "Bitcoin",
     paymentNetwork: "Bitcoin",
-    address: input.address.address,
     paymentFee: paymentFee,
     supportFee: supportFee,
     address: input.address.address,

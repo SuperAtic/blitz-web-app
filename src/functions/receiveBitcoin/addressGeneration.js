@@ -68,9 +68,9 @@ export async function initializeAddressProcess(wolletInfo) {
         fee: 0,
       };
     } else {
-      const response = await generateLiquidAddress(wolletInfo);
-      if (!response) throw new Error("Error with Liquid");
-      stateTracker = response;
+      // const response = await generateLiquidAddress(wolletInfo);
+      // if (!response) throw new Error("Error with Liquid");
+      // stateTracker = response;
     }
   } catch (error) {
     console.log(error, "HANDLING ERROR");

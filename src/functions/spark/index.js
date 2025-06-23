@@ -1,5 +1,6 @@
 import { SparkWallet, getLatestDepositTxId } from "@buildonspark/spark-sdk";
 import { getAllSparkTransactions } from "./transactions";
+import { SPARK_TO_SPARK_FEE } from "../../constants/math";
 
 export let sparkWallet = null;
 
@@ -34,19 +35,6 @@ export const getSparkIdentityPubKey = async () => {
     return await sparkWallet.getIdentityPublicKey();
   } catch (err) {
     console.log("Get spark balance error", err);
-  }
-};
-export const initializeTempSparkWallet = async (mnemoinc) => {
-  try {
-    const { wallet: w } = await SparkWallet.initialize({
-      signer: new ReactNativeSparkSigner(),
-      mnemonicOrSeed: mnemoinc,
-      options: { network: "MAINNET" },
-    });
-
-    return w;
-  } catch (err) {
-    console.log("Initialize spark wallet error", err);
   }
 };
 

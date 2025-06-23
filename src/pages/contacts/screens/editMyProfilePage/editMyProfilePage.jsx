@@ -554,113 +554,105 @@ function InnerContent({
   }
 
   async function addProfilePicture() {
-    const imagePickerResponse = await getImageFromLibrary({ quality: 1 });
-    const { didRun, error, imgURL } = imagePickerResponse;
-    if (!didRun) return;
-    if (error) {
-      navigate("/error", {
-        state: {
-          errorMessage: error,
-          background: location,
-        },
-      });
-
-      return;
-    }
-
-    if (isEditingMyProfile) {
-      const response = await uploadProfileImage({ imgURL: imgURL });
-      if (!response) return;
-      toggleGlobalContactsInformation(
-        {
-          myProfile: {
-            ...globalContactsInformation.myProfile,
-            hasProfileImage: true,
-          },
-
-          addedContacts: globalContactsInformation.addedContacts,
-        },
-        true
-      );
-      return;
-    }
-
-    await refreshCache(selectedAddedContact.uuid, imgURL.uri);
+    // const imagePickerResponse = await getImageFromLibrary({ quality: 1 });
+    // const { didRun, error, imgURL } = imagePickerResponse;
+    // if (!didRun) return;
+    // if (error) {
+    //   navigate("/error", {
+    //     state: {
+    //       errorMessage: error,
+    //       background: location,
+    //     },
+    //   });
+    //   return;
+    // }
+    // if (isEditingMyProfile) {
+    //   const response = await uploadProfileImage({ imgURL: imgURL });
+    //   if (!response) return;
+    //   toggleGlobalContactsInformation(
+    //     {
+    //       myProfile: {
+    //         ...globalContactsInformation.myProfile,
+    //         hasProfileImage: true,
+    //       },
+    //       addedContacts: globalContactsInformation.addedContacts,
+    //     },
+    //     true
+    //   );
+    //   return;
+    // }
+    // await refreshCache(selectedAddedContact.uuid, imgURL.uri);
   }
   async function uploadProfileImage({ imgURL, removeImage }) {
-    try {
-      setIsAddingImage(true);
-      if (!removeImage) {
-        const resized = ImageManipulator.ImageManipulator.manipulate(
-          imgURL.uri
-        ).resize({ width: 350 });
-        const image = await resized.renderAsync();
-        const savedImage = await image.saveAsync({
-          compress: 0.4,
-          format: ImageManipulator.SaveFormat.WEBP,
-        });
-
-        const response = await setDatabaseIMG(
-          globalContactsInformation.myProfile.uuid,
-          { uri: savedImage.uri }
-        );
-
-        if (response) {
-          await refreshCache(
-            globalContactsInformation.myProfile.uuid,
-            response
-          );
-          return true;
-        } else throw new Error("Unable to save image");
-      } else {
-        await deleteDatabaseImage(globalContactsInformation.myProfile.uuid);
-        await removeProfileImageFromCache(
-          globalContactsInformation.myProfile.uuid
-        );
-        return true;
-      }
-    } catch (err) {
-      console.log(err);
-      navigate("/error", {
-        state: {
-          errorMessage: err.message,
-          background: location,
-        },
-      });
-      return false;
-    } finally {
-      setIsAddingImage(false);
-    }
+    // try {
+    //   setIsAddingImage(true);
+    //   if (!removeImage) {
+    //     const resized = ImageManipulator.ImageManipulator.manipulate(
+    //       imgURL.uri
+    //     ).resize({ width: 350 });
+    //     const image = await resized.renderAsync();
+    //     const savedImage = await image.saveAsync({
+    //       compress: 0.4,
+    //       format: ImageManipulator.SaveFormat.WEBP,
+    //     });
+    //     const response = await setDatabaseIMG(
+    //       globalContactsInformation.myProfile.uuid,
+    //       { uri: savedImage.uri }
+    //     );
+    //     if (response) {
+    //       await refreshCache(
+    //         globalContactsInformation.myProfile.uuid,
+    //         response
+    //       );
+    //       return true;
+    //     } else throw new Error("Unable to save image");
+    //   } else {
+    //     await deleteDatabaseImage(globalContactsInformation.myProfile.uuid);
+    //     await removeProfileImageFromCache(
+    //       globalContactsInformation.myProfile.uuid
+    //     );
+    //     return true;
+    //   }
+    // } catch (err) {
+    //   console.log(err);
+    //   navigate("/error", {
+    //     state: {
+    //       errorMessage: err.message,
+    //       background: location,
+    //     },
+    //   });
+    //   return false;
+    // } finally {
+    //   setIsAddingImage(false);
+    // }
   }
   async function deleteProfilePicture() {
-    try {
-      if (isEditingMyProfile) {
-        const response = await uploadProfileImage({ removeImage: true });
-        console.log(response);
-        if (!response) return;
-        toggleGlobalContactsInformation(
-          {
-            myProfile: {
-              ...globalContactsInformation.myProfile,
-              hasProfileImage: false,
-            },
-
-            addedContacts: globalContactsInformation.addedContacts,
-          },
-          true
-        );
-        return;
-      }
-
-      await removeProfileImageFromCache(selectedAddedContact.uuid);
-    } catch (err) {
-      navigate("/error", {
-        state: {
-          errorMessage: "Unable to deleate image.",
-          background: location,
-        },
-      });
-      console.log(err);
-    }
+    //   try {
+    //     if (isEditingMyProfile) {
+    //       const response = await uploadProfileImage({ removeImage: true });
+    //       console.log(response);
+    //       if (!response) return;
+    //       toggleGlobalContactsInformation(
+    //         {
+    //           myProfile: {
+    //             ...globalContactsInformation.myProfile,
+    //             hasProfileImage: false,
+    //           },
+    //           addedContacts: globalContactsInformation.addedContacts,
+    //         },
+    //         true
+    //       );
+    //       return;
+    //     }
+    //     await removeProfileImageFromCache(selectedAddedContact.uuid);
+    //   } catch (err) {
+    //     navigate("/error", {
+    //       state: {
+    //         errorMessage: "Unable to deleate image.",
+    //         background: location,
+    //       },
+    //     });
+    //     console.log(err);
+    //   }
   }
 }

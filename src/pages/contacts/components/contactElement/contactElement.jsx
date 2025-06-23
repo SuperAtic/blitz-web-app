@@ -90,7 +90,7 @@ export function ContactElement(props) {
                   marginRight: 5,
                 }}
                 textContent={
-                  !!contact.name.length ? contact.name : contact.uniqueName
+                  contact.name.length ? contact.name : contact.uniqueName
                 }
               />
               {hasUnlookedTransaction && (
@@ -121,7 +121,7 @@ export function ContactElement(props) {
                     marginRight: 5,
                   }}
                   textContent={
-                    !!contactsMessags[contact.uuid]?.messages?.length
+                    contactsMessags[contact.uuid]?.messages?.length
                       ? createFormattedDate(
                           contactsMessags[contact.uuid].lastUpdated
                         )
@@ -155,7 +155,7 @@ export function ContactElement(props) {
                   }
                 }
                 textContent={
-                  !!contactsMessags[contact.uuid]?.messages?.length
+                  contactsMessags[contact.uuid]?.messages?.length
                     ? formatMessage(
                         contactsMessags[contact.uuid]?.messages[0]
                       ) || " "

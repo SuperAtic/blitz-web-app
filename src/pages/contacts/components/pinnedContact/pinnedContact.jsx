@@ -62,11 +62,8 @@ export default function PinnedContactElement(props) {
         >
           {hasUnlookedTransaction && <div className="activeMessageDot" />}
           <ThemeText
-            CustomEllipsizeMode={"tail"}
-            CustomNumberOfLines={1}
-            styles={{ textAlign: "center", fontSize: SIZES.small, flex: 1 }}
-            content={
-              !!contact.name.length
+            textContent={
+              contact.name.length
                 ? contact.name.trim()
                 : contact.uniqueName.trim()
             }
