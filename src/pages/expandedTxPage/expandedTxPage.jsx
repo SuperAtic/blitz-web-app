@@ -68,7 +68,7 @@ export default function ExpandedTxPage() {
               >
                 <img
                   style={{
-                    filter: `invert(91%) sepia(3%) saturate(0%) hue-rotate(321deg) brightness(91%) contrast(93%)`,
+                    filter: `invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)`,
                   }}
                   className="paymentStatusIcon"
                   src={check}
