@@ -40,7 +40,7 @@ export const AuthProvider = ({ children, navigate }) => {
       walletKey: null,
       lastSession: null,
     });
-    navigate("/");
+    // navigate("/");
   };
 
   const logout = () => {

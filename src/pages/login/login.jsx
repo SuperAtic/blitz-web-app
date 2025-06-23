@@ -18,7 +18,6 @@ function Login() {
   const queryParams = new URLSearchParams(location.search);
   const wantsToDeleteAccount = queryParams.get("confirmed");
 
-  console.log(queryParams, "t", wantsToDeleteAccount);
   const [password, setPassword] = useState("");
 
   const handlePassEncription = () => {
@@ -44,7 +43,9 @@ function Login() {
     async function deleateAllWalletData() {
       try {
         deleteWallet();
-        window.location.reload();
+        setTimeout(() => {
+          window.location.reload();
+        }, 800);
       } catch (err) {
         console.log("Error deleting account", err);
         navigate("/error", {

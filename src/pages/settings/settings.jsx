@@ -130,15 +130,15 @@ export default function SettingsHome() {
   const queryParams = new URLSearchParams(location.search);
   const wantsToDeleteAccount = queryParams.get("confirmed");
   const props = location.state;
-  const { sparkInformation } = useSpark();
   const { deleteWallet } = useAuth();
-  console.log(sparkInformation);
   const settignsList = props?.isDoomsday ? DOOMSDAYSETTINGS : SETTINGSOPTIONS;
 
   useEffect(() => {
     if (wantsToDeleteAccount !== "true") return;
     deleteWallet();
-    window.location.reload();
+    setTimeout(() => {
+      window.location.reload();
+    }, 800);
   }, [wantsToDeleteAccount]);
 
   const settingsItems = settignsList.map((item, id) => {
