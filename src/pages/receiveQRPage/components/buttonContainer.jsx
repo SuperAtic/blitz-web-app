@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import copyToClipboard from "../../../functions/copyToClipboard";
 import "./buttonContainer.css";
@@ -12,6 +12,7 @@ export default function ReceiveButtonsContainer({
   description,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <div className="receiveButtonContainer">
@@ -33,7 +34,7 @@ export default function ReceiveButtonsContainer({
         }}
         onClick={() => {
           if (!generatedAddress) return;
-          copyToClipboard(generatedAddress);
+          copyToClipboard(generatedAddress, navigate, location);
         }}
       >
         Copy

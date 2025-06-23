@@ -67,7 +67,7 @@ function CreateSeed() {
       <div className="buttonsContainer">
         <button
           onClick={() => {
-            copyToClipboard(seed.join(" "));
+            copyToClipboard(seed.join(" "), navigate, location);
           }}
         >
           Copy

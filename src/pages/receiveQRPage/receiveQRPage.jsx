@@ -85,7 +85,11 @@ export default function ReceiveQRPage() {
       />
       <div className="receiveQrPageContent">
         <p className="selectedReceiveOption">{selectedRecieveOption}</p>
-        <QrCode addressState={addressState} navigate={navigate} />
+        <QrCode
+          addressState={addressState}
+          navigate={navigate}
+          location={location}
+        />
         <ReceiveButtonsContainer
           initialSendAmount={initialSendAmount}
           description={description}
@@ -113,7 +117,7 @@ export default function ReceiveQRPage() {
   );
 }
 
-function QrCode({ addressState, navigate }) {
+function QrCode({ addressState, navigate, location }) {
   if (addressState.isGeneratingInvoice) {
     return (
       <div className="qrCodeContainerReceivePage">
@@ -132,7 +136,9 @@ function QrCode({ addressState, navigate }) {
   }
   return (
     <div
-      onClick={() => copyToClipboard(addressState.generatedAddress, navigate)}
+      onClick={() =>
+        copyToClipboard(addressState.generatedAddress, navigate, location)
+      }
       className="qrCodeContainerReceivePage"
     >
       <QRCodeQrapper data={addressState.generatedAddress} />

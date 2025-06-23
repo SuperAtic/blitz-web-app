@@ -42,7 +42,7 @@ export default function TechnicalDetailsPage() {
         <div
           className="itemContainer"
           onClick={() => {
-            copyToClipboard(txItem);
+            copyToClipboard(txItem, navigate, location);
           }}
         >
           <ThemeText textContent={txItem || "N/A"} />
