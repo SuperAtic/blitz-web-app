@@ -9,6 +9,7 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 export default defineConfig(({ command, mode }) => {
   const isProduction = mode === "production";
   return {
+    base: '/blitz-web-app/', // Add this line for GitHub Pages
     plugins: [
       react(),
       wasm(),
