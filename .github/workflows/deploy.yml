@@ -3,10 +3,23 @@ on:
   push:
     branches: [ main ]
 jobs:
-  deploy:
+  lint:
+    name: Run ESLint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm run lint
+  
+  deploy:
+    name: Deploy
+    needs: lint  # Only deploy if linting passes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
