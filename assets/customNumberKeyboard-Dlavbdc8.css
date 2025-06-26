@@ -1,0 +1,1 @@
+.keyboard-container{display:flex;flex-direction:column;align-items:center}.keyboard-container .number-keyboard{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:300px;margin-bottom:20px}.keyboard-container .keyboard-key{padding:15px;font-size:18px;background:transparent;cursor:pointer}.keyboard-container .number-keyboard img{width:25px;height:25px}
